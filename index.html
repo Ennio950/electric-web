@@ -1,14 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Straight Wire Electric</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Straight Wire Electric | Solicita tu estimado</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+  <main class="page">
+    <header class="hero">
+      <p class="hero__eyebrow">Servicio eléctrico profesional en Estados Unidos</p>
+      <h1 class="hero__title">Straight Wire Electric</h1>
+      <p class="hero__subtitle">
+        Solicita tu estimado sin registro. Responderemos lo antes posible para coordinar la visita.
+      </p>
+    </header>
 
-  <h1>Straight Wire Electric</h1>
-  <p>Professional Electrical Services</p>
+    <section class="card">
+      <h2 class="card__title">Formulario de solicitud de estimado</h2>
+      <p class="card__subtitle">Completa todos los campos para generar tu solicitud por WhatsApp.</p>
 
+      <form id="estimate-form" class="form">
+        <div class="form__grid">
+          <label class="form__field">
+            <span class="form__label">Nombre completo</span>
+            <input type="text" name="nombre" required placeholder="Ej. María González">
+          </label>
+
+          <label class="form__field">
+            <span class="form__label">Teléfono</span>
+            <input type="tel" name="telefono" required placeholder="Ej. +1 555 123 4567">
+          </label>
+
+          <label class="form__field">
+            <span class="form__label">Email</span>
+            <input type="email" name="email" required placeholder="Ej. maria@email.com">
+          </label>
+
+          <label class="form__field">
+            <span class="form__label">Dirección</span>
+            <input type="text" name="direccion" required placeholder="Ej. 742 Evergreen Terrace, Springfield">
+          </label>
+
+          <label class="form__field">
+            <span class="form__label">Tipo de trabajo</span>
+            <select name="tipo" required>
+              <option value="" disabled selected>Selecciona una opción</option>
+              <option>Instalación residencial</option>
+              <option>Servicio comercial</option>
+              <option>Iluminación interior/exterior</option>
+              <option>Panel eléctrico / breaker</option>
+              <option>Cargador para vehículo eléctrico</option>
+              <option>Otro</option>
+            </select>
+          </label>
+
+          <fieldset class="form__field form__field--full">
+            <legend class="form__label">Nivel de urgencia</legend>
+            <div class="form__radios">
+              <label class="form__radio">
+                <input type="radio" name="urgencia" value="Normal" checked>
+                <span>Normal</span>
+              </label>
+              <label class="form__radio">
+                <input type="radio" name="urgencia" value="Urgente">
+                <span>Urgente</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <label class="form__field form__field--full">
+            <span class="form__label">Descripción del trabajo</span>
+            <textarea name="descripcion" rows="5" required placeholder="Cuéntanos los detalles del trabajo que necesitas."></textarea>
+          </label>
+        </div>
+
+        <label class="form__consent">
+          <input type="checkbox" name="consentimiento" required>
+          <span>Confirmo que deseo ser contactado para este estimado.</span>
+        </label>
+
+        <button class="button" type="submit">Enviar solicitud por WhatsApp</button>
+        <p class="form__note">* No se solicita registro. Tus datos se envían únicamente a Straight Wire Electric.</p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    // Número de WhatsApp de la empresa en formato internacional sin signos especiales.
+    // Ejemplo: 15551234567 (código de país + número).
+    const whatsappNumber = "15551234567";
+
+    const form = document.getElementById("estimate-form");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+
+      const nombre = formData.get("nombre");
+      const telefono = formData.get("telefono");
+      const email = formData.get("email");
+      const direccion = formData.get("direccion");
+      const tipo = formData.get("tipo");
+      const urgencia = formData.get("urgencia");
+      const descripcion = formData.get("descripcion");
+      const consentimiento = formData.get("consentimiento")
+        ? "Confirmo que deseo ser contactado para este estimado."
+        : "";
+
+      const message = `📩 NUEVA SOLICITUD DE ESTIMADO\n(Enviada desde la web)\n\n`
+        + `👤 Nombre: ${nombre}\n`
+        + `📞 Teléfono: ${telefono}\n`
+        + `📧 Email: ${email}\n`
+        + `📍 Dirección: ${direccion}\n\n`
+        + `🔧 Tipo de trabajo: ${tipo}\n`
+        + `⏱ Urgencia: ${urgencia}\n\n`
+        + `📝 Descripción: ${descripcion}\n\n`
+        + `✅ ${consentimiento}`;
+
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+      // Abre WhatsApp con el mensaje listo para enviar.
+      window.open(whatsappUrl, "_blank", "noopener");
+    });
+  </script>
 </body>
 </html>
