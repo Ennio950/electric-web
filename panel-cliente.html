@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Cliente | Straight Wire Electric</title>
+  <script src="assets/js/company-branding-bootstrap.js?v=20260310a"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/chat.css?v=20260213e" />
+  <style>
+    :root {
+      --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      min-height: 100dvh;
+      font-family: var(--font-family);
+      background-image: url('assets/images/bg-electric.webp');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      color: #fff;
+    }
+
+    /* Overlay for darkness */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.9) 100%);
+      z-index: -1;
+    }
+
+    /* Ambient Lighting (Futuristic Glows) */
+    .wrap {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 26px;
+      position: relative;
+    }
+
+    .wrap::before {
+      content: '';
+      position: fixed;
+      top: -10%;
+      left: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 60%);
+      filter: blur(60px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .wrap::after {
+      content: '';
+      position: fixed;
+      bottom: -10%;
+      right: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(250, 204, 21, 0.1) 0%, transparent 60%);
+      filter: blur(60px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Glass Panel */
+    .panel {
+      width: min(1200px, 96%);
+      background: rgba(20, 20, 20, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      border-radius: 24px;
+      padding: 24px;
+      position: relative;
+    }
+
+    /* Gradient Border Effect */
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(250, 204, 21, 0.3));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Topbar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      flex-wrap: wrap;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    .topbar-info {
+      opacity: 0.8;
+      font-size: 0.95rem;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons PRO */
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 0.92rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      filter: brightness(1.1);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-sm {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+    }
+
+    /* Map old classes to PRO colors */
+    .btn-primary {
+      background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
+      color: #000 !important;
+      box-shadow: 0 4px 6px -1px rgba(250, 204, 21, 0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      color: #fff;
+      box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+      color: #fff;
+    }
+
+    /* Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .request-form-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        background-attachment: scroll;
+      }
+
+      .wrap {
+        padding: 12px;
+      }
+
+      .panel {
+        width: 100%;
+        padding: 16px;
+        border-radius: 18px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .topbar-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .topbar-actions .btn {
+        width: 100%;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .request-form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .request-list {
+        max-height: unset;
+      }
+
+      .form-actions {
+        justify-content: stretch !important;
+      }
+
+      .form-actions .btn {
+        width: 100%;
+      }
+
+      .section-title {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .detail-panel-container {
+        padding: 16px;
+        min-height: 320px;
+      }
+
+      .proposal-amount {
+        font-size: 1.4rem;
+      }
+
+      .chat-msg {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .wrap {
+        padding: 8px;
+      }
+
+      .panel {
+        padding: 14px;
+        border-radius: 16px;
+      }
+
+      .topbar-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Section */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+      color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Create Form */
+    .form-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: rgba(6, 182, 212, 0.6);
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* Request List */
+    .request-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .request-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .request-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(4px);
+    }
+
+    .request-card.selected {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.5);
+    }
+
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .request-id {
+      font-family: monospace;
+      opacity: 0.6;
+      font-size: 0.9rem;
+    }
+
+    .request-meta {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+    }
+
+    /* Detail Panel */
+    .detail-panel-container {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 24px;
+      min-height: 400px;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-panel {
+      display: grid;
+      gap: 18px;
+    }
+
+    .detail-panel img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .proposal-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .close-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .rate-limit-msg {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #fcd34d;
+    }
+
+    .detail-section {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .detail-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .detail-summary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .detail-summary-body {
+      margin-top: 12px;
+    }
+
+    .detail-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .detail-value {
+      font-size: 1rem;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-unknown {
+      background: #64748b;
+    }
+
+    .badge-EN_ESPERA {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .badge-ASIGNADO {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    .badge-NEGOCIANDO {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .badge-EN_PROCESO {
+      background: #10b981;
+      color: white;
+    }
+
+    .badge-ESPERANDO_CIERRE_CLIENTE {
+      background: #06b6d4;
+      color: white;
+    }
+
+    .badge-PAGO_PENDIENTE_REVISION {
+      background: #ec4899;
+      color: white;
+    }
+
+    .badge-COMPLETADO {
+      background: #22c55e;
+      color: #022c22;
+    }
+
+    .badge-CANCELADO {
+      background: #94a3b8;
+      color: #1e293b;
+    }
+
+    /* Proposal Box */
+    .proposal-box {
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .proposal-amount {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #22d3ee;
+    }
+
+    /* Rating Starts */
+    .rating-stars {
+      display: flex;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .rating-star {
+      font-size: 2rem;
+      transition: transform 0.1s;
+    }
+
+    .rating-star:hover {
+      transform: scale(1.2);
+    }
+
+    .rating-star.active {
+      color: #facc15;
+    }
+
+    .rating-star.inactive {
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Chat Styling Override (using chat.css + customizations) */
+    .chat-container {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      height: 300px;
+      overflow-y: auto;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .chat-msg {
+      margin-bottom: 12px;
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+
+    .chat-msg.mine {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-msg.theirs {
+      background: rgba(255, 255, 255, 0.1);
+      margin-right: auto;
+      border-bottom-left-radius: 2px;
+    }
+
+    .chat-msg-meta {
+      font-size: 0.7rem;
+      opacity: 0.6;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .empty-state {
+      padding: 30px;
+      text-align: center;
+      opacity: 0.5;
+      font-style: italic;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+
+    .form-box,
+    .request-card,
+    .detail-panel-container,
+    .chat-container {
+      content-visibility: auto;
+      contain-intrinsic-size: 240px;
+    }
+
+    /* Remove X button from photo uploads */
+    #btnClearPhoto {
+      display: none !important;
+    }
+
+    @media (max-width: 900px), (hover: none), (pointer: coarse) {
+      body {
+        background-attachment: scroll;
+      }
+
+      .wrap::before,
+      .wrap::after {
+        filter: blur(28px);
+      }
+
+      .panel {
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.38);
+      }
+
+      .btn:hover:not(:disabled),
+      .request-card:hover,
+      .rating-star:hover {
+        transform: none;
+        box-shadow: none;
+        filter: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn,
+      .request-card,
+      .rating-star {
+        transition: none !important;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/css/panel-contrast.css?v=20260228g" />
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <!-- Top Bar -->
+      <div class="topbar">
+        <div>
+          <h2>🔌 Panel Cliente</h2>
+          <div class="topbar-info" id="userInfo">Cargando...</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary btn-sm" type="button" id="btnEmergency">Emergencia</button>
+          <button class="btn btn-secondary btn-sm" type="button" id="btnScheduledWork">Trabajo por horario</button>
+          <button class="btn btn-secondary btn-sm" id="btnRefresh">🔄 Actualizar</button>
+          <button class="btn btn-danger btn-sm" id="btnLogout">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="loading-state">
+        <div style="margin-bottom:10px;">⚡</div>
+        Cargando tu panel...
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="error-state" style="display:none; text-align:center; padding:40px;">
+        <p id="errorMsg" style="color:#fca5a5; margin-bottom:16px;">Error al cargar</p>
+        <button class="btn btn-secondary" id="btnRetry">Reintentar</button>
+      </div>
+
+      <!-- Main Content -->
+      <div id="mainContent" style="display:none;">
+
+        <!-- Create Request Form (Collapsible) -->
+        <div class="section" id="createFormSection">
+          <div class="form-box">
+            <div class="section-title" style="cursor:pointer; margin-bottom:0;" id="createFormHeader">
+              <span>➕ Nueva Solicitud</span>
+              <span id="createFormToggle" style="opacity:0.6;">▼</span>
+            </div>
+
+            <div id="createFormContent" style="margin-top:20px;">
+              <form id="createForm" class="form-grid">
+                <div class="request-form-row">
+                  <div class="form-group">
+                    <label>Categoría</label>
+                    <select id="createCategory">
+                      <option value="electricidad">⚡ Electricidad</option>
+                      <option value="plomeria">🔧 Plomería</option>
+                      <option value="general">🛠️ General</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Dirección</label>
+                    <input type="text" id="createAddress" placeholder="Ej: Av. Principal 123" required />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Descripción del problema</label>
+                  <textarea id="createDescription" placeholder="Describe detalladamente qué necesitas..."
+                    required></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>Foto (opcional)</label>
+                  <label for="createPhoto" class="btn btn-secondary btn-sm" style="display:inline-block; width:auto;">📷
+                    Subir Foto</label>
+                  <input type="file" id="createPhoto" accept="image/jpeg,image/png,image/webp" style="display:none;" />
+
+                  <div id="photoPreview"
+                    style="display:none; margin-top:12px; background:rgba(0,0,0,0.3); padding:8px; border-radius:10px; display:inline-flex; align-items:center; gap:10px;">
+                    <img id="photoPreviewImg" style="height:60px; border-radius:6px;" />
+                    <button type="button" class="btn btn-danger btn-sm" id="btnClearPhoto">✕</button>
+                  </div>
+                  <div id="uploadStatus" style="display:none; font-size:0.85rem; margin-top:8px; font-weight:600;">
+                  </div>
+                </div>
+
+                <div class="form-actions" style="display:flex; justify-content:flex-end;">
+                  <button type="submit" class="btn btn-primary" id="btnCreateSubmit">Crear Solicitud</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layout Grid -->
+        <div class="main-grid">
+
+          <!-- Left: List -->
+          <div class="section">
+            <div class="section-title">
+              <span>📋 Mis Solicitudes</span>
+              <span id="requestCount" class="badge badge-unknown" style="background:rgba(255,255,255,0.1);">0</span>
+            </div>
+            <div id="requestList" class="request-list">
+              <!-- JS injected -->
+              <div class="empty-state">No tienes solicitudes activas</div>
+            </div>
+          </div>
+
+          <!-- Right: Detail -->
+          <div class="section">
+            <div class="section-title">📄 Detalle</div>
+            <div id="detailPanel" class="detail-panel-container">
+              <div
+                style="height:100%; display:flex; align-items:center; justify-content:center; opacity:0.5; flex-direction:column;">
+                <div style="font-size:3rem; margin-bottom:16px;">👈</div>
+                Selecciona una solicitud
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth } from "./assets/js/firebase.js";
+    import { onAuthStateChanged, signOut } from "./assets/vendor/firebase/firebase-auth.js";
+    import { apiFetch, API_BASE, uploadImage } from "./assets/js/api.js?v=20260310b";
+    import { loadCompanyConfig, normalizeServiceCategories } from "./assets/js/company-config.js?v=20260310a";
+    import { clearPortalSession } from "./assets/js/portal-session.js";
+    import {
+      createRequest,
+      listClientRequests,
+      getRequest,
+      acceptProposal,
+      rejectProposal,
+      clientClose,
+      cancelRequest,
+      submitPaymentProof,
+      STATUS,
+      STATUS_LABELS,
+      STATUS_COLORS
+    } from "./assets/js/marketplace-api.js";
+
+    // ================================================================
+    // State
+    // ================================================================
+    let currentUser = null;
+    let requests = [];
+    let selectedRequestId = null;
+    let selectedRequest = null;
+    let chatMessages = [];
+    let pollInterval = null;
+    let isRateLimited = false;
+
+    // Close Work Draft State (prevents polling from resetting form)
+    let closeDraft = {
+      amount: "",
+      rating: 0,
+      photoUrl: "",
+      dirty: false
+    };
+
+    // ================================================================
+    // DOM References
+    // ================================================================
+    const loadingState = document.getElementById("loadingState");
+    const errorState = document.getElementById("errorState");
+    const errorMsg = document.getElementById("errorMsg");
+    const mainContent = document.getElementById("mainContent");
+    const userInfo = document.getElementById("userInfo");
+    const requestList = document.getElementById("requestList");
+    const requestCount = document.getElementById("requestCount");
+    const detailPanel = document.getElementById("detailPanel");
+    const createCategorySelect = document.getElementById("createCategory");
+
+    function populateCategoryOptions(config = {}) {
+      if (!createCategorySelect) return;
+      const categories = normalizeServiceCategories(config?.serviceCategories);
+      const currentValue = String(createCategorySelect.value || "").trim().toLowerCase();
+
+      createCategorySelect.innerHTML = categories.map((category) => {
+        const key = String(category.key || "").trim().toLowerCase();
+        const label = String(category.label || key || "Categoria");
+        const icon = String(category.icon || "").trim();
+        const display = `${icon ? `${icon} ` : ""}${label}`;
+        return `<option value="${key}">${display}</option>`;
+      }).join("");
+
+      const hasCurrent = categories.some((category) => String(category.key || "").trim().toLowerCase() === currentValue);
+      createCategorySelect.value = hasCurrent
+        ? currentValue
+        : String(categories[0]?.key || "general").trim().toLowerCase();
+    }
+
+    // ================================================================
+    // UI Helpers
+    // ================================================================
+    function showLoading() {
+      loadingState.style.display = "block";
+      errorState.style.display = "none";
+      mainContent.style.display = "none";
+    }
+
+    function showError(msg) {
+      loadingState.style.display = "none";
+      errorState.style.display = "block";
+      errorMsg.textContent = msg;
+      mainContent.style.display = "none";
+    }
+
+    function showMain() {
+      loadingState.style.display = "none";
+      errorState.style.display = "none";
+      mainContent.style.display = "block";
+    }
+
+    function formatDate(isoStr) {
+      if (!isoStr) return "—";
+      try {
+        return new Date(isoStr).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" });
+      } catch { return "—"; }
+    }
+
+    function statusBadge(status) {
+      const label = STATUS_LABELS[status] || status || "Desconocido";
+      return `<span class="badge badge-${status || 'unknown'}">${label}</span>`;
+    }
+
+    // ================================================================
+    // Auth & Init
+    // ================================================================
+    async function init() {
+      showLoading();
+      try {
+        // Verify role with backend
+        const res = await apiFetch("/api/client/me");
+        if (!res || !res.data) throw new Error("No data");
+        const companyConfig = await loadCompanyConfig();
+
+        userInfo.textContent = `👤 ${currentUser.email || currentUser.uid}`;
+        populateCategoryOptions(companyConfig);
+
+        // Accordion Toggle
+        const header = document.getElementById("createFormHeader");
+        const content = document.getElementById("createFormContent");
+        const toggle = document.getElementById("createFormToggle");
+
+        if (header && content && toggle && !header.dataset.toggleBound) {
+          header.dataset.toggleBound = "true";
+          header.addEventListener("click", () => {
+            const isHidden = content.style.display === "none";
+            content.style.display = isHidden ? "block" : "none";
+            toggle.textContent = isHidden ? "▲" : "▼";
+          });
+        }
+
+        await loadRequests();
+        showMain();
+        startPolling();
+      } catch (err) {
+        console.error("[panel-cliente] init error:", err);
+        if (err.status === 401 || err.status === 403) {
+          await doLogout();
+          return;
+        }
+        showError("Error al cargar el panel. " + (err.message || ""));
+      }
+    }
+
+    async function doLogout() {
+      stopPolling();
+      try { await signOut(auth); } catch (e) { console.error("signOut error", e); }
+      await clearPortalSession({ revoke: true });
+      localStorage.removeItem("clientName");
+      sessionStorage.clear();
+      window.location.href = "login-gateway.html";
+    }
+
+    // ================================================================
+    // Load Requests
+    // ================================================================
+    async function loadRequests(silent = false) {
+      try {
+        const res = await listClientRequests({ limit: 50 });
+        requests = res.data || [];
+
+        updateCreateConstraint(silent); // Enforce limits and collapse state
+
+        renderRequestList();
+
+        // If we had a selected request, refresh it
+        if (selectedRequestId) {
+          const found = requests.find(r => r.id === selectedRequestId);
+          if (found) {
+            const prevStatus = selectedRequest?.status;
+            // Detect if something major changed that requires full re-render
+            const statusChanged = prevStatus !== found.status;
+            const proposalChanged = JSON.stringify(selectedRequest?.proposal) !== JSON.stringify(found?.proposal);
+            const proofChanged = selectedRequest?.paymentProofUrl !== found?.paymentProofUrl;
+
+            selectedRequest = found;
+
+            // Don't re-render if user is editing close form
+            const isCloseScreen = selectedRequest?.status === "ESPERANDO_CIERRE_CLIENTE";
+            if (isCloseScreen && closeDraft.dirty) {
+              console.log('[panel-cliente] Skipping render - closeDraft is dirty');
+              return;
+            }
+
+            // If silent poll, ONLY render if status/proposal changed. 
+            // Otherwise, we wipe input fields while user types!
+            if (silent && !statusChanged && !proposalChanged && !proofChanged) {
+              // No major changes, skip full re-render
+              return;
+            }
+
+            renderDetail();
+          }
+        }
+      } catch (err) {
+        console.error("[panel-cliente] loadRequests error:", err);
+      }
+    }
+
+    function updateCreateConstraint(silent = false) {
+      // Definition of Active: Not Completed, Not Cancelled
+      const activeCount = requests.filter(r =>
+        r.status !== "COMPLETADO" && r.status !== "CANCELADO"
+      ).length;
+
+      const formContent = document.getElementById("createFormContent");
+      const formToggle = document.getElementById("createFormToggle");
+      const submitBtn = document.getElementById("btnCreateSubmit");
+      const inputs = document.querySelectorAll("#createForm input, #createForm select, #createForm textarea");
+
+      // 1. Auto-Collapse if active > 0 (ONLY on initial load or non-silent updates)
+      // If silent (polling/refresh), we respect user's current toggle state
+      if (!silent) {
+        if (activeCount > 0) {
+          formContent.style.display = "none";
+          formToggle.textContent = "▼";
+        } else {
+          formContent.style.display = "block";
+          formToggle.textContent = "▲";
+        }
+      }
+
+      // 2. Limit Max 3 (Always check this to enforce disabled state)
+      const limitMsgId = "limitMsg";
+      let limitMsg = document.getElementById(limitMsgId);
+
+      if (activeCount >= 3) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Límite Alcanzado (3/3)";
+        inputs.forEach(i => i.disabled = true);
+
+        if (!limitMsg) {
+          limitMsg = document.createElement("div");
+          limitMsg.id = limitMsgId;
+          limitMsg.style.cssText = "background:rgba(239,68,68,0.2); color:#fca5a5; padding:12px; border-radius:8px; margin-top:10px; border:1px solid rgba(239,68,68,0.4); font-weight:bold; text-align:center;";
+          limitMsg.textContent = "⚠️ Has alcanzado el límite de 3 solicitudes activas. Finaliza o cancela alguna para crear otra.";
+          const box = document.querySelector(".form-box");
+          if (box) box.insertBefore(limitMsg, document.getElementById("createFormContent"));
+        }
+
+      } else {
+        if (limitMsg) limitMsg.remove();
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Crear Solicitud";
+        inputs.forEach(i => i.disabled = false);
+      }
+    }
+
+    function renderRequestList() {
+      if (requests.length === 0) {
+        requestList.innerHTML = `<div class="empty-state">No tienes solicitudes aún. ¡Crea una arriba!</div>`;
+        requestCount.textContent = "";
+        return;
+      }
+
+      requestCount.textContent = `(${requests.length})`;
+      requestList.innerHTML = requests.map(r => {
+        const isSelected = r.id === selectedRequestId;
+        return `
+          <div class="request-card ${isSelected ? 'selected' : ''}" data-id="${r.id}">
+            <div class="request-header">
+              <span class="request-id">#${r.id.slice(0, 8)}...</span>
+              ${statusBadge(r.status)}
+            </div>
+            <div class="request-meta">
+              📍 ${r.address || "—"}<br/>
+              📝 ${(r.description || "").slice(0, 60)}${(r.description || "").length > 60 ? "..." : ""}<br/>
+              🕒 ${formatDate(r.createdAt)}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Add click handlers
+      requestList.querySelectorAll(".request-card").forEach(card => {
+        card.addEventListener("click", () => selectRequest(card.dataset.id));
+      });
+    }
+
+    // ================================================================
+    // Select & Detail
+    // ================================================================
+    async function selectRequest(id) {
+      selectedRequestId = id;
+      selectedRequest = requests.find(r => r.id === id);
+      renderRequestList(); // Update selection highlight
+
+      // Fetch fresh detail
+      try {
+        const res = await getRequest(id);
+        selectedRequest = res.data;
+        await loadChatMessages();
+        renderDetail();
+      } catch (err) {
+        console.error("[panel-cliente] getRequest error:", err);
+        detailPanel.innerHTML = `<div class="error-state">Error al cargar detalle</div>`;
+      }
+    }
+
+    function renderDetail() {
+      if (!selectedRequest) {
+        detailPanel.innerHTML = `<div class="empty-state">Selecciona una solicitud para ver detalles</div>`;
+        return;
+      }
+
+      const r = selectedRequest;
+      const status = r.status || "unknown";
+      console.log("[panel-cliente] renderDetail status =", status, "id =", r.id);
+
+      // Canonical status checks
+      const canAcceptReject = status === "NEGOCIANDO" && !!r.proposal && !!r.assignedEmployeeId;
+      const canClose = status === "ESPERANDO_CIERRE_CLIENTE";
+      const canUploadPaymentProof = status === "ESPERANDO_COMPROBANTE_PAGO";
+      const canChat = !!r.assignedEmployeeId && !["CANCELADO", "COMPLETADO", "EN_ESPERA", "ESPERANDO_COMPROBANTE_PAGO", "PAGO_PENDIENTE_REVISION"].includes(status);
+      const canCancel = status === "EN_ESPERA";
+      const summaryCollapsed = canChat;
+      const proposalCollapsed = status !== "NEGOCIANDO";
+      const chatCollapsed = canChat && status === "ESPERANDO_CIERRE_CLIENTE";
+
+      let html = `<div class="detail-panel">`;
+
+      // Employee assigned (always above status)
+      if (r.assignedEmployeeId) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-label">Tecnico asignado</div>
+            <div class="detail-value">
+              &#128119; ${r.employeeName || r.employeeEmail || r.assignedEmployeeId.slice(0, 8) + "..."}
+              <button class="btn btn-sm" style="margin-left:8px;background:#6366f1;color:#fff;font-size:.75rem;padding:4px 8px;"
+                type="button"
+                data-client-detail-action="show-employee-profile"
+                data-employee-id="${encodeURIComponent(r.assignedEmployeeId || "")}">
+                &#11088; Ver perfil
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Status & Summary
+      html += `
+        <div class="detail-section">
+          <div class="detail-label">Estado</div>
+          <div class="detail-value">${statusBadge(status)}</div>
+        </div>
+      `;
+
+      html += `
+        <div class="detail-section" id="detailSummary">
+          <div class="detail-summary-header" id="detailSummaryToggle">
+            <div class="detail-label">Detalles de la solicitud</div>
+            <button type="button" class="btn btn-secondary btn-sm" id="detailSummaryBtn">
+              ${summaryCollapsed ? "Mostrar" : "Ocultar"}
+            </button>
+          </div>
+          <div class="detail-summary-body" id="detailSummaryBody" style="${summaryCollapsed ? "display:none;" : ""}">
+            <div class="detail-label" style="margin-top:10px;">Descripcion</div>
+            <div class="detail-value">${r.description || "-"}</div>
+            <div class="detail-label" style="margin-top:14px;">Direccion</div>
+            <div class="detail-value">${r.address || "-"}</div>
+            <div class="detail-label" style="margin-top:14px;">Creado</div>
+            <div class="detail-value">${formatDate(r.createdAt)}</div>
+          </div>
+        </div>
+      `;
+
+      // Proposal
+      if (r.proposal) {
+        // Support both new secure object and legacy URL
+        const hasPdf = r.proposal.estimatePdf || r.proposal.estimatePdfUrl;
+
+        let pdfButtons = '';
+        if (hasPdf) {
+          // Extract safe ID
+          const pid = r.proposal.estimatePdf?.public_id ? encodeURIComponent(r.proposal.estimatePdf.public_id) : '';
+
+          pdfButtons = `
+            <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button type="button" class="btn-hero" style="background:#3b82f6; font-size:0.9rem; padding:8px 16px; border:none; color:white; cursor:pointer;" data-client-detail-action="view-secure-pdf" data-request-id="${encodeURIComponent(r.id || "")}" data-download="0">
+                📄 Ver PDF Seguro
+              </button>
+              <button type="button" class="btn-hero" style="background:rgba(255,255,255,0.1); font-size:0.9rem; padding:8px 16px; border:none; color:white; cursor:pointer;" data-client-detail-action="view-secure-pdf" data-request-id="${encodeURIComponent(r.id || "")}" data-download="1">
+                ⬇️ Descargar
+              </button>
+            </div>
+            `;
+        }
+
+        html += `
+          <div class="detail-section" id="proposalSection">
+            <div class="detail-summary-header" id="proposalToggle">
+              <div class="detail-label">Propuesta del técnico</div>
+              <button type="button" class="btn btn-secondary btn-sm" id="proposalToggleBtn">
+                ${proposalCollapsed ? "Mostrar" : "Ocultar"}
+              </button>
+            </div>
+            <div class="detail-summary-body" id="proposalBody" style="${proposalCollapsed ? "display:none;" : ""}">
+              <div class="proposal-box">
+                <div class="proposal-amount">$${r.proposal.amount?.toLocaleString() || "0"}</div>
+                ${r.proposal.notes ? `<div style="margin-top:6px;opacity:0.9;">${r.proposal.notes}</div>` : ""}
+                ${pdfButtons}
+                ${canAcceptReject ? `
+                  <div class="proposal-actions">
+                    <button class="btn btn-success btn-sm" id="btnAccept">✓ Aceptar</button>
+                    <button class="btn btn-danger btn-sm" id="btnReject">✗ Rechazar</button>
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Chat Section
+      if (canChat) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-summary-header" id="chatToggle">
+              <div class="detail-label">💬 Chat con técnico</div>
+              <button type="button" class="btn btn-secondary btn-sm" id="chatToggleBtn">
+                ${chatCollapsed ? "Mostrar" : "Ocultar"}
+              </button>
+            </div>
+            <div class="detail-summary-body" id="chatBody" style="${chatCollapsed ? "display:none;" : ""}">
+              <div class="chat-container" id="chatContainer">
+                ${renderChatMessages()}
+              </div>
+              <div class="chat-input-row" style="display:flex; gap:8px; align-items:flex-end; margin-top:10px;">
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="width:100%; border-radius:12px; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; min-height:45px;" />
+                  
+                  <!-- Attachments Preview -->
+                  <div id="chatPreviewArea" style="display:none; gap:8px; margin-top:8px; flex-wrap:wrap;"></div>
+                </div>
+                
+                <!-- Camera/Gallery Button -->
+                <!-- accept="image/*" facilitates camera on mobile. capture attribute helps but may restrict to ONLY camera on some devices, so usually accept="image/*" is safer. 
+                     However user explicitly wants camera options. "capture" can force it. -->
+                <input type="file" id="chatFileApi" accept="image/*" multiple style="display:none;" />
+                
+                <button class="btn btn-secondary" id="btnChatAttach" type="button" style="padding:0; width:45px; height:45px; border-radius:12px; font-size:1.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;">📷</button>
+                
+                <button class="btn btn-primary" id="btnSendChat" type="button" style="padding:0; width:45px; height:45px; border-radius:12px; font-size:1.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;">➤</button>
+              </div>
+              <div class="rate-limit-msg" id="rateLimitMsg" style="display:none;">⏳ Espera 3 segundos entre mensajes</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Close Work Form
+      if (canClose) {
+        const defaultAmount = closeDraft.amount !== "" ? closeDraft.amount : (r.proposal?.amount ?? "");
+        const defaultPhotoUrl = closeDraft.photoUrl || "";
+        const starsHtml = [1, 2, 3, 4, 5].map(n =>
+          `<span class="rating-star ${n <= closeDraft.rating ? 'active' : 'inactive'}" data-value="${n}">★</span>`
+        ).join("");
+
+        html += `
+          <div class="detail-section">
+            <div class="detail-label">✅ Cerrar trabajo</div>
+            <div class="close-form">
+              <div class="form-group">
+                <label>Monto final ($)</label>
+                <input type="number" id="closeAmount" min="0" step="0.01" value="${defaultAmount}" />
+              </div>
+              <div class="form-group">
+                <label>Calificación</label>
+                <div class="rating-stars" id="ratingStars">
+                  ${starsHtml}
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Foto del trabajo (obligatoria)</label>
+                <input type="file" id="closePhotoFile" accept="image/jpeg,image/png,image/webp" style="margin-bottom:8px;" />
+                <div id="closePhotoPreview" style="display:none; gap:10px; align-items:center;">
+                  <img id="closePhotoPreviewImg" style="width:90px;height:60px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.2);" />
+                  <button class="btn btn-secondary btn-sm" type="button" id="btnClearClosePhoto">Quitar</button>
+                </div>
+                <div id="closeUploadStatus" style="margin-top:8px; display:none; font-size:.85rem;"></div>
+                <input type="hidden" id="closePhoto" value="${defaultPhotoUrl}" />
+              </div>
+              <button class="btn btn-success" id="btnCloseWork">Cerrar y calificar</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Cancel button
+      if (canCancel) {
+        html += `
+          <div class="detail-section">
+            <button class="btn btn-danger btn-sm" id="btnCancel">Cancelar solicitud</button>
+          </div>
+        `;
+      }
+
+      // Payment Proof - Client just waits (employee uploads the proof)
+      if (canUploadPaymentProof) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-label">&#9203; Esperando aprobacion del jefe</div>
+            <div class="detail-value" style="font-size:.9rem; opacity:.85;">
+              Esperando aprobacion del jefe.
+            </div>
+          </div>
+        `;
+      }
+
+      // Show payment proof if already submitted (waiting boss approval)
+      if (status === "PAGO_PENDIENTE_REVISION") {
+        html += `
+          <div class="detail-section">
+            <div class="detail-label">📎 Comprobante recibido</div>
+            <div class="detail-value" style="font-size:.9rem;">
+              ${r.paymentProofUrl ? `<a href="${r.paymentProofUrl}" target="_blank" style="color:#60a5fa;">Ver comprobante ↗</a>` : ''}
+              <div style="margin-top:8px; opacity:.8;">⏳ Esperando aprobación del jefe...</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Final amount if completed
+      if (r.finalAmount) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-label">Monto final</div>
+            <div class="detail-value" style="font-size:1.2rem;color:#10b981;">$${r.finalAmount.toLocaleString()}</div>
+          </div>
+        `;
+      }
+      if (r.clientRating) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-label">Tu calificación</div>
+            <div class="detail-value">${"★".repeat(r.clientRating)}${"☆".repeat(5 - r.clientRating)}</div>
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+      detailPanel.innerHTML = html;
+
+      // Wire up event handlers
+      wireDetailHandlers();
+    }
+
+    function renderChatMessages() {
+      if (chatMessages.length === 0) {
+        return `<div class="chat-empty">No hay mensajes aún</div>`;
+      }
+      return chatMessages.map(m => {
+        const isMine = m.senderId === currentUser?.uid || m.senderRole === 'client';
+
+        let attachmentsHtml = "";
+        if (Array.isArray(m.attachments) && m.attachments.length > 0) {
+          attachmentsHtml = `<div style="display:flex; gap:5px; margin-top:6px; flex-wrap:wrap;">` +
+            m.attachments.map(url => `
+                <a href="${url}" target="_blank">
+                  <img src="${url}" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.2);">
+                </a>`
+            ).join("") + `</div>`;
+        }
+
+        return `
+          <div class="chat-msg ${isMine ? 'mine' : 'theirs'}">
+            ${m.text ? `<div style="white-space:pre-wrap;">${m.text}</div>` : ""}
+            ${attachmentsHtml}
+            <div class="chat-msg-meta">${formatDate(m.createdAt)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadChatMessages() {
+      if (!selectedRequestId) return;
+      try {
+        // REST API for chat
+        const res = await apiFetch(`/api/marketplace/requests/${selectedRequestId}/chat?limit=50`);
+        chatMessages = res.data || [];
+      } catch (err) {
+        console.error("[panel-cliente] loadChatMessages error:", err.status, err.body || err);
+        chatMessages = [];
+      }
+    }
+
+    // ================================================================
+    // Detail Event Handlers
+    // ================================================================
+    function wireDetailHandlers() {
+      // Accept Proposal
+      const btnAccept = document.getElementById("btnAccept");
+      if (btnAccept) {
+        btnAccept.addEventListener("click", async () => {
+          btnAccept.disabled = true;
+          try {
+            await acceptProposal(selectedRequestId);
+            await loadRequests();
+            await selectRequest(selectedRequestId);
+          } catch (err) {
+            alert("Error al aceptar: " + (err.message || err));
+          }
+          btnAccept.disabled = false;
+        });
+      }
+
+      // Reject Proposal
+      const btnReject = document.getElementById("btnReject");
+      if (btnReject) {
+        btnReject.addEventListener("click", async () => {
+          btnReject.disabled = true;
+          try {
+            await rejectProposal(selectedRequestId);
+            await loadRequests();
+            await selectRequest(selectedRequestId);
+          } catch (err) {
+            alert("Error al rechazar: " + (err.message || err));
+          }
+          btnReject.disabled = false;
+        });
+      }
+
+      document.querySelectorAll('[data-client-detail-action="show-employee-profile"]').forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const employeeId = decodeURIComponent(btn.dataset.employeeId || "");
+          await window.showEmployeeProfile(employeeId);
+        });
+      });
+
+      document.querySelectorAll('[data-client-detail-action="view-secure-pdf"]').forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const requestId = decodeURIComponent(btn.dataset.requestId || "");
+          const download = btn.dataset.download === "1";
+          await window.viewSecurePdf(requestId, download);
+        });
+      });
+
+      // Chat Logic
+      const btnSendChat = document.getElementById("btnSendChat");
+      const chatInput = document.getElementById("chatInput");
+      const chatFileApi = document.getElementById("chatFileApi");
+      const btnChatAttach = document.getElementById("btnChatAttach");
+      const chatPreviewArea = document.getElementById("chatPreviewArea");
+      const rateLimitMsg = document.getElementById("rateLimitMsg");
+
+      let chatAttachments = []; // Array of File objects
+      const MAX_CHAT_PHOTOS = 3;
+
+      const getClientAttachmentCount = () => {
+        return (chatMessages || []).reduce((sum, m) => {
+          const isMine = m.senderId === currentUser?.uid || m.senderRole === 'client';
+          if (!isMine) return sum;
+          if (Array.isArray(m.attachments)) return sum + m.attachments.length;
+          return sum;
+        }, 0);
+      };
+
+      const getRemainingSlots = () => {
+        return Math.max(0, MAX_CHAT_PHOTOS - getClientAttachmentCount() - chatAttachments.length);
+      };
+
+      if (btnSendChat && chatInput) {
+        // Toggle file picker
+        btnChatAttach?.addEventListener("click", () => {
+          chatFileApi.click();
+        });
+
+        // Handle file selection
+        chatFileApi?.addEventListener("change", (e) => {
+          const files = Array.from(e.target.files || []);
+          if (!files.length) return;
+
+          // Limit total to 3 across the entire chat (client side)
+          const slots = getRemainingSlots();
+          if (slots <= 0) {
+            alert("Ya alcanzaste el máximo de 3 fotos en este chat.");
+            chatFileApi.value = "";
+            return;
+          }
+
+          const toAdd = files.slice(0, slots);
+          if (files.length > slots) {
+            alert(`Solo puedes agregar ${slots} foto(s) más en este chat.`);
+          }
+          chatAttachments = [...chatAttachments, ...toAdd];
+          renderChatPreview();
+          chatFileApi.value = ""; // Reset for next pick
+        });
+
+        function renderChatPreview() {
+          if (chatAttachments.length === 0) {
+            chatPreviewArea.style.display = "none";
+            chatPreviewArea.innerHTML = "";
+            return;
+          }
+          chatPreviewArea.style.display = "flex";
+          chatPreviewArea.innerHTML = chatAttachments.map((file, i) => {
+            const url = URL.createObjectURL(file);
+            return `
+                <div style="position:relative; width:60px; height:60px;">
+                  <img src="${url}" style="width:100%; height:100%; object-fit:cover; border-radius:8px; border:1px solid #444;">
+                  <button data-idx="${i}" class="btn-remove-preview" 
+                    style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; width:18px; height:18px; font-size:10px; border:none; cursor:pointer;">✕</button>
+                </div>
+              `;
+          }).join("");
+
+          // Bind remove buttons
+          chatPreviewArea.querySelectorAll(".btn-remove-preview").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+              const idx = parseInt(e.target.dataset.idx);
+              chatAttachments.splice(idx, 1);
+              renderChatPreview();
+            });
+          });
+        }
+
+        const doSend = async () => {
+          const text = chatInput.value.trim();
+          if ((!text && chatAttachments.length === 0) || isRateLimited) return;
+
+          btnSendChat.disabled = true;
+          btnSendChat.textContent = "⏳"; // Loading indicator
+
+          try {
+            const remaining = MAX_CHAT_PHOTOS - getClientAttachmentCount();
+            if (chatAttachments.length > 0 && remaining <= 0) {
+              alert("Ya alcanzaste el máximo de 3 fotos en este chat.");
+              return;
+            }
+            if (chatAttachments.length > remaining) {
+              alert(`Solo puedes enviar ${remaining} foto(s) más en este chat.`);
+              return;
+            }
+
+            // 1. Upload images if any
+            let attachmentUrls = [];
+            if (chatAttachments.length > 0) {
+              for (const file of chatAttachments) {
+                const up = await uploadImage(file);
+                if (up?.url || up?.secure_url) {
+                  attachmentUrls.push(up.url || up.secure_url);
+                }
+              }
+            }
+
+            // 2. Send Message
+            const payload = {
+              text,
+              attachments: attachmentUrls
+            };
+
+            await apiFetch(`/api/marketplace/requests/${selectedRequestId}/chat`, {
+              method: 'POST',
+              body: JSON.stringify(payload)
+            });
+
+            // 3. Reset UI
+            chatInput.value = "";
+            chatAttachments = [];
+            renderChatPreview();
+
+            await loadChatMessages();
+            const container = document.getElementById("chatContainer");
+            if (container) {
+              container.innerHTML = renderChatMessages();
+              container.scrollTop = container.scrollHeight;
+            }
+          } catch (err) {
+            console.error("[panel-cliente] sendChat error:", err.status, err.body || err);
+            if (err.status === 429) {
+              isRateLimited = true;
+              if (rateLimitMsg) rateLimitMsg.style.display = "block";
+              setTimeout(() => {
+                isRateLimited = false;
+                if (rateLimitMsg) rateLimitMsg.style.display = "none";
+              }, 3000);
+            } else {
+              alert("Error al enviar: " + (err.message || err));
+            }
+          } finally {
+            btnSendChat.disabled = false;
+            btnSendChat.textContent = "➤";
+          }
+        };
+
+        btnSendChat.addEventListener("click", doSend);
+        chatInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") doSend();
+        });
+      }
+
+      const wireToggle = (toggleId, buttonId, bodyId) => {
+        const toggle = document.getElementById(toggleId);
+        const btn = document.getElementById(buttonId);
+        const body = document.getElementById(bodyId);
+        if (!toggle || !btn || !body) return;
+        const doToggle = () => {
+          const isHidden = body.style.display === "none";
+          body.style.display = isHidden ? "block" : "none";
+          btn.textContent = isHidden ? "Ocultar" : "Mostrar";
+        };
+        toggle.addEventListener("click", doToggle);
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          doToggle();
+        });
+      };
+
+      // Summary toggle
+      wireToggle("detailSummaryToggle", "detailSummaryBtn", "detailSummaryBody");
+      // Proposal toggle
+      wireToggle("proposalToggle", "proposalToggleBtn", "proposalBody");
+      // Chat toggle
+      wireToggle("chatToggle", "chatToggleBtn", "chatBody");
+
+      // Rating Stars
+      const ratingStars = document.getElementById("ratingStars");
+      if (ratingStars) {
+        ratingStars.querySelectorAll(".rating-star").forEach(star => {
+          star.addEventListener("click", () => {
+            closeDraft.rating = parseInt(star.dataset.value);
+            closeDraft.dirty = true;
+            ratingStars.querySelectorAll(".rating-star").forEach((s, i) => {
+              s.classList.toggle("active", i < closeDraft.rating);
+              s.classList.toggle("inactive", i >= closeDraft.rating);
+            });
+          });
+        });
+      }
+
+      // Close Work
+      const btnCloseWork = document.getElementById("btnCloseWork");
+      if (btnCloseWork) {
+        btnCloseWork.addEventListener("click", async () => {
+          const amountRaw = document.getElementById("closeAmount")?.value || closeDraft.amount || "0";
+          const amount = parseFloat(amountRaw);
+          const closePhotoUrl = document.getElementById("closePhoto")?.value?.trim() || closeDraft.photoUrl || "";
+          const closeFile = document.getElementById("closePhotoFile")?.files?.[0];
+
+          if (!amount || amount <= 0) {
+            alert("Ingresa un monto válido");
+            return;
+          }
+          if (!closeDraft.rating) {
+            alert("Selecciona una calificación");
+            return;
+          }
+
+          let finalPhotoUrl = closePhotoUrl;
+
+          // Upload file if selected and no URL provided
+          if (!finalPhotoUrl && closeFile) {
+            const statusEl = document.getElementById("closeUploadStatus");
+            if (statusEl) {
+              statusEl.style.display = "block";
+              statusEl.style.color = "#bfdbfe";
+              statusEl.textContent = "⏳ Subiendo foto...";
+            }
+
+            try {
+              const up = await uploadImage(closeFile);
+              finalPhotoUrl = up?.url || up?.secure_url || "";
+
+              if (statusEl) {
+                statusEl.style.color = finalPhotoUrl ? "#86efac" : "#fca5a5";
+                statusEl.textContent = finalPhotoUrl ? "✅ Foto subida" : "❌ No se pudo subir la foto";
+              }
+
+              if (finalPhotoUrl) {
+                const urlEl = document.getElementById("closePhoto");
+                if (urlEl) urlEl.value = finalPhotoUrl;
+                closeDraft.photoUrl = finalPhotoUrl;
+              }
+            } catch (uploadErr) {
+              console.error("[panel-cliente] Close photo upload error:", uploadErr);
+              if (statusEl) {
+                statusEl.style.color = "#fca5a5";
+                statusEl.textContent = "❌ Error al subir foto";
+              }
+            }
+          }
+
+          if (!finalPhotoUrl) {
+            alert("Agrega una foto (sube archivo o pega URL)");
+            return;
+          }
+
+          btnCloseWork.disabled = true;
+          try {
+            await clientClose(selectedRequestId, {
+              finalAmount: amount,
+              clientRating: closeDraft.rating,
+              finalPhotoUrl: finalPhotoUrl
+            });
+            alert("¡Trabajo cerrado exitosamente!");
+            closeDraft = { amount: "", rating: 0, photoUrl: "", dirty: false };
+            await loadRequests();
+            await selectRequest(selectedRequestId);
+          } catch (err) {
+            alert("Error al cerrar: " + (err.message || err));
+          }
+          btnCloseWork.disabled = false;
+        });
+      }
+
+      // Close Draft: Amount listener
+      const closeAmountEl = document.getElementById("closeAmount");
+      if (closeAmountEl) {
+        closeAmountEl.addEventListener("input", () => {
+          closeDraft.amount = closeAmountEl.value;
+          closeDraft.dirty = true;
+        });
+      }
+
+      // Close Draft: Photo URL listener
+      const closePhotoEl = document.getElementById("closePhoto");
+      if (closePhotoEl) {
+        closePhotoEl.addEventListener("input", () => {
+          closeDraft.photoUrl = closePhotoEl.value.trim();
+          closeDraft.dirty = true;
+        });
+      }
+
+      // Close Draft: File upload with preview
+      const closeFileEl = document.getElementById("closePhotoFile");
+      const closePreview = document.getElementById("closePhotoPreview");
+      const closePreviewImg = document.getElementById("closePhotoPreviewImg");
+      const btnClearClosePhoto = document.getElementById("btnClearClosePhoto");
+
+      if (closeFileEl) {
+        closeFileEl.addEventListener("change", (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          closeDraft.dirty = true;
+
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            if (closePreviewImg) closePreviewImg.src = ev.target.result;
+            if (closePreview) closePreview.style.display = "flex";
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      if (btnClearClosePhoto) {
+        btnClearClosePhoto.addEventListener("click", () => {
+          if (closeFileEl) closeFileEl.value = "";
+          if (closePreview) closePreview.style.display = "none";
+          closeDraft.dirty = true;
+        });
+      }
+
+      // ================================================================
+      // Payment Proof Upload Handlers
+      // ================================================================
+      const paymentProofFileEl = document.getElementById("paymentProofFile");
+      const paymentProofUrlEl = document.getElementById("paymentProofUrl");
+      const paymentProofPreview = document.getElementById("paymentProofPreview");
+      const paymentProofPreviewImg = document.getElementById("paymentProofPreviewImg");
+      const btnClearPaymentProof = document.getElementById("btnClearPaymentProof");
+      const btnSendPaymentProof = document.getElementById("btnSendPaymentProof");
+      const paymentProofStatusEl = document.getElementById("paymentProofStatus");
+
+      // File preview
+      if (paymentProofFileEl) {
+        paymentProofFileEl.addEventListener("change", (e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          const rd = new FileReader();
+          rd.onload = (ev) => {
+            if (paymentProofPreviewImg) paymentProofPreviewImg.src = ev.target.result;
+            if (paymentProofPreview) paymentProofPreview.style.display = "flex";
+          };
+          rd.readAsDataURL(f);
+        });
+      }
+
+      // Clear preview
+      if (btnClearPaymentProof) {
+        btnClearPaymentProof.addEventListener("click", () => {
+          if (paymentProofFileEl) paymentProofFileEl.value = "";
+          if (paymentProofPreview) paymentProofPreview.style.display = "none";
+        });
+      }
+
+      // Send payment proof
+      if (btnSendPaymentProof) {
+        btnSendPaymentProof.addEventListener("click", async () => {
+          try {
+            const f = paymentProofFileEl?.files?.[0];
+            let proofUrl = paymentProofUrlEl?.value?.trim() || "";
+
+            // Upload file if no URL provided
+            if (!proofUrl && f) {
+              if (paymentProofStatusEl) {
+                paymentProofStatusEl.style.display = "block";
+                paymentProofStatusEl.style.color = "#bfdbfe";
+                paymentProofStatusEl.textContent = "⏳ Subiendo comprobante...";
+              }
+
+              const up = await uploadImage(f);
+              proofUrl = up?.secure_url || up?.url || "";
+
+              if (paymentProofStatusEl) {
+                paymentProofStatusEl.style.color = proofUrl ? "#86efac" : "#fca5a5";
+                paymentProofStatusEl.textContent = proofUrl ? "✅ Comprobante subido" : "❌ Error al subir";
+              }
+            }
+
+            if (!proofUrl) {
+              alert("Sube una foto o pega una URL del comprobante.");
+              return;
+            }
+
+            if (paymentProofStatusEl) {
+              paymentProofStatusEl.style.display = "block";
+              paymentProofStatusEl.style.color = "#bfdbfe";
+              paymentProofStatusEl.textContent = "⏳ Enviando comprobante...";
+            }
+
+            btnSendPaymentProof.disabled = true;
+            console.log("[panel-cliente] Sending payment proof:", selectedRequestId, proofUrl);
+
+            await submitPaymentProof(selectedRequestId, proofUrl);
+
+            if (paymentProofStatusEl) {
+              paymentProofStatusEl.style.color = "#86efac";
+              paymentProofStatusEl.textContent = "✅ Comprobante enviado. Esperando aprobación del jefe.";
+            }
+
+            await loadRequests();
+            await selectRequest(selectedRequestId);
+          } catch (err) {
+            console.error("[panel-cliente] Payment proof error:", err);
+            if (paymentProofStatusEl) {
+              paymentProofStatusEl.style.color = "#fca5a5";
+              paymentProofStatusEl.textContent = "❌ Error al enviar comprobante";
+            }
+            alert("Error enviando comprobante: " + (err.message || err));
+          } finally {
+            if (btnSendPaymentProof) btnSendPaymentProof.disabled = false;
+          }
+        });
+      }
+
+      // Cancel Request
+      const btnCancel = document.getElementById("btnCancel");
+      if (btnCancel) {
+        btnCancel.addEventListener("click", async () => {
+          if (!confirm("¿Seguro que deseas cancelar esta solicitud?")) return;
+          btnCancel.disabled = true;
+          try {
+            await cancelRequest(selectedRequestId);
+            selectedRequestId = null;
+            selectedRequest = null;
+            await loadRequests();
+            renderDetail();
+          } catch (err) {
+            alert("Error al cancelar: " + (err.message || err));
+          }
+          btnCancel.disabled = false;
+        });
+      }
+    }
+
+    // ================================================================
+    // Create Request
+    // ================================================================
+    const createForm = document.getElementById("createForm");
+    const photoInput = document.getElementById("createPhoto");
+    const photoPreview = document.getElementById("photoPreview");
+    const photoPreviewImg = document.getElementById("photoPreviewImg");
+    const uploadStatus = document.getElementById("uploadStatus");
+    const btnClearPhoto = document.getElementById("btnClearPhoto");
+
+    // Photo preview
+    photoInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          photoPreviewImg.src = ev.target.result;
+          photoPreview.style.display = "flex";
+          photoPreview.style.alignItems = "center";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        photoPreview.style.display = "none";
+      }
+    });
+
+    // Clear photo
+    btnClearPhoto.addEventListener("click", () => {
+      photoInput.value = "";
+      photoPreview.style.display = "none";
+      uploadStatus.style.display = "none";
+    });
+
+    createForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btnCreateSubmit");
+      btn.disabled = true;
+      btn.textContent = "Creando...";
+      uploadStatus.style.display = "none";
+
+      try {
+        const data = {
+          category: document.getElementById("createCategory").value,
+          address: document.getElementById("createAddress").value.trim(),
+          description: document.getElementById("createDescription").value.trim(),
+        };
+
+        // Handle file upload if file is selected
+        const file = photoInput.files[0];
+        if (file) {
+          uploadStatus.textContent = "📤 Subiendo imagen...";
+          uploadStatus.style.display = "block";
+          uploadStatus.style.color = "#93c5fd";
+
+          try {
+            const uploadResult = await uploadImage(file);
+            if (uploadResult.ok && uploadResult.url) {
+              data.photoUrls = [uploadResult.url];
+              uploadStatus.textContent = "✓ Imagen subida";
+              uploadStatus.style.color = "#86efac";
+            }
+          } catch (uploadErr) {
+            uploadStatus.textContent = "❌ " + (uploadErr.message || "Error al subir imagen");
+            uploadStatus.style.color = "#fca5a5";
+            btn.disabled = false;
+            btn.textContent = "Crear Solicitud";
+            return; // Stop if upload fails
+          }
+        }
+
+        await createRequest(data);
+        createForm.reset();
+        photoPreview.style.display = "none";
+        uploadStatus.style.display = "none";
+
+        // Collapse form after successful creation
+        const formContent = document.getElementById("createFormContent");
+        const formToggle = document.getElementById("createFormToggle");
+        if (formContent) formContent.style.display = "none";
+        if (formToggle) formToggle.textContent = "▼";
+
+        // Scroll to requests section
+        const requestSection = document.getElementById("requestList");
+        if (requestSection) requestSection.scrollIntoView({ behavior: 'smooth' });
+
+        await loadRequests();
+      } catch (err) {
+        alert("Error al crear solicitud: " + (err.message || err));
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Crear Solicitud";
+    });
+
+    // Form toggle handler is wired in init() to avoid duplicate listeners
+
+    // ================================================================
+    // Polling
+    // ================================================================
+    // ================================================================
+    // Polling
+    // ================================================================
+    function startPolling() {
+      stopPolling();
+      pollInterval = setInterval(async () => {
+        // Only refresh list data silently
+        await loadRequests(true);
+
+        // Chat polling: Only update container if it exists (don't nuke input)
+        if (selectedRequestId) {
+          await loadChatMessages();
+          const container = document.getElementById("chatContainer");
+          if (container) {
+            // Basic naive check: Only update if length changed or something. 
+            // But actually, innerHTML on just the container is fine IF the input is OUTSIDE.
+            // In my redesign, input IS outside chatContainer. So simply updating chatContainer innerHTML is safe.
+            // The PROBLEM was loadRequests() calling renderDetail() which wipes EVERYTHING.
+            container.innerHTML = renderChatMessages();
+            // Maintain scroll position?
+            // container.scrollTop = container.scrollHeight; // Optional, might be annoying if reading history
+          }
+        }
+      }, 6000); // Every 6 seconds
+    }
+
+    function stopPolling() {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+      }
+    }
+
+    // ================================================================
+    // Event Listeners
+    // ================================================================
+    document.getElementById("btnLogout").addEventListener("click", doLogout);
+    document.getElementById("btnEmergency").addEventListener("click", () => {
+      window.location.href = "emergency.html";
+    });
+    document.getElementById("btnScheduledWork").addEventListener("click", () => {
+      window.location.href = "emergency.html?mode=scheduled";
+    });
+    document.getElementById("btnRefresh").addEventListener("click", async () => {
+      await loadRequests();
+      if (selectedRequestId) await selectRequest(selectedRequestId);
+    });
+    document.getElementById("btnRetry").addEventListener("click", init);
+
+    // ================================================================
+    // Auth State
+    // ================================================================
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        clearPortalSession({ revoke: true });
+        window.location.href = "login-gateway.html";
+        return;
+      }
+      currentUser = user;
+      init();
+    });
+
+    // ================================================================
+    // Secure PDF Viewer (Canonical)
+    // ================================================================
+    window.viewSecurePdf = async function (requestId, download = false) {
+      if (!requestId) return;
+
+      const toast = document.createElement('div');
+      toast.style.cssText = "position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2563eb;color:white;padding:12px 24px;border-radius:24px;z-index:9999;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,0.5);";
+      toast.textContent = "🔐 Buscando PDF...";
+      document.body.appendChild(toast);
+
+      try {
+        const nocache = new Date().getTime();
+        const res = await apiFetch(`/api/marketplace/requests/${requestId}/estimate-url?_t=${nocache}`, {
+          headers: { 'Cache-Control': 'no-cache, no-store' },
+          cache: 'no-store'
+        });
+
+        if (res.ok && res.url) {
+          toast.textContent = "✅ Abriendo...";
+          toast.style.background = "#16a34a";
+
+          setTimeout(() => {
+            window.open(res.url, '_blank', 'noopener,noreferrer');
+            toast.remove();
+          }, 300);
+        } else {
+          // Manejo elegante de errores conocidos
+          const msg = res.message || "PDF no disponible";
+          console.warn("PDF View Error Response:", res);
+
+          let bgColor = "#f59e0b"; // Naranja advertencia
+          let userMsg = "⚠️ " + msg;
+
+          if (res.error === 'forbidden') {
+            bgColor = "#ef4444";
+            userMsg = "⛔ Acceso denegado";
+          }
+
+          toast.style.background = bgColor;
+          toast.textContent = userMsg;
+          setTimeout(() => toast.remove(), 3500);
+        }
+      } catch (err) {
+        console.error("Critical PDF Error:", err);
+        toast.style.background = "#ef4444";
+        toast.textContent = "❌ Error al abrir PDF";
+        setTimeout(() => toast.remove(), 3500);
+      }
+    };
+
+    window.showEmployeeProfile = async function (employeeId) {
+      if (!employeeId) return;
+
+      try {
+        const res = await apiFetch(`/api/employees/${employeeId}/profile`);
+        const profile = res.data;
+
+        // Build star display
+        const avgRating = profile.rating?.average || 0;
+        const totalRatings = profile.rating?.totalRatings || 0;
+        const fullStars = Math.floor(avgRating);
+        const halfStar = avgRating - fullStars >= 0.5;
+        let starsHtml = '';
+        for (let i = 0; i < 5; i++) {
+          if (i < fullStars) starsHtml += '⭐';
+          else if (i === fullStars && halfStar) starsHtml += '⭐';
+          else starsHtml += '☆';
+        }
+
+        // Build portfolio gallery
+        let portfolioHtml = '';
+        if (profile.portfolio && profile.portfolio.length > 0) {
+          portfolioHtml = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:12px;">
+              ${profile.portfolio.map(p => `
+                <a href="${p.url}" target="_blank" style="display:block;">
+                  <img src="${p.url}" alt="Trabajo" style="width:100%;height:80px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.2);">
+                </a>
+              `).join('')}
+            </div>
+          `;
+        } else {
+          portfolioHtml = `<div style="opacity:0.6;font-size:.9rem;margin-top:8px;">Sin fotos de trabajos aún</div>`;
+        }
+
+        // Create modal
+        const modal = document.createElement('div');
+        modal.id = 'employeeProfileModal';
+        modal.style.cssText = `
+          position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;
+          align-items:center;justify-content:center;z-index:9999;
+          padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+          overflow-y:auto;
+        `;
+        modal.innerHTML = `
+          <div style="background:linear-gradient(135deg,#1e293b,#0f172a);border-radius:16px;
+            padding:24px;max-width:min(500px,100%);width:100%;
+            max-height:calc(100dvh - 32px);overflow-y:auto;overflow-wrap:anywhere;word-break:break-word;
+            border:1px solid rgba(255,255,255,0.1);color:#fff;">
+            
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+              <div style="display:flex; gap:12px; align-items:center; min-width:0; flex:1;">
+                 <img src="${profile.photoUrl || 'assets/images/logo.webp'}" 
+                      style="width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid #22c55e;"
+                      data-profile-photo-url="${profile.photoUrl || ''}" />
+                 <div style="min-width:0;">
+                    <h3 style="margin:0;font-size:1.3rem;">👷 ${profile.name || profile.displayName || profile.email || 'T&eacute;cnico'}</h3>
+                    <div style="font-size:0.9rem; opacity:0.7; margin-top:2px;">📍 ${profile.address || 'Sin dirección'}</div>
+                 </div>
+              </div>
+              <button type="button" data-close-employee-profile="1"
+                style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;">✕</button>
+            </div>
+            
+            <div style="background:rgba(99,102,241,0.2);padding:12px;border-radius:12px;margin-bottom:16px;">
+              <div style="font-size:1.5rem;text-align:center;">${starsHtml}</div>
+              <div style="text-align:center;font-size:.9rem;opacity:0.8;margin-top:4px;">
+                ${avgRating.toFixed(1)}/5 (${totalRatings} calificaciones)
+              </div>
+            </div>
+            
+            <div>
+              <div style="font-weight:600;margin-bottom:4px;">📸 Portafolio de trabajos</div>
+              ${portfolioHtml}
+            </div>
+          </div>
+        `;
+
+        // Remove existing modal if any
+        const existing = document.getElementById('employeeProfileModal');
+        if (existing) existing.remove();
+
+        document.body.appendChild(modal);
+        modal.querySelector('[data-close-employee-profile="1"]')?.addEventListener('click', () => {
+          modal.remove();
+        });
+        modal.querySelector('[data-profile-photo-url]')?.addEventListener('click', () => {
+          const photoUrl = String(profile.photoUrl || '').trim();
+          if (photoUrl) {
+            window.open(photoUrl, '_blank', 'noopener,noreferrer');
+          }
+        });
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) modal.remove();
+        });
+
+      } catch (err) {
+        console.error('[panel-cliente] Error loading employee profile:', err);
+        alert('Error al cargar perfil del técnico');
+      }
+    };
+
+    // Cleanup on page unload
+    window.addEventListener("beforeunload", stopPolling);
+  </script>
+  <script type="module" src="assets/js/company-branding.js?v=20260228e"></script>
+</body>
+
+</html>

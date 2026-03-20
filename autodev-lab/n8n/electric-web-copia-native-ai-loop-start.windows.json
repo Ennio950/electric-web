@@ -1,0 +1,55 @@
+{
+  "id": "u2K8vN4Bp6QsW1Yf",
+  "name": "Electric Web Copia Native AI Loop Start (Windows Host)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ManualTrigger_LoopStart",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "cmd /d /c \"C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia\\autodev-lab\\n8n\\start-native-ai-loop.cmd\""
+      },
+      "id": "ExecuteCommand_LoopStart",
+      "name": "Start Infinite Native Loop",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        720,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Start Infinite Native Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "electric-web-copia-native-ai-loop-start-windows-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

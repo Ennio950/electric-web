@@ -1,0 +1,55 @@
+{
+  "id": "w4M1xQ6Ds8UyA3Ch",
+  "name": "Electric Web Copia Native AI Loop Status (Windows Host)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ManualTrigger_LoopStatus",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia\\autodev-lab\\n8n\\native-multi-agent-runner.mjs\" status"
+      },
+      "id": "ExecuteCommand_LoopStatus",
+      "name": "Show Infinite Loop Status",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        720,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Show Infinite Loop Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "electric-web-copia-native-ai-loop-status-windows-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

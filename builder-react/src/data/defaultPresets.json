@@ -1,0 +1,47 @@
+﻿{
+  "presetRecipes": [
+    {
+      "id": "preset_basico_area",
+      "name": "Preset basico area",
+      "recipeIds": ["rcp_area_simple", "rcp_capa_pintura"]
+    },
+    {
+      "id": "preset_basico_volumen",
+      "name": "Preset basico volumen",
+      "recipeIds": ["rcp_volume_simple", "rcp_mortero_base"]
+    }
+  ],
+  "presetComponents": [
+    {
+      "id": "preset_area_module",
+      "name": "Modulo por area",
+      "measureType": "AREA",
+      "inputs": [
+        { "id": "largo", "label": "Largo", "unit": "m", "required": true, "example": "4", "help": "Largo principal" },
+        { "id": "ancho", "label": "Ancho", "unit": "m", "required": true, "example": "3", "help": "Ancho principal" }
+      ],
+      "inputValues": { "largo": 4, "ancho": 3 },
+      "derived": [],
+      "baseMeasure": { "unit": "m2", "expr": "largo * ancho" },
+      "recipeBindings": [
+        {
+          "recipeId": "rcp_area_simple",
+          "enabled": true,
+          "paramOverrides": { "consumo": 1 }
+        }
+      ],
+      "labor": { "mode": "NONE", "rate": 0, "hours": 0 },
+      "wastePct": 0,
+      "children": []
+    }
+  ],
+  "presetJobs": [
+    {
+      "name": "Trabajo universal base",
+      "currency": "GTQ",
+      "globalWastePct": 3,
+      "fixedCost": 0,
+      "tax": { "enabled": false, "pct": 0 }
+    }
+  ]
+}

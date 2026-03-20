@@ -1,0 +1,41 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-background text-foreground min-h-screen antialiased;
+  background-image:
+    radial-gradient(circle at 8% 0%, rgba(30, 64, 175, 0.35), transparent 35%),
+    radial-gradient(circle at 100% 100%, rgba(14, 116, 144, 0.26), transparent 38%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.scroll-slim::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: rgba(124, 161, 255, 0.35);
+  border-radius: 999px;
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) minmax(280px, 340px);
+  gap: 0.75rem;
+}
+
+@media (max-width: 1320px) {
+  .app-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

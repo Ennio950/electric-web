@@ -1,0 +1,476 @@
+/* ==========================
+   Estimate Form (Premium)
+   ========================== */
+
+:root {
+  --ef-bg: rgba(9, 15, 28, 0.72);
+  --ef-bg-soft: rgba(9, 15, 28, 0.5);
+  --ef-border: rgba(148, 163, 184, 0.28);
+  --ef-border-strong: rgba(147, 197, 253, 0.55);
+  --ef-text: #f8fafc;
+  --ef-muted: #cbd5e1;
+  --ef-primary: #3b82f6;
+  --ef-danger: #fca5a5;
+  --ef-shadow: 0 26px 58px rgba(2, 6, 23, 0.58);
+}
+
+body {
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+.ef-back {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  text-decoration: none;
+  color: var(--ef-text);
+  background: rgba(9, 15, 28, 0.8);
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--ef-border);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.5);
+  font-weight: 700;
+}
+
+.ef-page {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 84px 18px 38px;
+}
+
+.ef-card {
+  width: min(1100px, 100%);
+  background: linear-gradient(145deg, rgba(17, 24, 39, 0.86), rgba(10, 17, 31, 0.76));
+  border: 1px solid var(--ef-border);
+  border-radius: 24px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--ef-shadow);
+  padding: 24px 24px 22px;
+  color: var(--ef-text);
+}
+
+.ef-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--ef-border);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.ef-header h1 {
+  margin: 0;
+  font-size: clamp(1.85rem, 2.3vw, 2.35rem);
+  line-height: 1.08;
+}
+
+.ef-subtitle {
+  margin-top: 6px;
+  color: var(--ef-muted);
+  font-size: 0.95rem;
+  max-width: 620px;
+}
+
+.ef-logo {
+  width: 144px !important;
+  height: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  filter: drop-shadow(0 12px 24px rgba(2, 6, 23, 0.45));
+}
+
+.ef-section-title-block {
+  margin: 2px 0 14px;
+}
+
+.ef-section-title-block h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.ef-section-title-block p {
+  margin: 4px 0 0;
+  color: var(--ef-muted);
+  font-size: 0.9rem;
+}
+
+.ef-form-error {
+  min-height: 20px;
+  margin: 0 0 8px;
+  color: var(--ef-danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ef-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ef-span-4 { grid-column: span 4; }
+.ef-span-6 { grid-column: span 6; }
+.ef-span-12 { grid-column: span 12; }
+
+.ef-field {
+  min-width: 0;
+}
+
+.ef-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.ef-required {
+  color: #93c5fd;
+}
+
+.ef-field input,
+.ef-field textarea,
+.ef-tax input,
+.ef-table input,
+.ef-table select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--ef-border);
+  background: var(--ef-bg-soft);
+  color: var(--ef-text);
+  padding: 11px 12px;
+  outline: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+.ef-field textarea {
+  resize: vertical;
+  min-height: 82px;
+  line-height: 1.45;
+}
+
+.ef-field small {
+  display: block;
+  margin-top: 6px;
+  color: var(--ef-muted);
+  font-size: 0.8rem;
+}
+
+.ef-field input::placeholder,
+.ef-field textarea::placeholder {
+  color: rgba(203, 213, 225, 0.7);
+}
+
+.ef-field input:focus,
+.ef-field textarea:focus,
+.ef-tax input:focus,
+.ef-table input:focus,
+.ef-table select:focus {
+  border-color: var(--ef-border-strong);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+  background: rgba(15, 23, 42, 0.84);
+}
+
+.ef-invalid {
+  border-color: rgba(248, 113, 113, 0.82) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.14) !important;
+}
+
+.ef-section-title {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ef-actions-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ef-btn-link {
+  text-decoration: none;
+}
+
+.ef-section-title h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.ef-material-library {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--ef-border);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.52);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.ef-library-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #dbeafe;
+}
+
+.ef-library-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ef-material-helper {
+  margin: 8px 0 0;
+  color: var(--ef-muted);
+  font-size: 0.82rem;
+  min-height: 18px;
+}
+
+.ef-table-wrap {
+  margin-top: 10px;
+  border: 1px solid var(--ef-border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(2, 6, 23, 0.25);
+}
+
+.ef-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ef-table th,
+.ef-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  vertical-align: middle;
+}
+
+.ef-table th {
+  text-align: left;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.ef-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ef-col-xs { width: 54px; }
+.ef-col-sm { width: 90px; }
+.ef-col-md { width: 150px; }
+.ef-col-type { width: 145px; }
+
+.ef-amount {
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ef-remove {
+  text-align: right;
+}
+
+.ef-x {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.22);
+  color: #fee2e2;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ef-x:hover {
+  background: rgba(220, 38, 38, 0.28);
+}
+
+.ef-bottom {
+  margin-top: 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.ef-tax {
+  width: 160px;
+}
+
+.ef-tax label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.ef-summary {
+  display: grid;
+  gap: 7px;
+  min-width: 210px;
+  padding: 10px 12px;
+  border: 1px solid var(--ef-border);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.ef-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-weight: 700;
+  color: #dbeafe;
+}
+
+.ef-total {
+  min-width: 170px;
+  text-align: right;
+}
+
+.ef-total span {
+  display: block;
+  color: var(--ef-muted);
+  margin-bottom: 3px;
+}
+
+.ef-total strong {
+  display: block;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.ef-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ef-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.ef-btn-primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.32);
+}
+
+.ef-btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+.ef-btn-ghost {
+  background: rgba(15, 23, 42, 0.7);
+  color: #e2e8f0;
+  border: 1px solid var(--ef-border);
+}
+
+.ef-btn-secondary {
+  background: rgba(30, 64, 175, 0.85);
+  color: #fff;
+  border: 1px solid rgba(147, 197, 253, 0.5);
+}
+
+.ef-btn-secondary:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 980px) {
+  .ef-span-4,
+  .ef-span-6 {
+    grid-column: span 6;
+  }
+
+  .ef-material-library {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ef-library-actions {
+    grid-column: span 2;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .ef-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ef-logo {
+    width: 132px;
+  }
+
+  .ef-span-4,
+  .ef-span-6,
+  .ef-span-12 {
+    grid-column: span 12;
+  }
+
+  .ef-bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ef-section-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ef-actions-inline {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .ef-actions-inline .ef-btn {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .ef-material-library {
+    grid-template-columns: 1fr;
+  }
+
+  .ef-library-actions {
+    grid-column: auto;
+  }
+
+  .ef-btn-secondary {
+    width: 100%;
+  }
+
+  .ef-tax,
+  .ef-total,
+  .ef-summary {
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .ef-actions {
+    justify-content: stretch;
+  }
+
+  .ef-btn-primary {
+    width: 100%;
+  }
+}

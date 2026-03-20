@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workflow Viewer</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Electric Web Workflow Control</p>
+          <h1>Codex + Claude Execution Viewer</h1>
+          <p class="hero-copy">
+            Estado operativo, backlog, locks, handoffs, actividad y preview real del móvil en un solo panel.
+          </p>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-chip" id="refresh-chip">Cargando</div>
+          <a class="meta-link" id="open-preview-link" href="/preview-static/" target="_blank" rel="noreferrer">
+            Abrir preview
+          </a>
+        </div>
+      </header>
+
+      <section class="top-grid">
+        <div class="panel" id="agent-status-panel">
+          <div class="panel-header">
+            <h2>Agentes</h2>
+            <span>Estado en vivo</span>
+          </div>
+          <div class="agent-grid" id="agent-grid"></div>
+        </div>
+
+        <div class="panel" id="progress-panel">
+          <div class="panel-header">
+            <h2>Progreso</h2>
+            <span>Backlog completo</span>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-value" id="progress-value"></div>
+            </div>
+            <div class="progress-stats" id="progress-stats"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="main-grid">
+        <div class="left-column">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Backlog</h2>
+              <span>Tareas activas y pendientes</span>
+            </div>
+            <div class="table-shell">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Estado</th>
+                    <th>Tarea</th>
+                    <th>Agente</th>
+                    <th>Prioridad</th>
+                  </tr>
+                </thead>
+                <tbody id="backlog-table"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="dual-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Locks</h2>
+                <span>Rutas reservadas</span>
+              </div>
+              <div class="stack-list" id="locks-list"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Handoffs</h2>
+                <span>Transferencias abiertas</span>
+              </div>
+              <div class="stack-list" id="handoffs-list"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Errores</h2>
+              <span>Fallos y conflictos recientes</span>
+            </div>
+            <div class="stack-list errors-list" id="errors-list"></div>
+          </div>
+        </div>
+
+        <div class="right-column">
+          <div class="panel preview-panel">
+            <div class="panel-header">
+              <h2>Preview</h2>
+              <span id="preview-mode">Preparando</span>
+            </div>
+            <div class="selected-event" id="selected-event"></div>
+            <iframe id="preview-frame" title="Mobile preview"></iframe>
+          </div>
+
+          <div class="panel activity-panel">
+            <div class="panel-header">
+              <h2>Activity Feed</h2>
+              <span>Últimos cambios instrumentados</span>
+            </div>
+            <div class="feed-list" id="activity-feed"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Progreso detallado</h2>
+              <span>Checkpoint y reportes</span>
+            </div>
+            <div class="stack-list" id="progress-list"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+  </html>

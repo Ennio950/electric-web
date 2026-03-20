@@ -1,0 +1,168 @@
+Eres un agente autónomo de ingeniería de software dentro del laboratorio AutoDev del proyecto Electric Web.
+
+Misión:
+Implementar el PASO 3 del laboratorio AutoDev: el INSPECTOR REAL de la aplicación móvil React Native basada en Expo Router.
+
+Contexto del repositorio:
+
+El proyecto es un monorepo Node.js con las siguientes partes principales:
+
+- straight-wire-backend/
+- builder-react/
+- apps/mobile/ (React Native + Expo)
+- packages/estimator-core/
+- packages/builder-domain/
+
+La aplicación móvil usa:
+
+Expo Router con estructura basada en archivos.
+
+Ejemplo de estructura detectada:
+
+apps/mobile/app/
+
+(client)/
+(builder)/
+emergency/
+login.tsx
+index.tsx
+
+Esto indica que la app usa Route Groups de Expo Router para separar roles.
+
+Objetivo de este paso:
+
+Reemplazar el análisis placeholder del motor AutoDev por una inspección real de la aplicación móvil.
+
+NO modificar código existente.
+
+Solo crear nuevos archivos dentro de:
+
+autodev-lab/
+
+Crear la siguiente estructura:
+
+autodev-lab/
+engine/
+inspectors/
+mobile/
+
+Archivos a crear:
+
+autodev-lab/engine/inspectors/mobile/mobileInspector.js
+
+Función principal:
+
+inspectMobileApp()
+
+Responsabilidades del inspector:
+
+1. Escanear la carpeta:
+
+apps/mobile/app
+
+2. Detectar:
+
+- todas las pantallas .tsx
+- rutas de Expo Router
+- grupos de rutas (client, builder)
+- layouts
+- hooks usados
+- llamadas a API
+- estado global
+- dependencias
+
+3. Identificar patrones importantes:
+
+- uso de useState
+- uso de useEffect
+- uso de fetch
+- uso de axios
+- imports de api.ts
+- imports de Zustand o React Query
+
+4. Detectar arquitectura de navegación:
+
+- Expo Router layouts
+- grupos de rutas
+- rutas dinámicas [id]
+
+5. Generar estadísticas:
+
+- número de pantallas
+- número de layouts
+- número de hooks detectados
+- número de llamadas a API
+
+6. Detectar posibles problemas:
+
+- pantallas demasiado grandes
+- hooks repetidos
+- llamadas a API sin capa de servicio
+- falta de tipado
+- lógica duplicada
+
+Salida del análisis:
+
+Crear reporte markdown en:
+
+autodev-lab/reports/mobile-inspection.md
+
+Contenido del reporte:
+
+1. Estructura completa de rutas Expo Router
+2. Lista de pantallas detectadas
+3. Grupos de rutas (client / builder)
+4. Layouts encontrados
+5. Hooks detectados
+6. Llamadas a API detectadas
+7. Problemas potenciales
+8. Recomendaciones de mejora
+9. Backlog de tareas sugeridas para AutoDev
+
+También modificar:
+
+autodev-lab/engine/core/loopRunner.js
+
+Para que en la fase:
+
+analysis
+
+ejecute:
+
+mobileInspector.inspectMobileApp()
+
+Si la tarea tiene:
+
+areaObjetivo: mobile
+
+Actualizar la tarea de ejemplo:
+
+autodev-lab/tasks/sample-task.json
+
+Para incluir:
+
+"areaObjetivo": "mobile"
+"plataformaObjetivo": "react-native-expo"
+"aplicacionObjetivo": "apps/mobile"
+
+Agregar logs claros durante el análisis:
+
+- escaneo iniciado
+- rutas detectadas
+- hooks detectados
+- APIs detectadas
+- reporte generado
+
+No introducir dependencias externas nuevas.
+
+Usar Node.js estándar (fs, path).
+
+Salida esperada en consola:
+
+- número de pantallas encontradas
+- grupos de rutas detectados
+- reporte generado
+
+Modo de ejecución:
+
+SAFE_AUTODEV_MOBILE_INSPECTION

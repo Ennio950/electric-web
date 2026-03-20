@@ -1,0 +1,879 @@
+{
+  "templates": [
+    {
+      "templateId": "tpl-universal-guiado-v1",
+      "name": "Universal Guiado",
+      "version": "1.0.0",
+      "currency": "Q",
+      "description": "Plantilla general para cualquier trabajo. Basada en area con asistente simple.",
+      "inputs": [
+        {
+          "id": "cantidad",
+          "label": "Cuantas areas iguales",
+          "type": "number",
+          "unit": "pza",
+          "default": 1,
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "id": "largo",
+          "label": "Largo",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "cm",
+            "ft"
+          ],
+          "default": 4,
+          "required": true,
+          "min": 0.1,
+          "step": 0.01
+        },
+        {
+          "id": "ancho",
+          "label": "Ancho",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "cm",
+            "ft"
+          ],
+          "default": 3,
+          "required": true,
+          "min": 0.1,
+          "step": 0.01
+        },
+        {
+          "id": "margenPct",
+          "label": "Margen extra (%)",
+          "type": "number",
+          "unit": "%",
+          "default": 8,
+          "required": false,
+          "min": 0,
+          "max": 80,
+          "step": 0.1
+        },
+        {
+          "id": "altoVisual",
+          "label": "Alto para vista 3D",
+          "type": "number",
+          "unit": "m",
+          "default": 0.2,
+          "required": false,
+          "min": 0.01,
+          "max": 5,
+          "step": 0.01
+        },
+        {
+          "id": "manoObra",
+          "label": "Mano de obra",
+          "type": "number",
+          "unit": "Q",
+          "default": 0,
+          "required": false,
+          "min": 0,
+          "step": 1
+        }
+      ],
+      "derived": [
+        {
+          "id": "medidaBase",
+          "formula": "largo * ancho",
+          "unit": "m2",
+          "precision": 3
+        },
+        {
+          "id": "medidaConMargen",
+          "formula": "medidaBase * (1 + margenPct / 100)",
+          "unit": "m2",
+          "precision": 3
+        },
+        {
+          "id": "medidaTotal",
+          "formula": "medidaConMargen * cantidad",
+          "unit": "m2",
+          "precision": 3
+        }
+      ],
+      "materials": [
+        {
+          "id": "material_principal",
+          "name": "Material principal",
+          "qtyFormula": "medidaTotal",
+          "unit": "m2",
+          "wastePct": 0,
+          "defaultUnitCost": 55,
+          "rounding": "round",
+          "precision": 2
+        }
+      ],
+      "summary": {
+        "includeLabor": true,
+        "laborInputId": "manoObra",
+        "defaultLabor": 0,
+        "includeFixedCost": false,
+        "includeTax": false,
+        "costPerDerivedId": "medidaTotal"
+      },
+      "3d": {
+        "enabled": true,
+        "dims": {
+          "xId": "largo",
+          "yId": "ancho",
+          "zId": "altoVisual"
+        },
+        "labels": {
+          "x": "Largo",
+          "y": "Ancho",
+          "z": "Espesor visual"
+        }
+      }
+    },
+    {
+      "templateId": "tpl-construccion-casa-v1",
+      "name": "Construccion Casa",
+      "version": "1.0.0",
+      "currency": "Q",
+      "description": "Estimacion base para bloques, mortero, arena y piedrin.",
+      "inputs": [
+        {
+          "id": "largoCasa",
+          "label": "Largo casa",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "cm",
+            "ft"
+          ],
+          "default": 10,
+          "required": true,
+          "min": 1,
+          "step": 0.1,
+          "help": "Medida exterior principal."
+        },
+        {
+          "id": "anchoCasa",
+          "label": "Ancho casa",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "cm",
+            "ft"
+          ],
+          "default": 8,
+          "required": true,
+          "min": 1,
+          "step": 0.1
+        },
+        {
+          "id": "altoPared",
+          "label": "Alto de pared",
+          "type": "number",
+          "unit": "m",
+          "default": 2.8,
+          "required": true,
+          "min": 1,
+          "max": 6,
+          "step": 0.01
+        },
+        {
+          "id": "espesorPared",
+          "label": "Espesor pared",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "cm"
+          ],
+          "default": 0.15,
+          "required": true,
+          "min": 0.08,
+          "max": 0.4,
+          "step": 0.01
+        },
+        {
+          "id": "areaAberturas",
+          "label": "Area puertas/ventanas",
+          "type": "number",
+          "unit": "m2",
+          "default": 12,
+          "required": false,
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "id": "largoBloque",
+          "label": "Largo bloque",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "cm"
+          ],
+          "default": 0.4,
+          "required": true,
+          "min": 0.1,
+          "step": 0.01
+        },
+        {
+          "id": "altoBloque",
+          "label": "Alto bloque",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "cm"
+          ],
+          "default": 0.2,
+          "required": true,
+          "min": 0.05,
+          "step": 0.01
+        },
+        {
+          "id": "factorMortero",
+          "label": "Factor mortero",
+          "type": "number",
+          "unit": "ratio",
+          "default": 0.08,
+          "required": true,
+          "min": 0.01,
+          "max": 0.6,
+          "step": 0.001,
+          "help": "Ajuste de consumo por espesor real y juntas."
+        },
+        {
+          "id": "bolsasCementoPorM3Mortero",
+          "label": "Bolsas cemento por m3 mortero",
+          "type": "number",
+          "unit": "bolsa/m3",
+          "default": 7,
+          "required": true,
+          "min": 1,
+          "step": 0.1
+        },
+        {
+          "id": "arenaPorM3Mortero",
+          "label": "Arena por m3 mortero",
+          "type": "number",
+          "unit": "m3/m3",
+          "default": 0.55,
+          "required": true,
+          "min": 0.1,
+          "step": 0.01
+        },
+        {
+          "id": "volumenConcreto",
+          "label": "Volumen concreto",
+          "type": "number",
+          "unit": "m3",
+          "default": 3,
+          "required": false,
+          "min": 0,
+          "step": 0.1,
+          "help": "Si no aplica, dejalo en 0."
+        },
+        {
+          "id": "piedrinPorM3Concreto",
+          "label": "Piedrin por m3 concreto",
+          "type": "number",
+          "unit": "m3/m3",
+          "default": 0.8,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "costoBloque",
+          "label": "Costo bloque",
+          "type": "number",
+          "unit": "Q/pza",
+          "default": 6,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "costoBolsaCemento",
+          "label": "Costo bolsa cemento",
+          "type": "number",
+          "unit": "Q/bolsa",
+          "default": 78,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "costoArenaM3",
+          "label": "Costo arena m3",
+          "type": "number",
+          "unit": "Q/m3",
+          "default": 190,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "costoPiedrinM3",
+          "label": "Costo piedrin m3",
+          "type": "number",
+          "unit": "Q/m3",
+          "default": 210,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "manoObra",
+          "label": "Mano de obra",
+          "type": "number",
+          "unit": "Q",
+          "default": 3500,
+          "required": false,
+          "min": 0,
+          "step": 1
+        },
+        {
+          "id": "costoFijo",
+          "label": "Costo fijo",
+          "type": "number",
+          "unit": "Q",
+          "default": 1200,
+          "required": false,
+          "min": 0,
+          "step": 1
+        },
+        {
+          "id": "impuestoPct",
+          "label": "Impuesto %",
+          "type": "number",
+          "unit": "%",
+          "default": 12,
+          "required": false,
+          "min": 0,
+          "max": 100,
+          "step": 0.1
+        }
+      ],
+      "derived": [
+        {
+          "id": "perimetro",
+          "formula": "2 * (largoCasa + anchoCasa)",
+          "unit": "m",
+          "precision": 3
+        },
+        {
+          "id": "areaBloque",
+          "formula": "largoBloque * altoBloque",
+          "unit": "m2",
+          "precision": 4
+        },
+        {
+          "id": "areaParedes",
+          "formula": "max((perimetro * altoPared) - areaAberturas, 0)",
+          "unit": "m2",
+          "precision": 3
+        },
+        {
+          "id": "volumenMortero",
+          "formula": "areaParedes * espesorPared * factorMortero",
+          "unit": "m3",
+          "precision": 3
+        },
+        {
+          "id": "bloquesBase",
+          "formula": "areaParedes / areaBloque",
+          "unit": "pza",
+          "precision": 3
+        },
+        {
+          "id": "cementoBolsasBase",
+          "formula": "volumenMortero * bolsasCementoPorM3Mortero",
+          "unit": "bolsa",
+          "precision": 3
+        },
+        {
+          "id": "arenaM3Base",
+          "formula": "volumenMortero * arenaPorM3Mortero",
+          "unit": "m3",
+          "precision": 3
+        },
+        {
+          "id": "piedrinM3Base",
+          "formula": "volumenConcreto * piedrinPorM3Concreto",
+          "unit": "m3",
+          "precision": 3
+        },
+        {
+          "id": "areaCasa",
+          "formula": "largoCasa * anchoCasa",
+          "unit": "m2",
+          "precision": 3
+        }
+      ],
+      "materials": [
+        {
+          "id": "bloques",
+          "name": "Bloque 40x20",
+          "qtyFormula": "bloquesBase",
+          "unit": "pza",
+          "wastePct": 10,
+          "unitCostInputId": "costoBloque",
+          "defaultUnitCost": 6,
+          "rounding": "ceil",
+          "precision": 0
+        },
+        {
+          "id": "cemento",
+          "name": "Cemento",
+          "qtyFormula": "cementoBolsasBase",
+          "unit": "bolsa",
+          "wastePct": 5,
+          "unitCostInputId": "costoBolsaCemento",
+          "defaultUnitCost": 78,
+          "rounding": "ceil",
+          "precision": 0
+        },
+        {
+          "id": "arena",
+          "name": "Arena",
+          "qtyFormula": "arenaM3Base",
+          "unit": "m3",
+          "wastePct": 8,
+          "unitCostInputId": "costoArenaM3",
+          "defaultUnitCost": 190,
+          "rounding": "round",
+          "precision": 2
+        },
+        {
+          "id": "piedrin",
+          "name": "Piedrin",
+          "qtyFormula": "piedrinM3Base",
+          "unit": "m3",
+          "wastePct": 5,
+          "unitCostInputId": "costoPiedrinM3",
+          "defaultUnitCost": 210,
+          "rounding": "round",
+          "precision": 2
+        }
+      ],
+      "summary": {
+        "includeLabor": true,
+        "laborInputId": "manoObra",
+        "defaultLabor": 0,
+        "includeFixedCost": true,
+        "fixedCostInputId": "costoFijo",
+        "defaultFixedCost": 0,
+        "includeTax": true,
+        "taxPctInputId": "impuestoPct",
+        "defaultTaxPct": 12,
+        "costPerDerivedId": "areaCasa"
+      },
+      "3d": {
+        "enabled": true,
+        "dims": {
+          "xId": "largoCasa",
+          "yId": "altoPared",
+          "zId": "anchoCasa"
+        },
+        "labels": {
+          "x": "Largo",
+          "y": "Alto",
+          "z": "Ancho"
+        }
+      }
+    },
+    {
+      "templateId": "tpl-electricidad-basica-v1",
+      "name": "Electricidad Basica",
+      "version": "1.0.0",
+      "currency": "Q",
+      "description": "Estimacion rapida de conduit, cable y breakers.",
+      "inputs": [
+        {
+          "id": "metrosRecorrido",
+          "label": "Metros de recorrido",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "ft"
+          ],
+          "default": 60,
+          "required": true,
+          "min": 1,
+          "step": 0.1
+        },
+        {
+          "id": "numeroPuntos",
+          "label": "Numero de puntos",
+          "type": "number",
+          "unit": "pza",
+          "default": 24,
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "id": "numeroCircuitos",
+          "label": "Numero de circuitos",
+          "type": "number",
+          "unit": "pza",
+          "default": 4,
+          "required": true,
+          "min": 1,
+          "step": 1
+        },
+        {
+          "id": "cablePorPunto",
+          "label": "Cable extra por punto",
+          "type": "number",
+          "unit": "m",
+          "default": 2.5,
+          "required": true,
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "id": "factorReserva",
+          "label": "Factor reserva",
+          "type": "number",
+          "unit": "ratio",
+          "default": 1.12,
+          "required": true,
+          "min": 1,
+          "step": 0.01
+        },
+        {
+          "id": "costoConduitM",
+          "label": "Costo conduit por metro",
+          "type": "number",
+          "unit": "Q/m",
+          "default": 7,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "costoCableM",
+          "label": "Costo cable por metro",
+          "type": "number",
+          "unit": "Q/m",
+          "default": 4.2,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "costoBreaker",
+          "label": "Costo breaker",
+          "type": "number",
+          "unit": "Q/pza",
+          "default": 95,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "manoObra",
+          "label": "Mano de obra",
+          "type": "number",
+          "unit": "Q",
+          "default": 1800,
+          "required": false,
+          "min": 0,
+          "step": 1
+        },
+        {
+          "id": "impuestoPct",
+          "label": "Impuesto %",
+          "type": "number",
+          "unit": "%",
+          "default": 12,
+          "required": false,
+          "min": 0,
+          "max": 100,
+          "step": 0.1
+        }
+      ],
+      "derived": [
+        {
+          "id": "conduitTotalM",
+          "formula": "metrosRecorrido * factorReserva",
+          "unit": "m",
+          "precision": 2
+        },
+        {
+          "id": "cableTotalM",
+          "formula": "(metrosRecorrido * 3 + numeroPuntos * cablePorPunto) * factorReserva",
+          "unit": "m",
+          "precision": 2
+        },
+        {
+          "id": "breakerTotal",
+          "formula": "safeCeil(numeroCircuitos * 1.1, 1)",
+          "unit": "pza",
+          "precision": 0
+        }
+      ],
+      "materials": [
+        {
+          "id": "conduit",
+          "name": "Conduit",
+          "qtyFormula": "conduitTotalM",
+          "unit": "m",
+          "wastePct": 5,
+          "unitCostInputId": "costoConduitM",
+          "defaultUnitCost": 7,
+          "rounding": "round",
+          "precision": 2
+        },
+        {
+          "id": "cable",
+          "name": "Cable THHN",
+          "qtyFormula": "cableTotalM",
+          "unit": "m",
+          "wastePct": 8,
+          "unitCostInputId": "costoCableM",
+          "defaultUnitCost": 4.2,
+          "rounding": "round",
+          "precision": 2
+        },
+        {
+          "id": "breaker",
+          "name": "Breaker",
+          "qtyFormula": "breakerTotal",
+          "unit": "pza",
+          "wastePct": 0,
+          "unitCostInputId": "costoBreaker",
+          "defaultUnitCost": 95,
+          "rounding": "ceil",
+          "precision": 0
+        }
+      ],
+      "summary": {
+        "includeLabor": true,
+        "laborInputId": "manoObra",
+        "includeFixedCost": false,
+        "includeTax": true,
+        "taxPctInputId": "impuestoPct",
+        "defaultTaxPct": 12,
+        "costPerInputId": "numeroPuntos"
+      },
+      "3d": {
+        "enabled": true,
+        "dims": {
+          "xId": "metrosRecorrido",
+          "yId": "numeroCircuitos",
+          "zId": "numeroPuntos"
+        },
+        "labels": {
+          "x": "Recorrido",
+          "y": "Circuitos",
+          "z": "Puntos"
+        }
+      }
+    },
+    {
+      "templateId": "tpl-pintura-v1",
+      "name": "Pintura",
+      "version": "1.0.0",
+      "currency": "Q",
+      "description": "Calculo de litros por area, manos y rendimiento.",
+      "inputs": [
+        {
+          "id": "largo",
+          "label": "Largo",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "ft"
+          ],
+          "default": 7,
+          "required": true,
+          "min": 0.5,
+          "step": 0.1
+        },
+        {
+          "id": "ancho",
+          "label": "Ancho",
+          "type": "number",
+          "unit": "m",
+          "unitOptions": [
+            "m",
+            "ft"
+          ],
+          "default": 5,
+          "required": true,
+          "min": 0.5,
+          "step": 0.1
+        },
+        {
+          "id": "alto",
+          "label": "Alto",
+          "type": "number",
+          "unit": "m",
+          "default": 2.7,
+          "required": true,
+          "min": 1,
+          "step": 0.01
+        },
+        {
+          "id": "areaAberturas",
+          "label": "Area de aberturas",
+          "type": "number",
+          "unit": "m2",
+          "default": 8,
+          "required": false,
+          "min": 0,
+          "step": 0.1
+        },
+        {
+          "id": "manos",
+          "label": "Cantidad de manos",
+          "type": "number",
+          "unit": "pza",
+          "default": 2,
+          "required": true,
+          "min": 1,
+          "max": 6,
+          "step": 1
+        },
+        {
+          "id": "rendimientoPintura",
+          "label": "Rendimiento pintura (m2/litro)",
+          "type": "number",
+          "unit": "m2/l",
+          "default": 8,
+          "required": true,
+          "min": 1,
+          "step": 0.1
+        },
+        {
+          "id": "rendimientoSellador",
+          "label": "Rendimiento sellador (m2/litro)",
+          "type": "number",
+          "unit": "m2/l",
+          "default": 10,
+          "required": true,
+          "min": 1,
+          "step": 0.1
+        },
+        {
+          "id": "costoPinturaL",
+          "label": "Costo pintura por litro",
+          "type": "number",
+          "unit": "Q/l",
+          "default": 42,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "costoSelladorL",
+          "label": "Costo sellador por litro",
+          "type": "number",
+          "unit": "Q/l",
+          "default": 29,
+          "required": true,
+          "min": 0,
+          "step": 0.01
+        },
+        {
+          "id": "manoObra",
+          "label": "Mano de obra",
+          "type": "number",
+          "unit": "Q",
+          "default": 1400,
+          "required": false,
+          "min": 0,
+          "step": 1
+        }
+      ],
+      "derived": [
+        {
+          "id": "perimetro",
+          "formula": "2 * (largo + ancho)",
+          "unit": "m",
+          "precision": 3
+        },
+        {
+          "id": "areaParedes",
+          "formula": "max((perimetro * alto) - areaAberturas, 0)",
+          "unit": "m2",
+          "precision": 3
+        },
+        {
+          "id": "areaTotalAplicada",
+          "formula": "areaParedes * manos",
+          "unit": "m2",
+          "precision": 3
+        },
+        {
+          "id": "litrosPinturaBase",
+          "formula": "areaTotalAplicada / rendimientoPintura",
+          "unit": "l",
+          "precision": 3
+        },
+        {
+          "id": "litrosSelladorBase",
+          "formula": "areaParedes / rendimientoSellador",
+          "unit": "l",
+          "precision": 3
+        }
+      ],
+      "materials": [
+        {
+          "id": "pintura",
+          "name": "Pintura",
+          "qtyFormula": "litrosPinturaBase",
+          "unit": "l",
+          "wastePct": 7,
+          "unitCostInputId": "costoPinturaL",
+          "defaultUnitCost": 42,
+          "rounding": "round",
+          "precision": 2
+        },
+        {
+          "id": "sellador",
+          "name": "Sellador",
+          "qtyFormula": "litrosSelladorBase",
+          "unit": "l",
+          "wastePct": 5,
+          "unitCostInputId": "costoSelladorL",
+          "defaultUnitCost": 29,
+          "rounding": "round",
+          "precision": 2
+        }
+      ],
+      "summary": {
+        "includeLabor": true,
+        "laborInputId": "manoObra",
+        "defaultLabor": 0,
+        "includeFixedCost": false,
+        "includeTax": false,
+        "costPerDerivedId": "areaParedes"
+      },
+      "3d": {
+        "enabled": true,
+        "dims": {
+          "xId": "largo",
+          "yId": "alto",
+          "zId": "ancho"
+        },
+        "labels": {
+          "x": "Largo",
+          "y": "Alto",
+          "z": "Ancho"
+        }
+      }
+    }
+  ]
+}

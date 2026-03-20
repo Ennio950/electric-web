@@ -1,0 +1,30 @@
+{
+  "id": "task-012",
+  "titulo": "Extraer llamada API repetida de app/(client)/emergency/new.tsx",
+  "descripcion": "Normalizar la importacion directa de api.ts en app/(client)/emergency/new.tsx.",
+  "modulo": "mobile",
+  "estado": "pendiente",
+  "reintentos": 0,
+  "modo": "SAFE_AUTODEV_EXECUTABLE_BACKLOG_MOBILE_BACKEND",
+  "areaObjetivo": "mobile",
+  "plataformaObjetivo": "react-native-expo",
+  "aplicacionObjetivo": "apps/mobile",
+  "creadoEn": "2026-03-15T02:39:24.452Z",
+  "actualizadoEn": "2026-03-15T02:40:46.939Z",
+  "resumenResultado": "Tarea generada y pendiente de orquestacion.",
+  "categoriaFix": "api-service-extraction",
+  "clasificacion": "semiautomatico",
+  "archivosObjetivo": [
+    "apps/mobile/app/(client)/emergency/new.tsx",
+    "apps/mobile/src/services/apiService.ts"
+  ],
+  "requiereRevision": true,
+  "taskKind": "generated",
+  "taskKey": "mobile-api:app/(client)/emergency/new.tsx",
+  "fixPayload": {
+    "kind": "mobile-api-service-extraction",
+    "targetFile": "app/(client)/emergency/new.tsx",
+    "serviceFunction": null
+  },
+  "taskPath": "autodev-lab/tasks/generated/task-012.json"
+}

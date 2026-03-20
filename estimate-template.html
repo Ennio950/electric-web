@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estimate Preview</title>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: #fff !important;
+    }
+
+    body * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets/css/style.css?v=estimate-pro-20260211-4" />
+</head>
+
+<body>
+
+  <button id="pdfBtn" type="button" style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-family: 'Inter', sans-serif;
+  ">Generate PDF</button>
+
+  <div class="main-wrapper">
+    <div id="pdfContent" class="estimate-paper">
+      <div class="company-header">
+        <div class="header-company-info">
+          <p class="company-info-line"><strong id="companyDisplayNameValue">Straight Wire Electric</strong></p>
+          <p class="company-info-line"><span id="companyAddressValue">3828 S Grand Ave Apt 207, Los Angeles, CA 90037</span></p>
+          <p class="company-info-line"><strong>EIN:</strong> <span id="companyEinValue">39-4757804</span></p>
+          <p class="company-info-line"><strong>Tel:</strong> <span id="companyPhoneValue">3236142546</span></p>
+          <p class="company-info-line"><strong>Email:</strong> <span id="companyEmailValue">straightwireelectric@gmail.com</span></p>
+        </div>
+
+        <div class="header-brand">
+          <img id="companyLogo" src="assets/images/logo.webp" class="pdf-logo" alt="Straight Wire Electric" />
+        </div>
+
+        <div class="quote-meta">
+          <h3 class="quote-title" id="quoteTitleText">Quote</h3>
+          <div class="quote-row">
+            <span class="quote-label">Quote No</span>
+            <span class="quote-value" id="quoteNumber">-</span>
+          </div>
+          <div class="quote-row">
+            <span class="quote-label">Quote date</span>
+            <span class="quote-value" id="quoteDate">-</span>
+          </div>
+          <div class="quote-row">
+            <span class="quote-label">Created by</span>
+            <span class="quote-value" id="quoteCreatorId">-</span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="pdf-divider" />
+
+      <div class="client-info-grid">
+        <div class="client-info-card">
+          <div class="info-card-title">Billing address</div>
+          <div class="info-card-body">
+            <p class="client-info-line"><strong>Client:</strong> <span id="clientNameValue"></span></p>
+            <p class="client-info-line"><strong>Phone:</strong> <span id="clientPhoneValue"></span></p>
+            <p class="client-info-line" id="clientEmailLine"><strong>Email:</strong> <span id="clientEmailValue"></span></p>
+            <p class="client-info-line" id="billingAddressValue"></p>
+          </div>
+        </div>
+
+        <div class="client-info-card">
+          <div class="info-card-title">Service address / Job site</div>
+          <div class="info-card-body">
+            <p class="client-info-line" id="serviceAddressValue"></p>
+          </div>
+        </div>
+      </div>
+
+      <table class="estimate-table">
+        <thead>
+          <tr>
+            <th style="width: 40%">Description</th>
+            <th style="width: 15%">Type</th>
+            <th style="width: 10%">Qty</th>
+            <th style="width: 15%">Price</th>
+            <th style="width: 20%">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+
+      <div class="footer-section">
+        <div class="notes-box">
+          <div class="notes-header">
+            <h4>Notes / Terms</h4>
+            <button id="resetNotesBtn" type="button" class="notes-reset-btn">Reset</button>
+          </div>
+          <textarea id="notesInput" class="notes-editor" spellcheck="true"></textarea>
+          <div id="notesPreview" class="notes-preview" aria-hidden="true"></div>
+        </div>
+
+        <div class="totals-box">
+          <table class="totals-table">
+            <tr>
+              <td class="label">SUBTOTAL:</td>
+              <td class="value">$<span id="subtotalDisplay">0.00</span></td>
+            </tr>
+            <tr>
+              <td class="label">TAX (<span id="taxRateDisplay">0</span>%):</td>
+              <td class="value">$<span id="taxAmountDisplay">0.00</span></td>
+            </tr>
+            <tr class="grand-total-row">
+              <td class="label">TOTAL DUE (USD):</td>
+              <td class="value">$<span id="totalDisplay">0.00</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/html2pdf/html2pdf.bundle.min.js"></script>
+  <script src="assets/js/estimate-template.js?v=estimate-pro-20260211-4"></script>
+</body>
+
+</html>

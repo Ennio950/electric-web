@@ -1,0 +1,18 @@
+FROM docker.n8n.io/n8nio/n8n:latest
+
+USER root
+
+RUN npm install -g \
+  @openai/codex@0.114.0 \
+  @anthropic-ai/claude-code@2.1.71
+
+COPY autodev-lab/n8n/ollama-proxy.mjs /usr/local/bin/ollama
+COPY autodev-lab/n8n/openclaw-proxy.sh /usr/local/bin/openclaw
+
+RUN ln -sf /opt/nodejs/node-v24.13.1/bin/codex /usr/local/bin/codex \
+  && ln -sf /opt/nodejs/node-v24.13.1/bin/claude /usr/local/bin/claude \
+  && chmod +x /usr/local/bin/ollama /usr/local/bin/openclaw
+
+USER node
+
+WORKDIR /workspace/electric-web

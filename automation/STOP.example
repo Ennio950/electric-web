@@ -1,0 +1,1 @@
+Crear un archivo llamado `automation/STOP` para detener el loop al final del ciclo actual.

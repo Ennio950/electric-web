@@ -1,0 +1,55 @@
+{
+  "id": "k7P2sD9Lm4QvR1Yx",
+  "name": "Electric Web Copia Native Converter (Windows Host)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ManualTrigger_MobileBuild",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia\\autodev-lab\\n8n\\mobile-native-build-runner.mjs\" convert"
+      },
+      "id": "ExecuteCommand_Convert",
+      "name": "Convert Electric Web Copia",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        700,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Convert Electric Web Copia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "mobile-native-multi-os-builder-windows-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

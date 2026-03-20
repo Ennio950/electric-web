@@ -1,0 +1,260 @@
+[
+  {
+    "id": "fix-001",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(auth)/apply-employee.tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 491,
+    "imports": [
+      "submitEmployeeApplication"
+    ],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-002",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(auth)/magic-client.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 267,
+    "imports": [
+      "fetchBootstrap",
+      "startMagicClientAuth",
+      "verifyMagicClientAuth"
+    ],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-003",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(auth)/signup-client.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 325,
+    "imports": [
+      "ensureCurrentUserProfile",
+      "fetchBootstrap"
+    ],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-004",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(boss)/admin/index.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 333,
+    "imports": [],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-005",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(boss)/index.tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 402,
+    "imports": [],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-006",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(boss)/payments/[id].tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 371,
+    "imports": [],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-007",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(boss)/payments/index.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 173,
+    "imports": [
+      "fetchBossReviewQueue",
+      "withCurrentToken"
+    ],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-008",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(boss)/queue/[id].tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 367,
+    "imports": [],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-009",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(boss)/queue/index.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 263,
+    "imports": [
+      "fetchBossRequests",
+      "fetchEmergencyCalls",
+      "withCurrentToken"
+    ],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-010",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(boss)/settings/index.tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 404,
+    "imports": [],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-011",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(client)/emergency/[id].tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 290,
+    "imports": [],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-012",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(client)/emergency/new.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 198,
+    "imports": [
+      "createClientEmergencyCall",
+      "withCurrentToken"
+    ],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-013",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(client)/index.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 137,
+    "imports": [
+      "fetchClientRequests",
+      "fetchEmergencyCalls",
+      "withCurrentToken"
+    ],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-014",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(client)/requests/[id].tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 458,
+    "imports": [],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-015",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(client)/requests/new.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 195,
+    "imports": [
+      "createClientRequest",
+      "withCurrentToken"
+    ],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-016",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(employee)/emergency/[id].tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 465,
+    "imports": [],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-017",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(employee)/index.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 298,
+    "imports": [],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-018",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(employee)/profile/index.tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 406,
+    "imports": [],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-019",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(employee)/requests/[id].tsx",
+    "clasificacion": "manual",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 465,
+    "imports": [],
+    "motivo": "La pantalla supera el umbral seguro o no coincide con un patron soportado."
+  },
+  {
+    "id": "fix-020",
+    "tipo": "api_directa_repetida",
+    "archivo": "app/(employee)/requests/index.tsx",
+    "clasificacion": "semiautomatico",
+    "accionSugerida": "extraer a src/services por feature antes de tocar la pantalla",
+    "serviceFunction": null,
+    "lineas": 229,
+    "imports": [
+      "fetchAvailableRequests",
+      "fetchEmployeeRequests",
+      "withCurrentToken"
+    ],
+    "motivo": "La pantalla requiere extraccion controlada, pero no coincide con un patron seguro exacto."
+  },
+  {
+    "id": "fix-021",
+    "tipo": "fetch_directo",
+    "archivo": "src/lib/imageUpload.ts",
+    "clasificacion": "manual",
+    "accionSugerida": "revisar si conviene extraer helper comun de upload sin tocar el flujo actual",
+    "motivo": "El fetch directo existe fuera del cliente API principal y no entra en el fix seguro de esta ejecucion."
+  }
+]

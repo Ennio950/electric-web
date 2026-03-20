@@ -1,0 +1,55 @@
+{
+  "id": "v3L9wP5Cr7TxZ2Bg",
+  "name": "Electric Web Copia Native AI Loop Stop (Windows Host)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ManualTrigger_LoopStop",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia\\autodev-lab\\n8n\\native-multi-agent-runner.mjs\" stop"
+      },
+      "id": "ExecuteCommand_LoopStop",
+      "name": "Stop Infinite Native Loop",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        720,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Stop Infinite Native Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "electric-web-copia-native-ai-loop-stop-windows-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

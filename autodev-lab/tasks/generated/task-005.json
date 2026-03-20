@@ -1,0 +1,30 @@
+{
+  "id": "task-005",
+  "titulo": "Extraer llamada API repetida de app/(boss)/index.tsx",
+  "descripcion": "Normalizar la importacion directa de api.ts en app/(boss)/index.tsx.",
+  "modulo": "mobile",
+  "estado": "requiere_revision",
+  "reintentos": 0,
+  "modo": "SAFE_AUTODEV_EXECUTABLE_BACKLOG_MOBILE_BACKEND",
+  "areaObjetivo": "mobile",
+  "plataformaObjetivo": "react-native-expo",
+  "aplicacionObjetivo": "apps/mobile",
+  "creadoEn": "2026-03-15T02:39:24.452Z",
+  "actualizadoEn": "2026-03-15T02:40:46.939Z",
+  "resumenResultado": "Tarea generada y pendiente de orquestacion.",
+  "categoriaFix": "api-service-extraction",
+  "clasificacion": "manual",
+  "archivosObjetivo": [
+    "apps/mobile/app/(boss)/index.tsx",
+    "apps/mobile/src/services/apiService.ts"
+  ],
+  "requiereRevision": true,
+  "taskKind": "generated",
+  "taskKey": "mobile-api:app/(boss)/index.tsx",
+  "fixPayload": {
+    "kind": "mobile-api-service-extraction",
+    "targetFile": "app/(boss)/index.tsx",
+    "serviceFunction": null
+  },
+  "taskPath": "autodev-lab/tasks/generated/task-005.json"
+}

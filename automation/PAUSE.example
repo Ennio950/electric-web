@@ -1,0 +1,1 @@
+Crear un archivo llamado `automation/PAUSE` para pausar el loop sin perder estado. Luego usar `node scripts/resume-workflow.js` o borrar `PAUSE` para continuar.

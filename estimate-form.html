@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Estimate</title>
+  <script src="assets/js/company-branding-bootstrap.js?v=20260301b"></script>
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/estimate-form.css" />
+</head>
+
+<body>
+
+  <a href="panel-empleado.html" class="ef-back"><- Back</a>
+
+  <main class="ef-page">
+    <section class="ef-card">
+      <header class="ef-header">
+        <div>
+          <h1>Create Estimate</h1>
+          <p class="ef-subtitle">Prepare a professional quote with clean customer data and accurate totals.</p>
+        </div>
+        <img src="assets/images/logo.webp" alt="Straight Wire Electric" class="ef-logo" />
+      </header>
+
+      <p id="estimateModeNotice" class="ef-material-helper" style="margin: 0 0 14px;"></p>
+
+      <div class="ef-section-title-block">
+        <h2>Client details</h2>
+        <p>Required: Client Name, Billing Address, Phone.</p>
+      </div>
+
+      <p id="formError" class="ef-form-error" role="alert" aria-live="polite"></p>
+
+      <div class="ef-grid">
+        <div class="ef-field ef-span-4">
+          <label for="clientName">Client Name <span class="ef-required">*</span></label>
+          <input id="clientName" type="text" placeholder="John Doe" autocomplete="name" />
+        </div>
+
+        <div class="ef-field ef-span-4">
+          <label for="clientPhone">Phone <span class="ef-required">*</span></label>
+          <input id="clientPhone" type="tel" placeholder="(323) 614-2546" autocomplete="tel" />
+        </div>
+
+        <div class="ef-field ef-span-4">
+          <label for="clientEmail">Email (optional)</label>
+          <input id="clientEmail" type="email" placeholder="client@email.com" autocomplete="email" />
+        </div>
+
+        <div class="ef-field ef-span-6">
+          <label for="billingAddress">Billing Address <span class="ef-required">*</span></label>
+          <textarea id="billingAddress" rows="3" placeholder="3828 S Grand Ave Apt 207&#10;Los Angeles, CA 90037"></textarea>
+        </div>
+
+        <div class="ef-field ef-span-6">
+          <label for="serviceAddress">Service Address / Job Site (optional)</label>
+          <textarea id="serviceAddress" rows="3" placeholder="Job location if different from billing"></textarea>
+          <small>If empty, Billing Address is used as Service Address.</small>
+        </div>
+      </div>
+
+      <div class="ef-section-title">
+        <h2>Materials / Services</h2>
+        <div class="ef-actions-inline">
+          <a href="materials.html" class="ef-btn ef-btn-ghost ef-btn-link">Manage materials</a>
+          <button type="button" class="ef-btn ef-btn-ghost" id="addItemBtn">+ Add item</button>
+        </div>
+      </div>
+
+      <section class="ef-material-library" aria-label="Material library">
+        <div class="ef-library-field">
+          <label for="materialPicker">Material library</label>
+          <select id="materialPicker"></select>
+        </div>
+        <div class="ef-library-field ef-library-qty">
+          <label for="materialQtyInput">Qty</label>
+          <input id="materialQtyInput" type="number" min="0" step="0.01" value="1" />
+        </div>
+        <div class="ef-library-actions">
+          <button type="button" class="ef-btn ef-btn-secondary" id="addMaterialFromLibraryBtn">+ Add selected material</button>
+        </div>
+      </section>
+      <p id="materialHelper" class="ef-material-helper"></p>
+
+      <div class="ef-table-wrap">
+        <table class="ef-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="ef-col-type">Type</th>
+              <th class="ef-col-sm">Qty</th>
+              <th class="ef-col-md">Unit Price ($)</th>
+              <th class="ef-col-md">Amount</th>
+              <th class="ef-col-xs"></th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="ef-bottom">
+        <div class="ef-tax">
+          <label for="taxInput">Tax (%)</label>
+          <input id="taxInput" type="number" min="0" step="0.01" value="0" />
+        </div>
+
+        <div class="ef-summary">
+          <div class="ef-summary-row">
+            <span>Services</span>
+            <strong id="serviceTotalLabel">$0.00</strong>
+          </div>
+          <div class="ef-summary-row">
+            <span>Materials</span>
+            <strong id="materialTotalLabel">$0.00</strong>
+          </div>
+        </div>
+
+        <div class="ef-total">
+          <span>Total</span>
+          <strong id="totalLabel">$0.00</strong>
+        </div>
+      </div>
+
+      <div class="ef-actions">
+        <button type="button" class="ef-btn ef-btn-primary" id="continueBtn">Continue to PDF</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./assets/js/session.js";
+    import { getCurrentUserProfile, requireProActionsAccess, logProAction } from "./assets/js/pro-actions.js";
+
+    const STORAGE_KEYS = {
+      estimate: "estimate",
+      estimateDraft: "estimateDraft",
+      requestPrefill: "estimateRequestPrefill",
+      materials: "materialsCatalog",
+      history: "estimatesHistory"
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const REQUEST_ID = urlParams.get("requestId");
+    const MODE = String(urlParams.get("mode") || "").trim().toLowerCase();
+    const INTERNAL_MODE = MODE === "internal";
+    const PRO_MODE = urlParams.get("pro") === "1";
+    const AUTH_USER = await requireAuth("employee");
+    const CURRENT_PROFILE = await getCurrentUserProfile(AUTH_USER);
+
+    if (PRO_MODE) {
+      const access = await requireProActionsAccess({
+        profile: CURRENT_PROFILE,
+        redirectTo: "panel-empleado.html",
+        showAlert: true
+      });
+      if (!access.allowed) {
+        throw new Error("Unauthorized Pro access");
+      }
+    }
+
+    const backBtn = document.querySelector(".ef-back");
+    const manageMaterialsLink = document.querySelector(".ef-btn-link");
+    const titleEl = document.querySelector(".ef-header h1");
+    const subtitleEl = document.querySelector(".ef-subtitle");
+    const sectionSubtitleEl = document.querySelector(".ef-section-title-block p");
+    const modeNoticeEl = document.getElementById("estimateModeNotice");
+
+    if (INTERNAL_MODE) {
+      backBtn.href = "panel-jefe.html";
+      backBtn.textContent = "<- Back to boss panel";
+    } else if (REQUEST_ID) {
+      backBtn.href = `client-requests.html?select=${REQUEST_ID}`;
+      backBtn.textContent = "<- Cancel and go back";
+    } else if (PRO_MODE && backBtn) {
+      backBtn.href = "host-vanilla/materiales.html";
+      backBtn.textContent = "<- Back to Pro estimator";
+    }
+
+    if (manageMaterialsLink && PRO_MODE) {
+      manageMaterialsLink.href = "host-vanilla/materiales.html";
+    }
+
+    if (INTERNAL_MODE) {
+      if (titleEl) titleEl.textContent = "Create Internal Estimate";
+      if (subtitleEl) subtitleEl.textContent = "Prepare a quote for internal review without notifying the client.";
+      if (sectionSubtitleEl) sectionSubtitleEl.textContent = "Required: Client Name, Billing Address, Phone. This version stays internal.";
+      if (modeNoticeEl) modeNoticeEl.textContent = "Boss mode: this estimate will generate a PDF without sending a proposal to the client.";
+    } else if (modeNoticeEl) {
+      modeNoticeEl.textContent = "";
+    }
+
+    const itemsBody = document.getElementById("itemsBody");
+    const addItemBtn = document.getElementById("addItemBtn");
+    const addMaterialFromLibraryBtn = document.getElementById("addMaterialFromLibraryBtn");
+    const materialPicker = document.getElementById("materialPicker");
+    const materialQtyInput = document.getElementById("materialQtyInput");
+    const materialHelper = document.getElementById("materialHelper");
+    const taxInput = document.getElementById("taxInput");
+    const totalLabel = document.getElementById("totalLabel");
+    const serviceTotalLabel = document.getElementById("serviceTotalLabel");
+    const materialTotalLabel = document.getElementById("materialTotalLabel");
+    const continueBtn = document.getElementById("continueBtn");
+    const formError = document.getElementById("formError");
+
+    const clientNameInput = document.getElementById("clientName");
+    const billingAddressInput = document.getElementById("billingAddress");
+    const serviceAddressInput = document.getElementById("serviceAddress");
+    const clientPhoneInput = document.getElementById("clientPhone");
+    const clientEmailInput = document.getElementById("clientEmail");
+
+    if (INTERNAL_MODE && continueBtn) {
+      continueBtn.textContent = "Continue to internal PDF";
+    }
+
+    const requiredFields = [
+      { el: clientNameInput, label: "Client Name" },
+      { el: billingAddressInput, label: "Billing Address" },
+      { el: clientPhoneInput, label: "Phone" }
+    ];
+
+    let SERVICE_TOTAL = 0;
+    let MATERIAL_TOTAL = 0;
+    let SUBTOTAL_TOTAL = 0;
+    let TAX_AMOUNT = 0;
+    let GRAND_TOTAL = 0;
+    let MATERIAL_CATALOG = [];
+
+    function parseJson(rawValue, fallbackValue) {
+      try {
+        const parsed = JSON.parse(rawValue);
+        return parsed == null ? fallbackValue : parsed;
+      } catch (_) {
+        return fallbackValue;
+      }
+    }
+
+    function readStorage(key, fallbackValue) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallbackValue;
+        return parseJson(raw, fallbackValue);
+      } catch (_) {
+        return fallbackValue;
+      }
+    }
+
+    function writeStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (_) {
+        // Ignore storage quota/restrictions
+      }
+    }
+
+    function money(n) {
+      const value = Number(n || 0);
+      return "$" + value.toFixed(2);
+    }
+
+    function toPositiveNumber(value, fallbackValue = 0) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallbackValue;
+    }
+
+    function escapeAttribute(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function normalizeEmployeeCode(rawValue) {
+      const cleaned = String(rawValue || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      if (!cleaned) return "EMP-LOCAL";
+      return `EMP-${cleaned.slice(-6).padStart(6, "0")}`;
+    }
+
+    function resolveCreatedBy() {
+      const employeeName = String(localStorage.getItem("employeeName") || "").trim();
+      const employeeEmail = String(localStorage.getItem("employeeEmail") || "").trim();
+      const source = employeeEmail || employeeName || "employee";
+      return {
+        name: employeeName || "Employee",
+        email: employeeEmail,
+        employeeCode: normalizeEmployeeCode(source)
+      };
+    }
+
+    function markInvalid(input, isInvalid) {
+      input.classList.toggle("ef-invalid", !!isInvalid);
+    }
+
+    function clearValidationState() {
+      requiredFields.forEach(({ el }) => markInvalid(el, false));
+      formError.textContent = "";
+    }
+
+    function validateClientSection() {
+      const missing = [];
+      requiredFields.forEach(({ el, label }) => {
+        const empty = !String(el.value || "").trim();
+        markInvalid(el, empty);
+        if (empty) missing.push(label);
+      });
+
+      if (missing.length) {
+        const suffix = missing.length > 1 ? "fields are" : "field is";
+        formError.textContent = `${missing.join(", ")} ${suffix} required.`;
+        return false;
+      }
+
+      formError.textContent = "";
+      return true;
+    }
+
+    function recalc() {
+      let subtotal = 0;
+      let serviceSubtotal = 0;
+      let materialSubtotal = 0;
+
+      [...itemsBody.querySelectorAll("tr")].forEach((tr) => {
+        const qty = parseFloat(tr.querySelector(".ef-qty").value) || 0;
+        const price = parseFloat(tr.querySelector(".ef-price").value) || 0;
+        const amount = qty * price;
+        const type = (tr.querySelector(".ef-type")?.value || "service").toLowerCase();
+
+        tr.querySelector(".ef-amount").textContent = money(amount);
+        subtotal += amount;
+
+        if (type === "material") materialSubtotal += amount;
+        else serviceSubtotal += amount;
+      });
+
+      const taxRate = parseFloat(taxInput.value) || 0;
+      const total = subtotal + (subtotal * (taxRate / 100));
+
+      totalLabel.textContent = money(total);
+      serviceTotalLabel.textContent = money(serviceSubtotal);
+      materialTotalLabel.textContent = money(materialSubtotal);
+
+      SERVICE_TOTAL = serviceSubtotal;
+      MATERIAL_TOTAL = materialSubtotal;
+      SUBTOTAL_TOTAL = subtotal;
+      TAX_AMOUNT = subtotal * (taxRate / 100);
+      GRAND_TOTAL = total;
+    }
+
+    function addRow(desc = "", qty = 1, price = 0, type = "service") {
+      const normalizedType = String(type || "service").toLowerCase() === "material" ? "material" : "service";
+      const normalizedQty = toPositiveNumber(qty, 1);
+      const normalizedPrice = toPositiveNumber(price, 0);
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>
+          <input class="ef-desc" type="text" placeholder="e.g. Install ceiling fan" value="${escapeAttribute(desc)}" />
+        </td>
+        <td>
+          <select class="ef-type">
+            <option value="service" ${normalizedType === "service" ? "selected" : ""}>Service</option>
+            <option value="material" ${normalizedType === "material" ? "selected" : ""}>Material</option>
+          </select>
+        </td>
+        <td>
+          <input class="ef-qty" type="number" min="0" step="0.01" value="${normalizedQty}" />
+        </td>
+        <td>
+          <input class="ef-price" type="number" min="0" step="0.01" value="${normalizedPrice}" />
+        </td>
+        <td class="ef-amount">${money(normalizedQty * normalizedPrice)}</td>
+        <td class="ef-remove">
+          <button type="button" class="ef-x" title="Remove">X</button>
+        </td>
+      `;
+
+      tr.querySelector(".ef-x").addEventListener("click", () => {
+        tr.remove();
+        recalc();
+      });
+
+      tr.querySelectorAll("input, select").forEach((input) => {
+        input.addEventListener("input", recalc);
+        input.addEventListener("change", recalc);
+      });
+
+      itemsBody.appendChild(tr);
+      recalc();
+    }
+
+    function normalizeMaterialRecord(rawMaterial) {
+      if (!rawMaterial || typeof rawMaterial !== "object") return null;
+      const id = String(rawMaterial.id || "").trim();
+      const name = String(rawMaterial.name || "").trim();
+      if (!id || !name) return null;
+      return {
+        id,
+        name,
+        category: String(rawMaterial.category || "").trim(),
+        unit: String(rawMaterial.unit || "").trim(),
+        size: String(rawMaterial.size || "").trim(),
+        cost: toPositiveNumber(rawMaterial.cost, 0),
+        defaultQty: toPositiveNumber(rawMaterial.defaultQty, 1),
+        notes: String(rawMaterial.notes || "").trim(),
+        active: rawMaterial.active !== false
+      };
+    }
+
+    function loadMaterialCatalog() {
+      const rawCatalog = readStorage(STORAGE_KEYS.materials, []);
+      const normalized = Array.isArray(rawCatalog)
+        ? rawCatalog.map(normalizeMaterialRecord).filter(Boolean).filter((item) => item.active)
+        : [];
+      normalized.sort((a, b) => a.name.localeCompare(b.name));
+      return normalized;
+    }
+
+    function formatMaterialOption(material) {
+      const unitText = material.unit ? ` / ${material.unit}` : "";
+      const sizeText = material.size ? ` (${material.size})` : "";
+      return `${material.name}${sizeText} - $${material.cost.toFixed(2)}${unitText}`;
+    }
+
+    function renderMaterialLibrary() {
+      MATERIAL_CATALOG = loadMaterialCatalog();
+      materialPicker.innerHTML = "";
+
+      if (!MATERIAL_CATALOG.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "No materials found. Create one in Materials / Inventory.";
+        materialPicker.appendChild(option);
+        addMaterialFromLibraryBtn.disabled = true;
+        materialQtyInput.disabled = true;
+        materialHelper.textContent = "Create your material catalog first, then reuse those prices here.";
+        return;
+      }
+
+      const placeholderOption = document.createElement("option");
+      placeholderOption.value = "";
+      placeholderOption.textContent = "Select material...";
+      materialPicker.appendChild(placeholderOption);
+
+      MATERIAL_CATALOG.forEach((material) => {
+        const option = document.createElement("option");
+        option.value = material.id;
+        option.textContent = formatMaterialOption(material);
+        materialPicker.appendChild(option);
+      });
+
+      addMaterialFromLibraryBtn.disabled = false;
+      materialQtyInput.disabled = false;
+      materialHelper.textContent = "Tip: define costs and units in Materials / Inventory to build accurate estimates faster.";
+    }
+
+    function addMaterialFromLibrary() {
+      const materialId = String(materialPicker.value || "").trim();
+      if (!materialId) {
+        materialHelper.textContent = "Select a material first.";
+        return;
+      }
+
+      const material = MATERIAL_CATALOG.find((item) => item.id === materialId);
+      if (!material) {
+        materialHelper.textContent = "Material not found. Refresh and try again.";
+        return;
+      }
+
+      const qtyInputValue = toPositiveNumber(materialQtyInput.value, material.defaultQty || 1);
+      const qty = qtyInputValue > 0 ? qtyInputValue : (material.defaultQty || 1);
+      const descriptor = [material.name, material.size].filter(Boolean).join(" - ");
+
+      addRow(descriptor, qty, material.cost, "material");
+      materialHelper.textContent = `${material.name} added to estimate.`;
+    }
+
+    function createHistoryId() {
+      const randomSegment = Math.random().toString(36).slice(2, 7).toUpperCase();
+      return `EST-${Date.now()}-${randomSegment}`;
+    }
+
+    function saveEstimateHistory(estimate) {
+      const historyId = createHistoryId();
+      estimate.historyId = historyId;
+
+      const history = readStorage(STORAGE_KEYS.history, []);
+      const status = INTERNAL_MODE
+        ? "internal-draft"
+        : (REQUEST_ID ? "proposal-pending" : "draft");
+      const record = {
+        id: historyId,
+        date: new Date().toISOString(),
+        status,
+        requestId: REQUEST_ID || null,
+        quoteNumber: String(estimate.quoteNumber || "").trim().toUpperCase(),
+        client: estimate.client,
+        phone: estimate.phone,
+        billingAddress: estimate.billingAddress,
+        serviceAddress: estimate.serviceAddress,
+        total: Number(estimate.breakdown?.total || 0),
+        itemsCount: Array.isArray(estimate.items) ? estimate.items.length : 0,
+        createdByName: estimate.createdBy?.name || "",
+        createdByCode: estimate.createdBy?.employeeCode || "",
+        estimateSnapshot: estimate
+      };
+
+      history.unshift(record);
+      writeStorage(STORAGE_KEYS.history, history.slice(0, 300));
+    }
+
+    function hydrateDraftIfAvailable() {
+      if (REQUEST_ID) return;
+      const draft = readStorage(STORAGE_KEYS.estimateDraft, null);
+      if (!draft || typeof draft !== "object") return;
+
+      clientNameInput.value = String(draft.client || "");
+      clientPhoneInput.value = String(draft.phone || "");
+      clientEmailInput.value = String(draft.email || "");
+      billingAddressInput.value = String(draft.billingAddress || draft.address || "");
+      serviceAddressInput.value = String(draft.serviceAddress || draft.shippingAddress || "");
+      taxInput.value = Number.isFinite(Number(draft.tax)) ? Number(draft.tax) : 0;
+
+      itemsBody.innerHTML = "";
+      const draftItems = Array.isArray(draft.items) ? draft.items : [];
+      if (draftItems.length) {
+        draftItems.forEach((item) => {
+          addRow(
+            String(item.desc || ""),
+            toPositiveNumber(item.qty, 1),
+            toPositiveNumber(item.price, 0),
+            String(item.type || "service").toLowerCase()
+          );
+        });
+      } else {
+        addRow();
+      }
+
+      recalc();
+      localStorage.removeItem(STORAGE_KEYS.estimateDraft);
+      materialHelper.textContent = "Draft loaded from Estimate History.";
+    }
+
+    function hydrateRequestPrefill() {
+      const prefill = readStorage(STORAGE_KEYS.requestPrefill, null);
+      if (!prefill || typeof prefill !== "object") return;
+
+      const prefillRequestId = String(prefill.requestId || "").trim();
+      if (REQUEST_ID && prefillRequestId && prefillRequestId !== REQUEST_ID) return;
+
+      if (!String(clientNameInput.value || "").trim()) {
+        clientNameInput.value = String(prefill.client || "").trim();
+      }
+      if (!String(clientEmailInput.value || "").trim()) {
+        clientEmailInput.value = String(prefill.email || "").trim();
+      }
+      if (!String(billingAddressInput.value || "").trim()) {
+        billingAddressInput.value = String(prefill.billingAddress || prefill.address || "").trim();
+      }
+      if (!String(serviceAddressInput.value || "").trim()) {
+        serviceAddressInput.value = String(prefill.serviceAddress || prefill.billingAddress || prefill.address || "").trim();
+      }
+
+      try {
+        localStorage.removeItem(STORAGE_KEYS.requestPrefill);
+      } catch (_) {
+        // ignore storage restrictions
+      }
+
+      if (String(prefill.source || "").trim() === "boss-panel") {
+        materialHelper.textContent = "Client data loaded from the boss panel request.";
+      }
+    }
+
+    requiredFields.forEach(({ el }) => {
+      el.addEventListener("input", () => {
+        if (String(el.value || "").trim()) {
+          markInvalid(el, false);
+          if (!requiredFields.some(({ el: requiredEl }) => !String(requiredEl.value || "").trim())) {
+            formError.textContent = "";
+          }
+        }
+      });
+    });
+
+    addItemBtn.addEventListener("click", () => addRow());
+    addMaterialFromLibraryBtn.addEventListener("click", addMaterialFromLibrary);
+    taxInput.addEventListener("input", recalc);
+
+    materialPicker.addEventListener("change", () => {
+      const materialId = String(materialPicker.value || "").trim();
+      const selected = MATERIAL_CATALOG.find((item) => item.id === materialId);
+      if (selected) {
+        materialQtyInput.value = selected.defaultQty || 1;
+        materialHelper.textContent = selected.notes || "Ready to add this material.";
+      }
+    });
+
+    continueBtn.addEventListener("click", async () => {
+      clearValidationState();
+      if (!validateClientSection()) return;
+
+      const client = String(clientNameInput.value || "").trim();
+      const billingAddress = String(billingAddressInput.value || "").trim();
+      const serviceAddress = String(serviceAddressInput.value || "").trim() || billingAddress;
+      const phone = String(clientPhoneInput.value || "").trim();
+      const email = String(clientEmailInput.value || "").trim();
+      const legacyContact = [phone, email].filter(Boolean).join(" / ");
+
+      const createdBy = resolveCreatedBy();
+      const estimate = {
+        requestId: REQUEST_ID,
+        deliveryMode: INTERNAL_MODE ? "internal" : "client",
+        client,
+        phone,
+        email,
+        billingAddress,
+        serviceAddress,
+        isProEstimate: PRO_MODE,
+        createdBy,
+        createdByRole: String(CURRENT_PROFILE?.role || "employee").trim().toLowerCase() || "employee",
+        createdByCode: createdBy.employeeCode,
+        // Backward compatibility for existing flows
+        address: billingAddress,
+        contact: legacyContact,
+        tax: taxInput.value,
+        breakdown: {
+          serviceTotal: SERVICE_TOTAL,
+          materialTotal: MATERIAL_TOTAL,
+          subtotal: SUBTOTAL_TOTAL,
+          taxRate: parseFloat(taxInput.value) || 0,
+          taxAmount: TAX_AMOUNT,
+          total: GRAND_TOTAL
+        },
+        items: [...itemsBody.querySelectorAll("tr")].map((tr) => {
+          const desc = tr.querySelector(".ef-desc").value.trim();
+          const type = (tr.querySelector(".ef-type").value || "service").toLowerCase();
+          const qty = toPositiveNumber(tr.querySelector(".ef-qty").value, 0);
+          const price = toPositiveNumber(tr.querySelector(".ef-price").value, 0);
+          const amount = qty * price;
+          return { desc, type, qty, price, amount: amount.toFixed(2) };
+        })
+      };
+
+      saveEstimateHistory(estimate);
+      writeStorage(STORAGE_KEYS.estimate, estimate);
+      localStorage.removeItem(STORAGE_KEYS.estimateDraft);
+
+      if (PRO_MODE) {
+        await logProAction("GENERATE_ESTIMATE", {
+          source: "estimate-form.html",
+          requestId: REQUEST_ID || "",
+          itemsCount: Array.isArray(estimate.items) ? estimate.items.length : 0,
+          total: Number(estimate.breakdown?.total || 0),
+          client: estimate.client || ""
+        });
+      }
+
+      const templateParams = new URLSearchParams();
+      if (PRO_MODE) templateParams.set("pro", "1");
+      if (INTERNAL_MODE) templateParams.set("mode", "internal");
+      const templateUrl = templateParams.toString()
+        ? `estimate-template.html?${templateParams.toString()}`
+        : "estimate-template.html";
+      window.location.href = templateUrl;
+    });
+
+    addRow();
+    renderMaterialLibrary();
+    hydrateDraftIfAvailable();
+    hydrateRequestPrefill();
+    recalc();
+  </script>
+  <script type="module" src="assets/js/company-branding.js?v=20260228e"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AutoDev Task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "titulo",
+    "descripcion",
+    "modulo",
+    "estado",
+    "reintentos",
+    "modo",
+    "areaObjetivo",
+    "plataformaObjetivo",
+    "aplicacionObjetivo",
+    "creadoEn",
+    "actualizadoEn",
+    "resumenResultado"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "titulo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "descripcion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "modulo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "estado": {
+      "type": "string",
+      "enum": [
+        "pendiente",
+        "ejecutando",
+        "fallido",
+        "completado",
+        "requiere_revision"
+      ]
+    },
+    "reintentos": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "modo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "areaObjetivo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "plataformaObjetivo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "aplicacionObjetivo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "creadoEn": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actualizadoEn": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resumenResultado": {
+      "type": "string",
+      "minLength": 1
+    },
+    "categoriaFix": {
+      "type": "string",
+      "minLength": 1
+    },
+    "clasificacion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "archivosObjetivo": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "requiereRevision": {
+      "type": "boolean"
+    },
+    "taskKind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taskKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fixPayload": {
+      "type": "object"
+    },
+    "taskPath": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

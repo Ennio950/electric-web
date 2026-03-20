@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Login | Straight Wire Electric</title>
+  <script src="assets/js/company-branding-bootstrap.js?v=20260301b"></script>
+  <link rel="stylesheet" href="assets/css/portal-auth.css?v=20260309b" />
+
+  <!-- Face-API (TensorFlow.js) -->
+  <script defer src="assets/vendor/face-api/face-api.min.js"></script>
+</head>
+
+<body class="auth-shell font-sans text-white flex items-center justify-center p-4 md:p-6" data-portal-theme="employee">
+
+  <!-- Dark Gradient Overlay -->
+  <div class="overlay"></div>
+
+  <!-- Floating Back Button -->
+  <a href="index.html"
+    class="fixed top-6 left-6 z-50 flex items-center gap-2 px-5 py-2.5 bg-black/30 backdrop-blur-md border border-white/10 rounded-full text-white text-sm font-bold hover:bg-black/50 hover:scale-105 transition-all shadow-lg group">
+    <span class="group-hover:-translate-x-1 transition-transform font-bold text-electric">&larr;</span> Volver al inicio
+  </a>
+
+  <!-- Main Card -->
+  <div class="glass-card w-full max-w-[420px] p-8 md:p-10 rounded-2xl animate-fade-in-up relative z-10">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <img src="assets/images/logo.webp" alt="Straight Wire Electric"
+        class="h-16 w-auto mx-auto mb-4 drop-shadow-lg object-contain" decoding="async" fetchpriority="high">
+      <h1 class="text-2xl font-black tracking-widest text-white mb-2 uppercase">
+        Employee <span class="text-green-500">Login</span>
+      </h1>
+      <p class="text-gray-400 text-sm tracking-wide">Acceso Interno / Operativo</p>
+    </div>
+
+    <!-- Auth Form -->
+    <form id="loginForm" class="space-y-6">
+
+      <!-- Email -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1 tracking-wider">Email</label>
+        <input type="email" id="email" required
+          class="input-hud w-full px-4 py-3.5 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="tecnico@electric.com">
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1 tracking-wider">Contrasena</label>
+        <input type="password" id="password" required
+          class="input-hud w-full px-4 py-3.5 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="********">
+      </div>
+
+      <!-- Error Log -->
+      <p id="error" class="text-red-400 text-sm text-center min-h-[20px] font-semibold"></p>
+
+      <!-- Submit Button -->
+      <button type="submit"
+        class="btn-glow w-full text-white font-black py-3.5 rounded-xl flex items-center justify-center gap-2 uppercase tracking-wide text-sm">
+        LOGIN
+      </button>
+
+      <div class="text-center text-sm">
+        <span class="text-gray-400">&iquest;Quieres unirte?</span>
+        <button type="button" id="showAppFormBtn" class="text-green-400 font-bold ml-1 hover:underline">
+          Solicitar Empleo
+        </button>
+      </div>
+
+    </form>
+
+    <!-- JOB APPLICATION FORM (Hidden) -->
+    <form id="appForm" class="space-y-4" style="display:none;">
+      <h3 class="text-lg font-bold text-center text-green-400 mb-2">SOLICITUD DE EMPLEO</h3>
+
+      <!-- Name -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1 tracking-wider">Nombre Completo</label>
+        <input type="text" id="appName" required
+          class="input-hud w-full px-4 py-3 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="Juan Perez">
+      </div>
+
+      <!-- Address -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1 tracking-wider">Direccion de
+          Residencia</label>
+        <input type="text" id="appAddress" required
+          class="input-hud w-full px-4 py-3 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="Ej: Calle 10 #5-20, Zona 1">
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1 tracking-wider">Celular
+          (WhatsApp)</label>
+        <input type="tel" id="appPhone" required
+          class="input-hud w-full px-4 py-3 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="+54 9 11 1234 5678">
+      </div>
+
+      <!-- Selfie Scan -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1 tracking-wider">Escaneo Facial</label>
+        <div id="scanControl" class="flex flex-col gap-2">
+          <button type="button" id="startCameraScanBtn"
+            class="w-full py-3 rounded-xl border border-green-500 text-green-400 hover:bg-green-500/10 transition font-bold uppercase text-sm flex items-center justify-center gap-2">
+            Iniciar Escaneo
+          </button>
+          <input type="hidden" id="appPhotoBlob"> <!-- Stores the captured blob URL or base64 -->
+          <div id="scanPreview"
+            class="hidden relative w-full h-48 bg-black rounded-xl overflow-hidden border border-gray-600">
+            <img id="scanResult" class="w-full h-full object-cover">
+            <button type="button" id="retakeCameraScanBtn"
+              class="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full text-xs">Retake</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMERA MODAL -->
+      <div id="cameraModal" style="display:none;"
+        class="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-4">
+        <div
+          class="relative w-full max-w-sm aspect-[3/4] bg-black rounded-2xl overflow-hidden border-2 border-green-500 shadow-2xl shadow-green-900/50">
+          <video id="cameraFeed" autoplay playsinline class="w-full h-full object-cover transform scale-x-[-1]"></video>
+          <!-- Mirrored -->
+
+          <!-- Face Guide Overlay -->
+          <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+            <div
+              class="w-48 h-64 border-2 border-green-400/50 rounded-[50%] box-shadow-[0_0_100px_rgba(0,0,0,0.5)_inset]">
+            </div>
+          </div>
+
+          <!-- Scan Line Animation -->
+          <div id="scanLine"
+            class="absolute top-0 left-0 w-full h-1 bg-green-500 shadow-[0_0_15px_#22c55e] animate-scan opacity-50">
+          </div>
+
+          <!-- Auto-Capture Feedback -->
+          <div id="scanStatus"
+            class="absolute bottom-10 left-0 w-full text-center text-green-400 font-bold text-lg drop-shadow-md">
+            Buscando rostro...
+          </div>
+
+          <div id="scanCountdown"
+            class="absolute inset-0 flex items-center justify-center text-white font-black text-8xl opacity-0 scale-50 transition-all duration-300 pointer-events-none"
+            style="text-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            3
+          </div>
+        </div>
+
+        <p class="text-gray-400 text-sm mt-4 text-center">Ubica tu rostro dentro del ovalo</p>
+
+        <div class="flex gap-4 mt-6 w-full max-w-sm">
+          <button type="button" id="closeCameraBtn"
+            class="flex-1 py-3 rounded-xl bg-gray-800 text-white font-bold">Cancelar</button>
+          <button id="btnCapture" type="button"
+            class="flex-1 py-3 rounded-xl bg-green-500 text-black font-bold">Manual</button>
+        </div>
+        <canvas id="cameraCanvas" style="display:none;"></canvas>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1 tracking-wider">Email Personal</label>
+        <input type="email" id="appEmail" required
+          class="input-hud w-full px-4 py-3 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="juan@email.com">
+      </div>
+
+      <!-- Password (Register) -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1 tracking-wider">Crear Contrasena</label>
+        <input type="password" id="appPass" required
+          class="input-hud w-full px-4 py-3 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="Minimo 6 caracteres">
+      </div>
+
+      <!-- Submit Application -->
+      <button type="submit"
+        class="btn-glow w-full text-white font-black py-3.5 rounded-xl flex items-center justify-center gap-2 uppercase tracking-wide text-sm mt-4">
+        ENVIAR SOLICITUD
+      </button>
+
+      <p id="appError" class="text-red-400 text-sm text-center min-h-[20px] font-semibold"></p>
+
+      <div class="text-center text-sm mt-4">
+        <span class="text-gray-400">&iquest;Ya tienes cuenta?</span>
+        <button type="button" id="showLoginFormBtn" class="text-green-400 font-bold ml-1 hover:underline">
+          Iniciar Sesion</button>
+      </div>
+    </form>
+
+    <div class="mt-8 text-center text-xs text-gray-500 uppercase tracking-widest opacity-60">
+      Internal Access Only
+    </div>
+
+  </div>
+
+  <script type="module" src="assets/js/auth.js?v=20260213c"></script>
+  <script type="module" src="assets/js/auth-apply.js?v=20260310b"></script>
+  <script type="module" src="assets/js/company-branding.js?v=20260228e"></script>
+</body>
+
+</html>
+

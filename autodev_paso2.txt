@@ -1,0 +1,213 @@
+Eres un agente autónomo de ingeniería de software trabajando dentro de un laboratorio de desarrollo.
+
+Misión:
+Crear el PASO 2 del laboratorio AutoDev para el proyecto Electric Web.
+
+Contexto:
+El repositorio ya contiene el código principal de Electric Web.
+En el PASO 1 se creó la carpeta autodev-lab/ y el reporte de auditoría del repositorio.
+
+El repositorio es un monorepo basado en Node.js que incluye:
+
+- straight-wire-backend/ (backend Express)
+- builder-react/ (frontend React)
+- apps/mobile/ (aplicación móvil React Native con Expo)
+- packages/estimator-core/
+- packages/builder-domain/
+
+La estrategia móvil oficial del proyecto será React Native con Expo.
+NO se debe introducir Flutter en este paso.
+
+Objetivo:
+Crear la primera versión funcional del motor AutoDev dentro del repositorio, sin romper el código existente, orientado a analizar, mejorar y extender la aplicación móvil React Native.
+
+Reglas importantes:
+
+- NO modificar código existente del proyecto.
+- Solo crear archivos dentro de autodev-lab/.
+- Mantener la arquitectura simple, modular y extensible.
+- Usar Node.js para el motor AutoDev.
+- Preparar la arquitectura para integrarse en el futuro con:
+  n8n
+  OpenClaw
+  Codex
+  Claude
+  Ollama
+  control por WhatsApp
+
+Crear la siguiente estructura si no existe:
+
+autodev-lab/
+  engine/
+  engine/core/
+  engine/agents/
+  engine/config/
+  engine/tasks/
+  scripts/
+  tasks/
+  reports/
+  logs/
+
+Archivos a crear:
+
+1. autodev-lab/engine/index.js
+
+Punto de entrada principal del motor AutoDev.
+
+2. autodev-lab/engine/core/taskManager.js
+
+Responsable de:
+
+- crear tareas
+- cargar tareas
+- actualizar estado de tareas
+- guardar metadata en archivos JSON
+
+3. autodev-lab/engine/core/loopRunner.js
+
+Responsable de ejecutar el ciclo AutoDev.
+
+Fases del ciclo:
+
+- análisis
+- planificación
+- implementación
+- validación
+- reporte
+
+Por ahora implementar funciones placeholder que solo registren logs.
+
+4. autodev-lab/engine/core/logger.js
+
+Crear un sistema de logs reutilizable que escriba:
+
+- logs en consola
+- logs con timestamp en autodev-lab/logs/
+
+5. autodev-lab/engine/core/reporter.js
+
+Generar reportes en formato markdown para cada ejecución de tarea.
+
+Guardar reportes en:
+
+autodev-lab/reports/
+
+6. autodev-lab/engine/config/default.config.json
+
+Debe contener:
+
+- nombre del motor
+- versión
+- máximo de reintentos
+- rutas de logs
+- rutas de reportes
+- rutas de tareas
+- estrategia móvil: react-native-expo
+
+7. autodev-lab/engine/agents/claude.agent.js
+
+Crear módulo placeholder con funciones:
+
+analizarTarea()
+revisarResultado()
+
+8. autodev-lab/engine/agents/codex.agent.js
+
+Crear módulo placeholder con funciones:
+
+generarPlanImplementacion()
+generarParcheCodigo()
+
+9. autodev-lab/engine/agents/openclaw.agent.js
+
+Crear módulo placeholder con funciones:
+
+inspeccionarRepositorio()
+ejecutarComandoLocal()
+
+10. autodev-lab/engine/tasks/task.schema.json
+
+Definir esquema JSON de tareas con campos:
+
+- id
+- titulo
+- descripcion
+- modulo
+- estado
+- reintentos
+- modo
+- areaObjetivo
+- plataformaObjetivo
+- aplicacionObjetivo
+- creadoEn
+- actualizadoEn
+- resumenResultado
+
+11. autodev-lab/scripts/create-task.js
+
+Script CLI para crear nuevas tareas dentro de:
+
+autodev-lab/tasks/
+
+12. autodev-lab/scripts/run-task.js
+
+Script CLI para ejecutar una tarea usando loopRunner.
+
+13. autodev-lab/tasks/sample-task.json
+
+Crear tarea de ejemplo:
+
+titulo: "Auditar aplicación móvil React Native"
+
+areaObjetivo: mobile
+plataformaObjetivo: react-native-expo
+aplicacionObjetivo: apps/mobile
+
+Objetivo de la tarea:
+
+Analizar la estructura actual de la app React Native y generar recomendaciones de mejora.
+
+14. autodev-lab/README.md
+
+Explicar:
+
+- qué es AutoDev Lab
+- cómo crear tareas
+- cómo ejecutar tareas
+- cómo se integra con Electric Web
+
+Detalles de implementación:
+
+- usar módulos CommonJS de Node.js
+- mantener el código simple
+- evitar complejidad innecesaria
+
+Comportamiento del loopRunner:
+
+- cargar tarea
+- ejecutar análisis
+- ejecutar planificación
+- ejecutar implementación
+- ejecutar validación
+- generar reporte
+
+Estados de tarea permitidos:
+
+pendiente
+ejecutando
+fallido
+completado
+requiere_revision
+
+Salida final esperada:
+
+Mostrar en la terminal:
+
+- archivos creados
+- cómo crear una tarea
+- cómo ejecutar una tarea
+- cuál es el siguiente paso recomendado del laboratorio AutoDev
+
+Modo de ejecución:
+
+SAFE_AUTODEV_BOOTSTRAP_REACT_NATIVE

@@ -1,0 +1,16 @@
+[Unit]
+Description=Straight Wire Electric Web
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/electric-web/straight-wire-backend
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=5
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

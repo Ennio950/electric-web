@@ -1,0 +1,64 @@
+{
+  "id": "g4H8pL2sQ7vN1xCm",
+  "name": "Electric Web Copia Native Scheduler (Optional)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "15 2 * * *"
+            }
+          ]
+        }
+      },
+      "id": "ScheduleTrigger_ConvertProject",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        300,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"/workspace/electric-web/autodev-lab/n8n/mobile-native-build-runner.mjs\" convert"
+      },
+      "id": "ExecuteCommand_ConvertProject",
+      "name": "Convert Electric Web Copia",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        700,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Convert Electric Web Copia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "electric-web-copia-native-scheduler-docker-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

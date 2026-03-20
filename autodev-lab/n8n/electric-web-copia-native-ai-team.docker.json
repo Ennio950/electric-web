@@ -1,0 +1,158 @@
+{
+  "id": "f4N7sK2Wp8VmQ3Dx",
+  "name": "Electric Web Copia Native AI Team",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ManualTrigger_AITeam",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "45 1 * * *"
+            }
+          ]
+        }
+      },
+      "id": "ScheduleTrigger_AITeam",
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"/workspace/electric-web/autodev-lab/n8n/native-multi-agent-runner.mjs\" deepseek"
+      },
+      "id": "ExecuteCommand_DeepSeek",
+      "name": "Run DeepSeek CPU Analysis",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        620,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"/workspace/electric-web/autodev-lab/n8n/native-multi-agent-runner.mjs\" codex"
+      },
+      "id": "ExecuteCommand_Codex",
+      "name": "Run Codex Native Pass",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        960,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"/workspace/electric-web/autodev-lab/n8n/native-multi-agent-runner.mjs\" claude"
+      },
+      "id": "ExecuteCommand_Claude",
+      "name": "Run Claude Review",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"/workspace/electric-web/autodev-lab/n8n/native-multi-agent-runner.mjs\" convert"
+      },
+      "id": "ExecuteCommand_Convert",
+      "name": "Run Native Converter",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run DeepSeek CPU Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run DeepSeek CPU Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run DeepSeek CPU Analysis": {
+      "main": [
+        [
+          {
+            "node": "Run Codex Native Pass",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Codex Native Pass": {
+      "main": [
+        [
+          {
+            "node": "Run Claude Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Claude Review": {
+      "main": [
+        [
+          {
+            "node": "Run Native Converter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "electric-web-copia-native-ai-team-docker-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

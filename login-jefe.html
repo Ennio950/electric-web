@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Jefe | Straight Wire Electric</title>
+  <script src="assets/js/company-branding-bootstrap.js?v=20260301b"></script>
+  <link rel="stylesheet" href="assets/css/portal-auth.css?v=20260309b" />
+</head>
+
+<body class="auth-shell font-sans text-white min-h-screen flex items-center justify-center p-4" data-portal-theme="boss">
+
+  <!-- Dark Gradient Overlay -->
+  <div class="overlay"></div>
+
+  <!-- Floating Back Button -->
+  <a href="index.html"
+    class="fixed top-6 left-6 z-50 flex items-center gap-2 px-5 py-2.5 bg-black/30 backdrop-blur-md border border-white/10 rounded-full text-white text-sm font-bold hover:bg-black/50 hover:scale-105 transition-all shadow-lg group">
+    <span class="group-hover:-translate-x-1 transition-transform font-bold text-electric">&larr;</span> Volver al inicio
+  </a>
+
+  <!-- Main Card -->
+  <div class="glass-card w-full max-w-[420px] p-8 md:p-10 rounded-2xl animate-fade-in-up relative z-10">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <img src="assets/images/logo.webp" alt="Straight Wire Electric"
+        class="h-16 w-auto mx-auto mb-4 drop-shadow-lg object-contain" decoding="async" fetchpriority="high">
+      <h1 class="text-2xl font-black tracking-widest text-white mb-2 uppercase">
+        Panel <span class="text-purple-500">Jefe</span>
+      </h1>
+      <p class="text-gray-400 text-sm tracking-wide">Acceso de administracion y auditoria</p>
+    </div>
+
+    <!-- Auth Form -->
+    <form id="bossLoginForm" class="space-y-6">
+
+      <!-- Email -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1 tracking-wider">Email</label>
+        <input type="email" id="email" required
+          class="input-hud w-full px-4 py-3.5 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="boss@straightwireelectric.com">
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1 tracking-wider">Contrasena</label>
+        <input type="password" id="password" required
+          class="input-hud w-full px-4 py-3.5 rounded-xl outline-none placeholder-gray-600 text-sm"
+          placeholder="********">
+      </div>
+
+      <!-- Error Log -->
+      <p id="error" class="text-red-400 text-sm text-center min-h-[20px] font-semibold"></p>
+
+      <!-- Submit Button -->
+      <button type="submit"
+        class="btn-glow w-full text-white font-black py-3.5 rounded-xl flex items-center justify-center gap-2 uppercase tracking-wide text-sm">
+        ENTRAR
+      </button>
+
+    </form>
+
+    <div class="mt-8 text-center text-xs text-gray-500 uppercase tracking-widest opacity-60">
+      Internal Access Only
+    </div>
+
+  </div>
+
+  <script type="module" src="assets/js/auth-boss.js?v=20260213c"></script>
+  <script type="module" src="assets/js/company-branding.js?v=20260228e"></script>
+</body>
+
+</html>

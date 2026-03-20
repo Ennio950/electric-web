@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Jefe | Straight Wire Electric</title>
+  <script src="assets/js/company-branding-bootstrap.js?v=20260310a"></script>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/boss-master.css?v=20260310b" />
+  <link rel="stylesheet" href="assets/css/chat.css?v=20260213e" />
+</head>
+
+<body>
+  <div class="main-viewport">
+
+    <div class="master-panel">
+      <div class="master-header">
+        <div class="master-header-top">
+          <h1 class="master-title">Panel Jefe</h1>
+          <div class="pill status-pill" id="rtPill" aria-live="polite" data-state="on">Tiempo real activo</div>
+          <button type="button" class="pill quick-btn app-btn" data-boss-ui-action="open-app-modal">
+            <span>Solicitudes</span>
+          </button>
+          <button type="button" class="pill quick-btn logout-btn" data-boss-ui-action="do-logout">
+            Salir
+          </button>
+          <div id="bossPill" style="display:none;"></div>
+        </div>
+        <p class="master-subtitle">Control total y auditoria.</p>
+        <button type="button" class="master-cta-btn" data-boss-ui-action="open-standalone-estimate">Crear cotizacion sin solicitud</button>
+
+        <div class="earnings-ticker" role="button" tabindex="0" data-boss-ui-action="toggle-history">
+          <span>Hoy: <span id="eToday">$0</span></span>
+          <span>All: <span id="eAll">$0</span></span>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <button type="button" class="tab-btn active" data-filter="all" data-boss-ui-action="set-filter">Todas</button>
+        <button type="button" class="tab-btn" data-filter="new" data-boss-ui-action="set-filter">New</button>
+        <button type="button" class="tab-btn" data-filter="assigned" data-boss-ui-action="set-filter">Asig.</button>
+        <button type="button" class="tab-btn" data-filter="in_progress" data-boss-ui-action="set-filter">En Curso</button>
+        <button type="button" class="tab-btn tab-review" data-filter="review" data-boss-ui-action="set-filter">Revision</button>
+        <button type="button" class="tab-btn" data-filter="done" data-boss-ui-action="set-filter">Fin</button>
+      </div>
+
+      <div class="scroll-list" id="list"></div>
+
+      <div id="historyPanel" class="history-overlay hidden">
+        <div class="history-header">
+          <span>Historial pagos empleados</span>
+          <button type="button" data-boss-ui-action="toggle-history" style="background:none; border:none; color:#fff; cursor:pointer;">x</button>
+        </div>
+        <div id="historyList"></div>
+      </div>
+    </div>
+
+    <div class="detail-panel" id="detailPanel">
+      <div id="detailEmpty" class="empty-state">
+        <div style="font-size:3rem;">Panel de control</div>
+        <h3>Selecciona una solicitud</h3>
+        <p>Revisa detalles, chat y aprobaciones de pago.</p>
+      </div>
+      <div id="detailView" style="display:none; padding-bottom:100px;"></div>
+
+      <section class="action-hero boss-dashboard-card" id="bossDashboardCard">
+        <div class="boss-analytics-shell">
+          <div class="boss-dashboard-head boss-analytics-headline">
+            <div>
+              <h3 class="boss-analytics-title">BOSS ANALYTICS DASHBOARD</h3>
+              <p class="boss-dashboard-sub">Control visual de solicitudes, pagos, emergencias y actividad operativa en tiempo real.</p>
+            </div>
+            <div class="boss-analytics-top-actions">
+              <div class="boss-realtime-chip">
+                <span>Realtime</span>
+                <strong id="dashRealtime">ON</strong>
+              </div>
+              <button class="btn btn-secondary" id="dashboardRefreshAllBtn" type="button">Actualizar todo</button>
+              <button class="btn" id="dashboardToggleSectionsBtn" type="button">Minimizar secciones</button>
+            </div>
+          </div>
+
+          <div class="boss-filter-bar">
+            <label>
+              Canal
+              <select id="dashFilterSource">
+                <option value="all">Todos</option>
+                <option value="request">Solicitudes</option>
+                <option value="emergency">Emergencias</option>
+              </select>
+            </label>
+            <label>
+              Empleado
+              <select id="dashFilterEmployee">
+                <option value="">Todos</option>
+              </select>
+            </label>
+            <label>
+              Categoría
+              <select id="dashFilterCategory">
+                <option value="">Todas</option>
+              </select>
+            </label>
+            <label>
+              Estado
+              <select id="dashFilterStatus">
+                <option value="all">Todos</option>
+                <option value="pending">Pendientes</option>
+                <option value="inCourse">En curso</option>
+                <option value="review">En revisión</option>
+                <option value="done">Finalizadas</option>
+              </select>
+            </label>
+            <label>
+              Cliente
+              <select id="dashFilterClient">
+                <option value="">Todos</option>
+              </select>
+            </label>
+            <label>
+              Urgencia
+              <select id="dashFilterUrgency">
+                <option value="all">Todas</option>
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="normal">Normal</option>
+                <option value="baja">Baja</option>
+              </select>
+            </label>
+            <label>
+              Monto mínimo
+              <input id="dashFilterAmountMin" type="number" min="0" step="0.01" placeholder="0.00" />
+            </label>
+            <label>
+              Monto máximo
+              <input id="dashFilterAmountMax" type="number" min="0" step="0.01" placeholder="9999.00" />
+            </label>
+            <label>
+              Desde
+              <input id="dashFilterDateFrom" type="date" />
+            </label>
+            <label>
+              Hasta
+              <input id="dashFilterDateTo" type="date" />
+            </label>
+            <button class="btn" id="dashFilterClearBtn" type="button">Limpiar filtros</button>
+            <div class="boss-filter-result" id="dashFilterResult">Mostrando 0 de 0</div>
+          </div>
+
+          <div class="boss-kpi-strip">
+            <article class="dash-tile">
+              <span class="dash-label">Solicitudes totales</span>
+              <strong class="dash-value" id="dashTotalRequests">0</strong>
+            </article>
+            <article class="dash-tile">
+              <span class="dash-label">Trabajos activos</span>
+              <strong class="dash-value" id="dashWorkingRequests">0</strong>
+            </article>
+            <article class="dash-tile">
+              <span class="dash-label">Cola pagos revisión</span>
+              <strong class="dash-value" id="dashReviewQueue">0</strong>
+            </article>
+            <article class="dash-tile">
+              <span class="dash-label">Emergencias activas</span>
+              <strong class="dash-value" id="dashEmergencyActive">0</strong>
+            </article>
+            <article class="dash-tile">
+              <span class="dash-label">Eventos auditoría</span>
+              <strong class="dash-value" id="dashAuditEvents">0</strong>
+            </article>
+            <article class="dash-tile">
+              <span class="dash-label">Tasa de cierre</span>
+              <strong class="dash-value" id="dashClosureRate">0%</strong>
+            </article>
+          </div>
+
+          <div class="boss-analytics-grid">
+            <article class="dash-panel">
+              <h4>Distribución por categoría</h4>
+              <div class="dash-donut-wrap">
+                <div class="dash-donut" id="dashCategoryDonut"></div>
+                <div class="dash-donut-center">
+                  <strong id="dashCategoryTopCount">0</strong>
+                  <span id="dashCategoryTopLabel">Sin categoría</span>
+                </div>
+              </div>
+              <div class="dash-legend" id="dashCategoryLegend"></div>
+            </article>
+
+            <article class="dash-panel">
+              <h4>Pipeline por estado</h4>
+              <div class="dash-bars" id="dashStatusBars">
+                <div class="dash-empty">Cargando estados...</div>
+              </div>
+            </article>
+
+            <article class="dash-panel">
+              <h4>Matriz operativa</h4>
+              <div class="dash-matrix-wrap">
+                <table class="dash-matrix">
+                  <thead>
+                    <tr>
+                      <th>Canal</th>
+                      <th>Pend.</th>
+                      <th>Curso</th>
+                      <th>Rev.</th>
+                      <th>Fin</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashMatrixBody">
+                    <tr>
+                      <td colspan="6" class="dash-empty">Cargando matriz...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+
+          <div class="boss-analytics-bottom">
+            <article class="dash-panel">
+              <h4>Flujo de comisiones</h4>
+              <div class="dash-flow-list">
+                <div class="dash-flow-item">
+                  <span>Comisión hoy</span>
+                  <strong id="dashCommissionToday">$0</strong>
+                </div>
+                <div class="dash-flow-item">
+                  <span>Comisión total</span>
+                  <strong id="dashCommissionAll">$0</strong>
+                </div>
+                <div class="dash-flow-item">
+                  <span>Promedio por pago</span>
+                  <strong id="dashAvgCommission">$0</strong>
+                </div>
+                <div class="dash-flow-item">
+                  <span>Comprobantes pendientes</span>
+                  <strong id="dashPendingProofs">0</strong>
+                </div>
+              </div>
+            </article>
+
+            <article class="dash-panel">
+              <h4>Control fundamental</h4>
+              <div class="dash-pill-grid">
+                <div class="dash-pill-item">
+                  <span>Salud operativa</span>
+                  <strong id="dashOperationalHealth">0%</strong>
+                </div>
+                <div class="dash-pill-item">
+                  <span>Riesgo revisión</span>
+                  <strong id="dashReviewRisk">0%</strong>
+                </div>
+                <div class="dash-pill-item">
+                  <span>Cobertura empleados</span>
+                  <strong id="dashEmployeeCoverage">0%</strong>
+                </div>
+                <div class="dash-pill-item">
+                  <span>Índice auditoría</span>
+                  <strong id="dashAuditIntensity">0</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="action-hero pro-audit-card collapsible-card" id="emergencyPaymentsCard" data-default-collapsed="true">
+        <div class="pro-audit-head">
+          <h3 style="margin:0;">Pagos pendientes de aprobacion</h3>
+          <div class="pro-audit-head-actions">
+            <button class="btn btn-secondary" id="emergencyPaymentsRefreshBtn" type="button">Refrescar</button>
+            <button class="btn" data-collapse-btn type="button">Expandir</button>
+          </div>
+        </div>
+        <div class="collapsible-body">
+          <div id="emergencyPaymentsList" style="display:grid; gap:12px; margin-top:12px;">
+            <div class="pro-audit-empty">Cargando pagos de emergencias...</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="action-hero pro-audit-card collapsible-card" id="proAuditCard" data-default-collapsed="true">
+        <div class="pro-audit-head">
+          <h3 style="margin:0;">Actividad operativa reciente</h3>
+          <div class="pro-audit-head-actions">
+            <button class="btn btn-secondary" id="proAuditRefreshBtn" type="button">Refrescar</button>
+            <button class="btn" data-collapse-btn type="button">Expandir</button>
+          </div>
+        </div>
+
+        <div class="collapsible-body">
+          <div class="pro-audit-filters">
+            <label>
+              Actor
+              <select id="proAuditEmployeeFilter">
+                <option value="">Todos</option>
+              </select>
+            </label>
+            <label>
+              Evento
+              <select id="proAuditActionFilter">
+                <option value="">Todas</option>
+              </select>
+            </label>
+            <label>
+              Desde
+              <input id="proAuditFromDate" type="date" />
+            </label>
+            <label>
+              Hasta
+              <input id="proAuditToDate" type="date" />
+            </label>
+            <label>
+              Ventana
+              <select id="proAuditLimit">
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="pro-audit-table-wrap">
+            <table class="pro-audit-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Actor</th>
+                  <th>Evento</th>
+                  <th>Detalle</th>
+                  <th>Accion</th>
+                </tr>
+              </thead>
+              <tbody id="proAuditBody">
+                <tr>
+                  <td colspan="5" class="pro-audit-empty">Cargando actividad...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pro-audit-pagination">
+            <button class="btn" id="proAuditPrevBtn" type="button">Anterior</button>
+            <span id="proAuditPageInfo">Page 1 / 1</span>
+            <button class="btn" id="proAuditNextBtn" type="button">Siguiente</button>
+            <span id="proAuditSummary">0 registros</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="action-hero pro-audit-card collapsible-card" id="brandSettingsCard" data-default-collapsed="true" data-force-default-collapsed="true">
+        <div class="pro-audit-head">
+          <h3 style="margin:0;">Identidad y configuracion de empresa</h3>
+          <div class="brand-settings-actions">
+            <button class="btn" id="brandResetBtn" type="button">Descartar</button>
+            <button class="btn btn-secondary" id="brandSaveBtn" type="button">Guardar cambios</button>
+            <button class="btn" data-collapse-btn type="button">Expandir</button>
+          </div>
+        </div>
+
+        <div class="collapsible-body">
+          <div class="brand-settings-preview">
+            <img id="brandLogoPreview" src="assets/images/logo.webp" alt="Logo de empresa" />
+            <div id="brandBackgroundPreview" style="min-height:140px; border-radius:12px; border:1px solid rgba(148,163,184,0.2); background-color:rgba(2,6,23,0.45); background-position:center; background-repeat:no-repeat;"></div>
+          </div>
+
+          <div class="brand-settings-grid">
+            <label>
+              Nombre visible
+              <input id="brandDisplayName" type="text" placeholder="Nombre comercial" />
+            </label>
+            <label>
+              Nombre legal
+              <input id="brandLegalName" type="text" placeholder="Nombre legal / LLC" />
+            </label>
+            <label>
+              Tagline
+              <input id="brandTagline" type="text" placeholder="Texto corto del portal" />
+            </label>
+            <label>
+              Titulo de estimado
+              <input id="brandEstimateTitle" type="text" placeholder="Quote / Estimate / Proposal" />
+            </label>
+            <label>
+              Telefono
+              <input id="brandPhone" type="text" placeholder="Telefono principal" />
+            </label>
+            <label>
+              Email
+              <input id="brandEmail" type="text" placeholder="Correo principal" />
+            </label>
+            <label>
+              EIN / Identificacion
+              <input id="brandEin" type="text" placeholder="Identificacion fiscal" />
+            </label>
+            <label>
+              URL logo
+              <input id="brandLogoUrl" type="text" placeholder="https://..." />
+            </label>
+            <label>
+              Archivo logo
+              <div class="brand-settings-upload">
+                <input id="brandLogoFile" type="file" accept="image/*" />
+              </div>
+              <div class="brand-file-hint" id="brandLogoFileHint">Sin archivo nuevo seleccionado.</div>
+            </label>
+            <label>
+              Fondo para
+              <select id="brandBackgroundTarget">
+                <option value="default">General del portal</option>
+                <option value="hub">Inicio</option>
+                <option value="login-client">Login cliente</option>
+                <option value="login-employee">Login empleado</option>
+                <option value="login-boss">Login jefe</option>
+                <option value="panel-client">Panel cliente</option>
+                <option value="panel-employee">Panel empleado</option>
+                <option value="panel-boss">Panel jefe</option>
+                <option value="client-requests">Solicitudes cliente</option>
+                <option value="estimate-form">Formulario de estimado</option>
+              </select>
+            </label>
+            <label>
+              Ajuste del fondo
+              <select id="brandBackgroundFit">
+                <option value="cover">Llenar y recortar</option>
+                <option value="contain">Mostrar completa</option>
+              </select>
+            </label>
+            <label class="full-span">
+              URL fondo
+              <input id="brandBackgroundUrl" type="text" placeholder="https://..." />
+            </label>
+            <label class="full-span">
+              Archivo fondo
+              <div class="brand-settings-upload">
+                <input id="brandBackgroundFile" type="file" accept="image/*" />
+              </div>
+              <div class="brand-file-hint" id="brandBackgroundFileHint">Sin archivo nuevo seleccionado.</div>
+            </label>
+            <label class="full-span">
+              Direccion
+              <textarea id="brandAddress" placeholder="Direccion comercial"></textarea>
+            </label>
+            <label class="full-span">
+              Notas default para estimados
+              <textarea id="brandEstimateNotes" placeholder="Terminos, condiciones y notas por defecto"></textarea>
+            </label>
+
+            <div class="brand-editor-section full-span">
+              <div class="brand-editor-head">
+                <div>
+                  <strong>Categorias de servicio</strong>
+                  <p>Agrega, edita o elimina las categorias disponibles en el panel del cliente.</p>
+                </div>
+                <button class="btn" id="brandAddCategoryBtn" type="button">Agregar categoria</button>
+              </div>
+              <div id="brandCategoryList" class="category-editor-list"></div>
+            </div>
+
+            <div class="brand-editor-section full-span">
+              <div class="brand-editor-head">
+                <div>
+                  <strong>Tarjetas del inicio</strong>
+                  <p>Edita el texto y la imagen de Cliente, Empleado y Jefe en la portada.</p>
+                </div>
+              </div>
+
+              <div class="portal-card-editor-grid">
+                <article class="portal-card-editor">
+                  <h4>Cliente</h4>
+                  <label>
+                    Titulo
+                    <input id="brandPortalClientTitle" type="text" placeholder="Cliente" />
+                  </label>
+                  <label>
+                    Descripcion
+                    <textarea id="brandPortalClientDescription" placeholder="Texto de apoyo para cliente"></textarea>
+                  </label>
+                  <label>
+                    Texto boton
+                    <input id="brandPortalClientCta" type="text" placeholder="Acceder" />
+                  </label>
+                  <label>
+                    Icono / emoji
+                    <input id="brandPortalClientIcon" type="text" placeholder="⚡" />
+                  </label>
+                  <label>
+                    Imagen URL
+                    <input id="brandPortalClientImageUrl" type="text" placeholder="https://..." />
+                  </label>
+                  <label>
+                    Archivo imagen
+                    <div class="brand-settings-upload">
+                      <input id="brandPortalClientImageFile" type="file" accept="image/*" />
+                    </div>
+                  </label>
+                  <div class="brand-file-hint" id="brandPortalClientImageHint">Sin archivo nuevo seleccionado.</div>
+                  <div class="brand-file-hint">Si hay imagen, se usa la imagen. Si no, se usa el icono.</div>
+                </article>
+
+                <article class="portal-card-editor">
+                  <h4>Empleado</h4>
+                  <label>
+                    Titulo
+                    <input id="brandPortalEmployeeTitle" type="text" placeholder="Empleado" />
+                  </label>
+                  <label>
+                    Descripcion
+                    <textarea id="brandPortalEmployeeDescription" placeholder="Texto de apoyo para empleado"></textarea>
+                  </label>
+                  <label>
+                    Texto boton
+                    <input id="brandPortalEmployeeCta" type="text" placeholder="Ingresar" />
+                  </label>
+                  <label>
+                    Icono / emoji
+                    <input id="brandPortalEmployeeIcon" type="text" placeholder="🛠️" />
+                  </label>
+                  <label>
+                    Imagen URL
+                    <input id="brandPortalEmployeeImageUrl" type="text" placeholder="https://..." />
+                  </label>
+                  <label>
+                    Archivo imagen
+                    <div class="brand-settings-upload">
+                      <input id="brandPortalEmployeeImageFile" type="file" accept="image/*" />
+                    </div>
+                  </label>
+                  <div class="brand-file-hint" id="brandPortalEmployeeImageHint">Sin archivo nuevo seleccionado.</div>
+                  <div class="brand-file-hint">Si hay imagen, se usa la imagen. Si no, se usa el icono.</div>
+                </article>
+
+                <article class="portal-card-editor">
+                  <h4>Jefe</h4>
+                  <label>
+                    Titulo
+                    <input id="brandPortalBossTitle" type="text" placeholder="Admin" />
+                  </label>
+                  <label>
+                    Descripcion
+                    <textarea id="brandPortalBossDescription" placeholder="Texto de apoyo para jefe"></textarea>
+                  </label>
+                  <label>
+                    Texto boton
+                    <input id="brandPortalBossCta" type="text" placeholder="Panel Jefe" />
+                  </label>
+                  <label>
+                    Icono / emoji
+                    <input id="brandPortalBossIcon" type="text" placeholder="🛡️" />
+                  </label>
+                  <label>
+                    Imagen URL
+                    <input id="brandPortalBossImageUrl" type="text" placeholder="https://..." />
+                  </label>
+                  <label>
+                    Archivo imagen
+                    <div class="brand-settings-upload">
+                      <input id="brandPortalBossImageFile" type="file" accept="image/*" />
+                    </div>
+                  </label>
+                  <div class="brand-file-hint" id="brandPortalBossImageHint">Sin archivo nuevo seleccionado.</div>
+                  <div class="brand-file-hint">Si hay imagen, se usa la imagen. Si no, se usa el icono.</div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-settings-status" id="brandStatus">Cargando configuracion...</div>
+        </div>
+      </section>
+
+      <section class="action-hero pro-audit-card collapsible-card" id="notificationSettingsCard" data-default-collapsed="true">
+        <div class="pro-audit-head">
+          <h3 style="margin:0;">Canales y notificaciones</h3>
+          <div class="brand-settings-actions">
+            <button class="btn" id="notifyResetBtn" type="button">Descartar</button>
+            <button class="btn btn-secondary" id="notifySaveBtn" type="button">Guardar cambios</button>
+            <button class="btn btn-green" id="notifyConfigureBtn" type="button">Configurar produccion</button>
+            <button class="btn" data-collapse-btn type="button">Expandir</button>
+          </div>
+        </div>
+
+        <div class="collapsible-body">
+          <div class="brand-channel-guide">
+            <strong>Configuracion editable desde el panel:</strong>
+            <span>WhatsApp y Telegram quedan en bloques separados para no mezclar opciones. Llena solo el canal que si vas a usar, guarda cambios y luego pulsa <code>Configurar produccion</code> para dejarlo validado.</span>
+          </div>
+
+          <div class="notify-production-summary" id="notifyProductionSummary">Produccion: evaluando configuracion de canales...</div>
+
+          <div class="notify-channel-layout">
+            <section class="notify-channel-card" aria-labelledby="notifyWhatsappTitle">
+              <div class="notify-channel-head">
+                <div>
+                  <span class="notify-channel-kicker">Canal separado 1</span>
+                  <h4 id="notifyWhatsappTitle">WhatsApp</h4>
+                  <p>Alertas al jefe y pruebas de envio por separado de Telegram.</p>
+                </div>
+                <span class="notify-channel-chip" id="notifyWhatsAppReadyBadge" data-state="pending">Pendiente</span>
+              </div>
+
+              <div class="notify-source-list">
+                <div class="notify-source-item">
+                  <strong>Numero destino</strong>
+                  <span>Tu WhatsApp en formato internacional. Ejemplo: <code>+50255554444</code>.</span>
+                </div>
+                <div class="notify-source-item">
+                  <strong>Webhook URL</strong>
+                  <span>La entrega tu proveedor o tu propio backend que recibe y reenvia mensajes.</span>
+                </div>
+                <div class="notify-source-item">
+                  <strong>Twilio SID y token</strong>
+                  <span>Se copian desde la consola de Twilio. El <code>From</code> o el <code>Messaging Service SID</code> sale de Messaging.</span>
+                </div>
+              </div>
+
+              <div class="notify-settings-grid">
+                <label>
+                  WhatsApp destino alertas
+                  <input id="brandWhatsappNumber" type="text" placeholder="+50255554444" />
+                  <div class="brand-file-hint">Numero del jefe o del dispositivo que debe recibir alertas.</div>
+                </label>
+                <label>
+                  WhatsApp prueba (opcional)
+                  <input id="brandWhatsappTestTo" type="text" placeholder="+50255550000 (si lo dejas vacio usa el destino alertas)" />
+                </label>
+                <label class="full-span">
+                  Transporte WhatsApp
+                  <select id="notifyWhatsAppTransport">
+                    <option value="noop">Simulado</option>
+                    <option value="webhook">Webhook</option>
+                    <option value="twilio">Twilio</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="notify-transport-banner" data-whatsapp-transport-group="noop">
+                Estás en modo simulado. Sirve para revisar el flujo sin envio real. Para produccion cambia a <strong>Webhook</strong> o <strong>Twilio</strong>.
+              </div>
+              <div class="notify-transport-banner" data-whatsapp-transport-group="webhook">
+                Usa este modo cuando otro servicio ya te dio una URL para recibir solicitudes de envio. Tambien puedes usar el webhook interno de este sistema y protegerlo con Bearer token.
+              </div>
+              <div class="notify-transport-banner" data-whatsapp-transport-group="twilio">
+                Usa este modo cuando ya tengas Twilio configurado. Puedes usar <strong>Twilio WhatsApp From</strong> o <strong>Messaging Service SID</strong>.
+              </div>
+
+              <div class="notify-transport-section" data-whatsapp-transport-group="webhook">
+                <h5>Datos de Webhook</h5>
+                <div class="notify-inline-tools">
+                  <button class="btn" id="notifyWhatsAppUseInternalWebhookBtn" type="button">Usar webhook interno</button>
+                  <div class="brand-file-hint" id="notifyWhatsAppInternalWebhookHint">Webhook interno del sistema: se autocompleta con la URL del backend actual.</div>
+                </div>
+                <div class="notify-settings-grid">
+                  <label>
+                    Webhook URL
+                    <input id="notifyWhatsAppWebhookUrl" type="text" placeholder="https://tu-endpoint-whatsapp" />
+                  </label>
+                  <label>
+                    Webhook token
+                    <input id="notifyWhatsAppWebhookToken" type="password" placeholder="Se conserva si lo dejas vacio" />
+                    <div class="brand-file-hint" id="notifyWhatsAppWebhookTokenHint">Token webhook no configurado.</div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="notify-transport-section" data-whatsapp-transport-group="twilio webhook">
+                <h5>Datos de Twilio</h5>
+                <div class="brand-file-hint">Estas credenciales sirven para envio directo por Twilio o para que el webhook interno reenvie el mensaje real.</div>
+                <div class="notify-instructor-card">
+                  <div class="notify-instructor-head">
+                    <strong>Instructor Twilio</strong>
+                    <span>Guia corta para configurar pruebas y produccion</span>
+                  </div>
+
+                  <div class="notify-instructor-grid">
+                    <article class="notify-instructor-step">
+                      <strong>Paso 1</strong>
+                      <p>Entra a tu <code>Twilio Console</code> y copia <code>Account SID</code> y <code>Auth Token</code>. Esos dos datos siempre van aqui.</p>
+                    </article>
+                    <article class="notify-instructor-step">
+                      <strong>Paso 2 solo pruebas</strong>
+                      <p>Usa <code>Twilio Sandbox for WhatsApp</code>. Twilio te mostrara el numero del sandbox y un codigo tipo <code>join xxxx</code>; mandalo desde el WhatsApp que recibira pruebas para vincularlo.</p>
+                    </article>
+                    <article class="notify-instructor-step">
+                      <strong>Paso 3 produccion</strong>
+                      <p>Registra tu <code>WhatsApp sender</code> o usa un <code>Messaging Service</code>. Para mensajes fuera de la ventana de 24 horas, WhatsApp puede exigir plantillas aprobadas.</p>
+                    </article>
+                    <article class="notify-instructor-step">
+                      <strong>Paso 4 aqui en el panel</strong>
+                      <p>Llena <code>Account SID</code>, <code>Auth Token</code> y al menos uno: <code>Twilio WhatsApp From</code> o <code>Twilio Messaging Service SID</code>.</p>
+                    </article>
+                    <article class="notify-instructor-step">
+                      <strong>Paso 5 modo recomendado</strong>
+                      <p>Si usaras este backend como puente, deja <code>Transporte WhatsApp = Webhook</code>, pulsa <code>Usar webhook interno</code> y completa Twilio abajo. Si quieres envio directo, cambia el transporte a <code>Twilio</code>.</p>
+                    </article>
+                    <article class="notify-instructor-step">
+                      <strong>Paso 6 final</strong>
+                      <p>Guarda cambios, pulsa <code>Configurar produccion</code> y luego <code>Enviar prueba WhatsApp</code>. El callback de estado es opcional; dejalo vacio si no tienes una URL especial para eso.</p>
+                    </article>
+                  </div>
+
+                  <div class="notify-field-map">
+                    <div class="notify-field-map-row">
+                      <strong>Twilio Account SID</strong>
+                      <span>Sale en la pantalla principal de <code>Twilio Console</code>. Empieza con <code>AC</code>.</span>
+                    </div>
+                    <div class="notify-field-map-row">
+                      <strong>Twilio Auth Token</strong>
+                      <span>Tambien sale en <code>Twilio Console</code>, junto al Account SID. Guardalo como secreto.</span>
+                    </div>
+                    <div class="notify-field-map-row">
+                      <strong>Twilio WhatsApp From</strong>
+                      <span>Para pruebas suele ser el sender del sandbox, por ejemplo <code>whatsapp:+14155238886</code>. En produccion sera tu sender aprobado.</span>
+                    </div>
+                    <div class="notify-field-map-row">
+                      <strong>Twilio Messaging Service SID</strong>
+                      <span>Solo si administras el envio desde un <code>Messaging Service</code>. Empieza con <code>MG</code>.</span>
+                    </div>
+                    <div class="notify-field-map-row">
+                      <strong>Callback estado Twilio</strong>
+                      <span>Opcional. Solo llenalo si ya tienes otra URL preparada para recibir estados de entrega.</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notify-settings-grid">
+                  <label>
+                    Twilio Account SID
+                    <input id="notifyTwilioAccountSid" type="text" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+                  </label>
+                  <label>
+                    Twilio Auth Token
+                    <input id="notifyTwilioAuthToken" type="password" placeholder="Se conserva si lo dejas vacio" />
+                    <div class="brand-file-hint" id="notifyTwilioAuthTokenHint">Auth token Twilio no configurado.</div>
+                  </label>
+                  <label>
+                    Twilio WhatsApp From
+                    <input id="notifyTwilioWhatsAppFrom" type="text" placeholder="whatsapp:+14155238886" />
+                  </label>
+                  <label>
+                    Twilio Messaging Service SID
+                    <input id="notifyTwilioMessagingServiceSid" type="text" placeholder="MGxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+                  </label>
+                  <label class="full-span">
+                    Callback estado Twilio
+                    <input id="notifyTwilioStatusCallbackUrl" type="text" placeholder="https://tu-dominio.com/api/twilio/status" />
+                  </label>
+                </div>
+              </div>
+
+              <div class="notify-actions-row">
+                <button class="btn" id="brandWhatsappStatusBtn" type="button">Estado WhatsApp</button>
+                <button class="btn btn-secondary" id="brandWhatsappTestBtn" type="button">Enviar prueba WhatsApp</button>
+              </div>
+              <div class="brand-file-hint" id="brandWhatsappHealth">Canal WhatsApp: cargando estado...</div>
+            </section>
+
+            <section class="notify-channel-card" aria-labelledby="notifyTelegramTitle">
+              <div class="notify-channel-head">
+                <div>
+                  <span class="notify-channel-kicker">Canal separado 2</span>
+                  <h4 id="notifyTelegramTitle">Telegram</h4>
+                  <p>Configuracion totalmente aparte para no confundirla con WhatsApp.</p>
+                </div>
+                <span class="notify-channel-chip" id="notifyTelegramReadyBadge" data-state="pending">Pendiente</span>
+              </div>
+
+              <div class="notify-source-list">
+                <div class="notify-source-item">
+                  <strong>Bot Token</strong>
+                  <span>Lo genera <code>@BotFather</code> cuando creas tu bot en Telegram.</span>
+                </div>
+                <div class="notify-source-item">
+                  <strong>Chat ID o canal</strong>
+                  <span>Puede ser un numero tipo <code>123456789</code> o un usuario/canal tipo <code>@mi_canal</code>.</span>
+                </div>
+                <div class="notify-source-item">
+                  <strong>Modo real</strong>
+                  <span>Para produccion el transporte debe quedar en <strong>API real</strong>. Si lo dejas deshabilitado, no afecta WhatsApp.</span>
+                </div>
+              </div>
+
+              <div class="notify-settings-grid">
+                <label>
+                  Transporte Telegram
+                  <select id="notifyTelegramTransport">
+                    <option value="disabled">Deshabilitado</option>
+                    <option value="noop">Simulado</option>
+                    <option value="api">API real</option>
+                  </select>
+                </label>
+                <label>
+                  Telegram destino default
+                  <input id="notifyTelegramDefaultChatId" type="text" placeholder="123456789 o @canal_usuario" />
+                </label>
+                <label class="full-span">
+                  Telegram prueba (opcional)
+                  <input id="brandTelegramTestTo" type="text" placeholder="123456789 o @canal_usuario" />
+                </label>
+              </div>
+
+              <div class="notify-transport-banner" data-telegram-transport-group="disabled">
+                Telegram está apagado. Eso no bloquea el uso de WhatsApp; simplemente este canal no enviará nada.
+              </div>
+              <div class="notify-transport-banner" data-telegram-transport-group="noop">
+                Telegram quedó en simulacion. Cambia a <strong>API real</strong> cuando ya tengas el bot token y el destino final.
+              </div>
+              <div class="notify-transport-banner" data-telegram-transport-group="api">
+                Con <strong>API real</strong> necesitas el bot token de <code>@BotFather</code> y el chat destino donde el bot ya pueda escribir.
+              </div>
+
+              <div class="notify-transport-section" data-telegram-transport-group="api">
+                <h5>Datos del bot</h5>
+                <div class="notify-settings-grid">
+                  <label class="full-span">
+                    Telegram Bot Token
+                    <input id="notifyTelegramBotToken" type="password" placeholder="Se conserva si lo dejas vacio" />
+                    <div class="brand-file-hint" id="notifyTelegramBotTokenHint">Bot token Telegram no configurado.</div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="notify-actions-row">
+                <button class="btn" id="brandTelegramStatusBtn" type="button">Estado Telegram</button>
+                <button class="btn btn-secondary" id="brandTelegramTestBtn" type="button">Enviar prueba Telegram</button>
+              </div>
+              <div class="brand-file-hint" id="brandTelegramHealth">Canal Telegram: cargando estado...</div>
+            </section>
+          </div>
+
+          <div class="brand-settings-status" id="notifyStatus">Cargando configuracion de notificaciones...</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="appModal" class="modal-overlay"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
+    <div
+      style="background:#1e293b; width:90%; max-width:600px; border-radius:16px; border:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; max-height:80vh;">
+      <div
+        style="padding:16px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+        <h3>Solicitudes de Empleo</h3>
+        <button type="button" data-boss-ui-action="close-app-modal"
+          style="background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+      <div id="appList" style="padding:16px; overflow-y:auto; flex:1;">
+        <div style="text-align:center; padding:20px; opacity:0.6;">Cargando...</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chatPanel" class="chat-panel hidden"></div>
+
+  <script type="module" src="assets/js/boss-panel.js?v=20260310b"></script>
+  <script type="module" src="assets/js/company-branding.js?v=20260306d"></script>
+</body>
+
+</html>

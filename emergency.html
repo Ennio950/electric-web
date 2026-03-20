@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solicitudes de emergencia | Straight Wire Electric</title>
+  <script src="assets/js/company-branding-bootstrap.js?v=20260310a"></script>
+  <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css" />
+  <style>
+    :root { --bg:#040816; --panel:rgba(6,13,32,.88); --soft:rgba(15,23,42,.9); --line:rgba(148,163,184,.18); --text:#f8fafc; --muted:#94a3b8; --green:#22c55e; --blue:#38bdf8; --yellow:#facc15; --red:#ef4444; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:"Inter",system-ui,sans-serif; color:var(--text); background:radial-gradient(circle at top left,rgba(56,189,248,.14),transparent 30%),radial-gradient(circle at bottom right,rgba(250,204,21,.1),transparent 26%),linear-gradient(180deg,#020617 0%,#091126 100%); }
+    body::before { content:""; position:fixed; inset:0; background:linear-gradient(140deg,rgba(2,6,23,.74),rgba(2,6,23,.3)),url("assets/images/bg-electric.webp") center/cover no-repeat; opacity:.26; z-index:-1; pointer-events:none; }
+    .page { width:min(1380px,calc(100% - 20px)); margin:10px auto; padding:14px; border:1px solid var(--line); border-radius:24px; background:rgba(2,6,23,.58); backdrop-filter:blur(16px); }
+    .hero,.card { border:1px solid var(--line); border-radius:22px; background:var(--panel); }
+    .hero { display:flex; justify-content:space-between; gap:16px; padding:18px; }
+    .hero h1 { margin:0 0 8px; font-size:clamp(1.6rem,2vw,2.2rem); }
+    .hero p,.subtle { margin:0; color:#d8e6f8; line-height:1.5; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .tag { display:inline-flex; align-items:center; padding:7px 11px; border-radius:999px; font-size:.82rem; font-weight:700; border:1px solid var(--line); background:var(--soft); color:#e2e8f0; }
+    .tag.green { background:rgba(34,197,94,.14); color:#86efac; border-color:rgba(34,197,94,.34); }
+    .tag.blue { background:rgba(56,189,248,.14); color:#7dd3fc; border-color:rgba(56,189,248,.34); }
+    .tag.yellow { background:rgba(250,204,21,.16); color:#fde68a; border-color:rgba(250,204,21,.34); }
+    .tag.red { background:rgba(239,68,68,.16); color:#fca5a5; border-color:rgba(239,68,68,.34); }
+    .btn { appearance:none; border:1px solid transparent; border-radius:14px; padding:11px 16px; font:inherit; font-weight:800; cursor:pointer; transition:transform .15s ease,filter .15s ease; }
+    .btn:hover:not(:disabled) { transform:translateY(-1px); filter:brightness(1.04); }
+    .btn:disabled { opacity:.6; cursor:not-allowed; }
+    .btn-primary { background:linear-gradient(135deg,#22c55e,#16a34a); color:#04111f; }
+    .btn-secondary { background:var(--soft); color:var(--text); border-color:rgba(148,163,184,.22); }
+    .btn-blue { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; }
+    .btn-danger { background:linear-gradient(135deg,#dc2626,#991b1b); color:white; }
+    .statusline { margin:14px 0; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:rgba(8,15,32,.82); color:#d7e5f6; }
+    .layout { display:grid; grid-template-columns:minmax(350px,420px) minmax(0,1fr); gap:16px; }
+    .card { overflow:hidden; }
+    .section-card.collapsed .section-content { display:none; }
+    .section-card.collapsed > .body { padding-top:14px; padding-bottom:14px; }
+    .section-card.collapsed .section-main-copy { display:none; }
+    .section-peek { display:none; margin-top:6px; font-size:.88rem; }
+    .section-card.collapsed .section-peek { display:block; }
+    .section-tools { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px; align-items:center; }
+    .btn-ghost { background:transparent; color:#d8e6f8; border-color:rgba(148,163,184,.22); }
+    .body { padding:16px; }
+    .title { margin:0 0 6px; font-size:1.02rem; font-weight:800; }
+    .form { display:grid; gap:12px; margin-top:14px; }
+    .field { display:grid; gap:7px; }
+    .two { display:grid; grid-template-columns:1fr 150px; gap:12px; }
+    label { font-size:.92rem; font-weight:700; }
+    input,select,textarea { width:100%; padding:13px 14px; border-radius:14px; border:1px solid rgba(148,163,184,.18); background:rgba(2,6,23,.72); color:var(--text); font:inherit; }
+    textarea { min-height:120px; resize:vertical; }
+    .map { height:360px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#020617; }
+    .stack { display:grid; gap:16px; min-width:0; }
+    .head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+    .calls { display:grid; gap:12px; }
+    .call { padding:15px; border-radius:18px; background:rgba(2,6,23,.84); border:1px solid rgba(148,163,184,.14); display:grid; gap:12px; }
+    .call-top { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+    .meta { color:var(--muted); font-size:.9rem; line-height:1.5; }
+    .grid2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .box { padding:12px; border-radius:14px; background:var(--soft); border:1px solid rgba(148,163,184,.12); }
+    .box strong { display:block; margin-bottom:6px; font-size:.82rem; }
+    .chat-box { display:grid; gap:12px; min-width:0; }
+    .chat-messages { display:grid; gap:10px; max-height:320px; overflow:auto; padding-right:4px; }
+    .chat-msg { display:grid; gap:4px; }
+    .chat-msg.mine { justify-items:end; }
+    .bubble { max-width:min(100%, 520px); min-width:0; padding:12px 14px; border-radius:16px; background:rgba(15,23,42,.92); border:1px solid rgba(148,163,184,.14); line-height:1.45; overflow-wrap:anywhere; }
+    .chat-msg.mine .bubble { background:rgba(37,99,235,.24); border-color:rgba(59,130,246,.34); }
+    .chat-msg .meta { font-size:.78rem; }
+    .chat-actions { display:grid; gap:10px; min-width:0; }
+    .chat-composer { display:grid; gap:10px; min-width:0; }
+    .chat-files { display:flex; flex-wrap:wrap; gap:8px; min-width:0; max-width:100%; }
+    .chat-file-pill { display:inline-flex; align-items:center; gap:8px; max-width:100%; padding:7px 10px; border-radius:999px; font-size:.8rem; border:1px solid rgba(148,163,184,.16); background:rgba(15,23,42,.88); white-space:normal; overflow-wrap:anywhere; word-break:break-word; }
+    .workflow-stack { display:grid; gap:12px; }
+    .preview-image { width:100%; max-height:240px; object-fit:cover; border-radius:14px; border:1px solid rgba(148,163,184,.14); background:rgba(2,6,23,.72); }
+    .helper { color:var(--muted); font-size:.85rem; line-height:1.45; }
+    .empty { padding:24px; border-radius:18px; border:1px dashed rgba(148,163,184,.22); text-align:center; color:#d8e6f8; }
+    .hidden { display:none !important; }
+    .leaflet-popup-content-wrapper,.leaflet-popup-tip { background:#07101f; color:#ecf3fb; }
+    @media (max-width:1080px) { .layout { grid-template-columns:1fr; } }
+    @media (max-width:720px) { .page { width:calc(100% - 8px); margin:4px auto; padding:8px; border-radius:18px; } .hero,.body { padding:14px; } .hero,.head,.call-top,.two,.grid2 { display:grid; grid-template-columns:1fr; } .map { height:300px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <h1 id="pageTitle">Solicitudes de emergencia</h1>
+        <p id="pageSubtitle">Envia una emergencia y comparte tu ubicacion en tiempo real hasta que un tecnico la acepte.</p>
+      </div>
+      <div class="row">
+        <span class="tag blue" id="roleBadge">Cargando rol...</span>
+        <button class="btn btn-secondary" type="button" id="backButton">Volver al panel</button>
+      </div>
+    </section>
+
+    <div class="statusline" id="statusLine">Preparando pantalla...</div>
+
+    <section class="layout">
+      <aside class="card section-card" id="formCard">
+        <div class="body">
+          <div class="head">
+            <div>
+              <h2 class="title" id="formTitle">Nueva emergencia</h2>
+              <p class="subtle section-main-copy" id="formSubtitle">Solo puedes tener 1 emergencia abierta hasta que confirmes el pago final.</p>
+              <p class="subtle section-peek" id="formPeek"></p>
+            </div>
+            <div class="section-tools">
+              <button class="btn btn-ghost" type="button" data-section-toggle="form" aria-expanded="true">Minimizar</button>
+            </div>
+          </div>
+          <div class="section-content" id="formContent">
+            <div class="row" style="margin-top:12px;">
+              <span class="tag" id="gpsBadge">GPS listo</span>
+              <span class="tag green" id="lockBadge">Formulario libre</span>
+            </div>
+            <form class="form" id="emergencyForm">
+              <div class="field"><label for="clientName">Cliente / llamador</label><input id="clientName" required maxlength="120" /></div>
+              <div class="field"><label for="phone">Telefono</label><input id="phone" required maxlength="40" /></div>
+              <div class="field"><label for="location">Ubicacion</label><input id="location" required maxlength="180" /></div>
+              <div class="two">
+                <div class="field"><label for="priority">Prioridad</label><select id="priority"><option value="urgent">Urgente</option><option value="high">Alta</option><option value="normal">Normal</option><option value="critical">Critica</option></select></div>
+                <div class="field" id="etaField"><label for="eta">Tiempo estimado (min)</label><input id="eta" type="number" min="1" max="240" value="30" /></div>
+              </div>
+              <div class="two hidden" id="scheduleFields">
+                <div class="field"><label for="scheduledDate">Fecha programada</label><input id="scheduledDate" type="date" /></div>
+                <div class="field"><label for="scheduledTime">Hora programada</label><input id="scheduledTime" type="time" /></div>
+              </div>
+              <div class="field"><label for="issue">Descripcion</label><textarea id="issue" required placeholder="Describe el problema y el riesgo inmediato."></textarea></div>
+              <button class="btn btn-primary" type="submit" id="submitButton">Enviar emergencia</button>
+            </form>
+          </div>
+        </div>
+      </aside>
+
+      <section class="stack">
+        <article class="card section-card" id="trackingCard">
+          <div class="body">
+            <div class="head">
+              <div>
+                <h2 class="title" id="trackingTitle">Mapa en vivo</h2>
+                <p class="subtle section-main-copy" id="trackingStatus">Esperando una emergencia activa para mostrar ubicaciones.</p>
+                <p class="subtle section-peek" id="trackingPeek"></p>
+              </div>
+              <div class="section-tools">
+                <span class="tag" id="trackingBadge">Sin seguimiento</span>
+                <button class="btn btn-ghost" type="button" data-section-toggle="tracking" aria-expanded="true">Minimizar</button>
+              </div>
+            </div>
+          </div>
+          <div class="section-content" id="trackingContent">
+            <div class="map" id="trackingMap"></div>
+            <div class="body">
+              <p class="subtle" id="trackingCopy">Cuando exista una emergencia activa, aqui se vera el cliente y luego el tecnico tipo Uber.</p>
+              <div class="row" style="margin-top:12px;"><span class="tag green">Cliente</span><span class="tag blue">Tecnico</span></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card section-card" id="listCard">
+          <div class="body">
+            <div class="head">
+              <div>
+                <h2 class="title" id="listTitle">Emergencias</h2>
+                <p class="subtle section-main-copy" id="listSubtitle">La lista se refresca sola cada pocos segundos.</p>
+                <p class="subtle section-peek" id="listPeek"></p>
+              </div>
+              <div class="section-tools">
+                <button class="btn btn-secondary" type="button" id="refreshButton">Refrescar</button>
+                <button class="btn btn-ghost" type="button" data-section-toggle="list" aria-expanded="true">Minimizar</button>
+              </div>
+            </div>
+            <div class="section-content" id="listContent">
+              <div class="calls" id="callList"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card section-card" id="workflowCard">
+          <div class="body">
+            <div class="head">
+              <div>
+                <h2 class="title" id="workflowTitle">Siguiente paso</h2>
+                <p class="subtle section-main-copy" id="workflowSubtitle">El flujo cambiara segun el estado actual de la emergencia.</p>
+                <p class="subtle section-peek" id="workflowPeek"></p>
+              </div>
+              <div class="section-tools">
+                <button class="btn btn-ghost" type="button" data-section-toggle="workflow" aria-expanded="true">Minimizar</button>
+              </div>
+            </div>
+            <div class="section-content" id="workflowContent">
+              <div class="workflow-stack" id="workflowPanel">
+                <div class="empty">Selecciona o acepta una emergencia para continuar el flujo.</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card section-card" id="chatCard">
+          <div class="body">
+            <div class="head">
+              <div>
+                <h2 class="title" id="chatTitle">Chat de emergencia</h2>
+                <p class="subtle section-main-copy" id="chatSubtitle">Se activa automaticamente cuando un tecnico acepta la solicitud.</p>
+                <p class="subtle section-peek" id="chatPeek"></p>
+              </div>
+              <div class="section-tools">
+                <span class="tag" id="chatLimitTag">Fotos cliente: 0/3</span>
+                <button class="btn btn-ghost" type="button" data-section-toggle="chat" aria-expanded="true">Minimizar</button>
+              </div>
+            </div>
+            <div class="section-content" id="chatContent">
+              <div class="chat-box" id="chatPanel">
+                <div class="empty">Todavia no hay chat disponible para esta emergencia.</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <script src="assets/vendor/leaflet/leaflet.js"></script>
+  <script type="module">
+    import { auth, onAuthStateChanged } from "./assets/js/firebase.js";
+    import { apiFetch, uploadImage } from "./assets/js/api.js?v=20260310b";
+    import { validateRoleWithBackend } from "./assets/js/role-gateway.js?v=20260213c";
+    import { createNotifier } from "./assets/js/notify-center.js";
+
+    const ROLE_HOME = { client: "panel-cliente.html", employee: "panel-empleado.html", boss: "panel-jefe.html" };
+    const STATUS_LABELS = {
+      pending: "Pendiente",
+      accepted: "Tecnico enviado",
+      awaiting_client_close: "Esperando confirmacion del cliente",
+      awaiting_payment_proof: "Esperando comprobante del tecnico",
+      payment_pending_review: "Pago pendiente de aprobacion",
+      completed: "Completada"
+    };
+    const PRIORITY_LABELS = { urgent: "Urgente", high: "Alta", normal: "Normal", critical: "Critica" };
+    const POLL_MS = 5000;
+    const GPS_SEND_MS = 8000;
+    const GPS_DECIMALS = 5;
+    const MAX_CLIENT_CHAT_ATTACHMENTS = 3;
+    let ROLE = "";
+    let USER = null;
+    let CALLS = [];
+    let CHAT_MESSAGES = [];
+    let CHAT_FILES = [];
+    let CHAT_DRAFT_TEXT = "";
+    let WORKFLOW_FINAL_FILE = null;
+    let WORKFLOW_PROOF_FILE = null;
+    let WORKFLOW_DRAFT = { resolveAmount: "", closeAmount: "", rating: "5" };
+    let MAP = null;
+    let MARKERS = new Map();
+    let POLL = null;
+    let GEO = null;
+    let LAST_CALL_ID = "";
+    let LAST_SENT_AT = 0;
+    let LAST_SENT_KEY = "";
+    let LAST_WORKFLOW_RENDER_KEY = "";
+    let LAST_SECTION_STAGE_KEY = "";
+    const SECTION_OVERRIDES = {};
+    const URL_PARAMS = new URLSearchParams(window.location.search);
+    const FLOW_MODE = String(URL_PARAMS.get("mode") || "").trim().toLowerCase() === "scheduled" ? "scheduled" : "emergency";
+    let PREFERRED_CALL_ID = String(URL_PARAMS.get("focusId") || URL_PARAMS.get("callId") || "").trim();
+    let REQUEST_CHAT_ON_LOAD = String(URL_PARAMS.get("openChat") || "").trim() === "1";
+    let EMERGENCY_NOTIFIER = null;
+    let EMERGENCY_NOTIFY_PRIMED = false;
+    let EMERGENCY_NOTIFY_STATE = new Map();
+
+    const $ = (id) => document.getElementById(id);
+    const refs = {
+      pageTitle: $("pageTitle"), pageSubtitle: $("pageSubtitle"), roleBadge: $("roleBadge"), backButton: $("backButton"),
+      statusLine: $("statusLine"), formCard: $("formCard"), formTitle: $("formTitle"), formSubtitle: $("formSubtitle"), formPeek: $("formPeek"),
+      gpsBadge: $("gpsBadge"), lockBadge: $("lockBadge"), form: $("emergencyForm"), clientName: $("clientName"),
+      phone: $("phone"), location: $("location"), priority: $("priority"), eta: $("eta"), etaField: $("etaField"),
+      scheduleFields: $("scheduleFields"), scheduledDate: $("scheduledDate"), scheduledTime: $("scheduledTime"), issue: $("issue"),
+      submitButton: $("submitButton"), trackingTitle: $("trackingTitle"), trackingStatus: $("trackingStatus"),
+      trackingBadge: $("trackingBadge"), trackingCopy: $("trackingCopy"), trackingMap: $("trackingMap"), trackingCard: $("trackingCard"), trackingPeek: $("trackingPeek"),
+      listTitle: $("listTitle"), listSubtitle: $("listSubtitle"), refreshButton: $("refreshButton"), callList: $("callList"), listCard: $("listCard"), listPeek: $("listPeek"),
+      workflowTitle: $("workflowTitle"), workflowSubtitle: $("workflowSubtitle"), workflowPanel: $("workflowPanel"), workflowCard: $("workflowCard"), workflowPeek: $("workflowPeek"),
+      chatTitle: $("chatTitle"), chatSubtitle: $("chatSubtitle"), chatLimitTag: $("chatLimitTag"), chatPanel: $("chatPanel"), chatCard: $("chatCard"), chatPeek: $("chatPeek")
+    };
+
+    const esc = (v) => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    const fmtStatus = (v) => STATUS_LABELS[String(v || "").toLowerCase()] || "Pendiente";
+    const fmtPriority = (v) => PRIORITY_LABELS[String(v || "").toLowerCase()] || "Urgente";
+    const home = () => ROLE_HOME[ROLE] || "index.html";
+    const flowMode = (value = null) => {
+      const raw = typeof value === "string"
+        ? value
+        : value?.dispatchMode || value?.mode || value?.serviceType || FLOW_MODE;
+      return String(raw || "").trim().toLowerCase() === "scheduled" ? "scheduled" : "emergency";
+    };
+    const isScheduledMode = (call = null) => flowMode(call) === "scheduled";
+    const flowLabel = (call = null) => isScheduledMode(call) ? "trabajo programado" : "emergencia";
+    const flowLabelPlural = () => FLOW_MODE === "scheduled" ? "trabajos programados" : "emergencias";
+    const flowActionLabel = () => FLOW_MODE === "scheduled" ? "visita programada" : "emergencia";
+    const flowActionLabelWithArticle = () => FLOW_MODE === "scheduled" ? "una visita programada" : "una emergencia";
+    const flowSubmitLabel = () => FLOW_MODE === "scheduled" ? "Programar trabajo" : "Enviar emergencia";
+    const flowAcceptLabel = (call = null) => isScheduledMode(call) ? "Aceptar trabajo programado" : "Aceptar solicitud de emergencia";
+    const flowLoadingLabel = () => FLOW_MODE === "scheduled" ? "trabajos programados" : "emergencias";
+    const flowReadyLabel = (call = null) => isScheduledMode(call) ? "servicio programado" : "emergencia";
+    const useQuietClientScheduledChrome = () => ROLE === "client" && FLOW_MODE === "scheduled";
+    const buildFlowUrl = ({ callId = "", openChat = false, mode = FLOW_MODE } = {}) => {
+      const params = new URLSearchParams();
+      if (flowMode(mode) === "scheduled") params.set("mode", "scheduled");
+      if (callId) params.set("focusId", callId);
+      if (openChat) params.set("openChat", "1");
+      return params.toString() ? `emergency.html?${params.toString()}` : "emergency.html";
+    };
+    const currentReturnTo = () => buildFlowUrl({ callId: PREFERRED_CALL_ID, openChat: REQUEST_CHAT_ON_LOAD, mode: FLOW_MODE });
+    const formatSchedule = (call = null) => {
+      const raw = call?.scheduledFor || call?.scheduledAt || (call?.scheduledDate && call?.scheduledTime ? `${call.scheduledDate}T${call.scheduledTime}:00` : "");
+      if (!raw) return "";
+      const date = new Date(raw);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat("es-GT", { dateStyle: "medium", timeStyle: "short" }).format(date);
+    };
+    function applyScheduledDefaults() {
+      if (FLOW_MODE !== "scheduled") return;
+      const today = new Date();
+      const todayIso = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+      if (refs.scheduledDate) {
+        refs.scheduledDate.min = todayIso;
+      }
+      if (!refs.scheduledDate?.value) {
+        const base = new Date();
+        base.setDate(base.getDate() + 1);
+        const localIsoDate = new Date(base.getTime() - (base.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+        refs.scheduledDate.value = localIsoDate;
+      }
+      if (!refs.scheduledTime?.value) {
+        refs.scheduledTime.value = "09:00";
+      }
+    }
+    function bindTemporalPicker(input) {
+      if (!(input instanceof HTMLInputElement)) return;
+      const openPicker = () => {
+        if (typeof input.showPicker !== "function") return;
+        try {
+          input.showPicker();
+        } catch (_) {
+          // Some browsers throw when picker opening is not allowed.
+        }
+      };
+
+      input.addEventListener("focus", openPicker);
+      input.addEventListener("click", openPicker);
+      input.addEventListener("pointerdown", () => {
+        window.setTimeout(openPicker, 0);
+      });
+    }
+    const coordsOk = (c) => c && Number.isFinite(Number(c.lat)) && Number.isFinite(Number(c.lng));
+    const isActiveStatus = (status) => status !== "completed";
+    const isClientBlockingStatus = (status) => ["pending", "accepted", "awaiting_client_close"].includes(String(status || "").toLowerCase());
+    const isEmployeeBlockingStatus = (status) => ["accepted", "awaiting_client_close", "awaiting_payment_proof", "payment_pending_review"].includes(String(status || "").toLowerCase());
+    const chatEnabledStatus = (status) => ["accepted", "awaiting_client_close", "awaiting_payment_proof", "payment_pending_review"].includes(String(status || "").toLowerCase());
+    const nowAge = (c) => { const ms = Number(c?.updatedAtMs || 0); if (!ms) return "Sin GPS reciente"; const s = Math.max(0, Math.round((Date.now() - ms) / 1000)); if (s < 60) return `Hace ${s}s`; const m = Math.round(s / 60); if (m < 60) return `Hace ${m}min`; return `Hace ${Math.round(m / 60)}h`; };
+    const fmtDate = (v) => { const d = new Date(typeof v === "number" ? v : (v || 0)); return Number.isNaN(d.getTime()) ? "Sin fecha" : new Intl.DateTimeFormat("es-GT", { dateStyle: "medium", timeStyle: "short" }).format(d); };
+    const sortCalls = (list) => [...list].sort((a, b) => ({ accepted: 0, awaiting_client_close: 1, awaiting_payment_proof: 2, payment_pending_review: 3, pending: 4, completed: 5 }[a.status] ?? 9) - ({ accepted: 0, awaiting_client_close: 1, awaiting_payment_proof: 2, payment_pending_review: 3, pending: 4, completed: 5 }[b.status] ?? 9) || Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
+    function toMillis(rawValue) {
+      if (rawValue == null) return 0;
+      if (typeof rawValue === "number") return Number.isFinite(rawValue) ? rawValue : 0;
+      if (typeof rawValue === "string") {
+        const asNumber = Number(rawValue);
+        if (Number.isFinite(asNumber) && asNumber > 0) return asNumber;
+        const asDate = Date.parse(rawValue);
+        return Number.isFinite(asDate) ? asDate : 0;
+      }
+      if (rawValue instanceof Date) return rawValue.getTime();
+      if (typeof rawValue?.toMillis === "function") {
+        const ms = Number(rawValue.toMillis());
+        return Number.isFinite(ms) ? ms : 0;
+      }
+      if (typeof rawValue?.toDate === "function") {
+        const date = rawValue.toDate();
+        return date instanceof Date ? date.getTime() : 0;
+      }
+      return 0;
+    }
+    function initEmergencyNotifier() {
+      if (EMERGENCY_NOTIFIER) return EMERGENCY_NOTIFIER;
+      EMERGENCY_NOTIFIER = createNotifier({
+        title: FLOW_MODE === "scheduled" ? "Alertas de trabajos programados" : "Alertas de emergencias",
+        bellLabel: "Alertas",
+        position: "top-right",
+        storageKey: FLOW_MODE === "scheduled" ? "swe:scheduled:notify:seen:v1" : "swe:emergency:notify:seen:v1",
+        historyStorageKey: "swe:electric:web:notify:history:v1",
+        typeOptions: {
+          emergencies: FLOW_MODE === "scheduled" ? "Programados" : "Emergencias",
+          payments: "Pagos",
+          requests: "Solicitudes"
+        },
+        onItemAction: handleEmergencyNotificationAction,
+        maxItems: 34,
+        toastMs: 5200,
+        sounds: true
+      });
+      return EMERGENCY_NOTIFIER;
+    }
+    function notifyEmergencyUser(payload = {}) {
+      return initEmergencyNotifier().notify(payload);
+    }
+    function rememberEmergencyNotificationKeys(keys = []) {
+      initEmergencyNotifier().rememberKeys(Array.isArray(keys) ? keys : []);
+    }
+    function flashCallCard(element, duration = 2200) {
+      if (!(element instanceof HTMLElement)) return;
+      const prevTransition = element.style.transition;
+      const prevBoxShadow = element.style.boxShadow;
+      const prevOutline = element.style.outline;
+      element.style.transition = "box-shadow 180ms ease, outline-color 180ms ease";
+      element.style.outline = "2px solid rgba(96,165,250,0.86)";
+      element.style.boxShadow = "0 0 0 2px rgba(96,165,250,0.35), 0 14px 30px rgba(2,8,23,0.55)";
+      window.setTimeout(() => {
+        element.style.transition = prevTransition;
+        element.style.boxShadow = prevBoxShadow;
+        element.style.outline = prevOutline;
+      }, duration);
+    }
+    function focusCallById(callId, { smooth = true } = {}) {
+      const id = String(callId || "").trim();
+      if (!id) return false;
+      const exists = CALLS.some((item) => String(item?.id || "") === id);
+      if (!exists) return false;
+      PREFERRED_CALL_ID = id;
+      LAST_CALL_ID = id;
+      renderCalls();
+      renderMap();
+      renderWorkflow();
+      applySectionState();
+      const card = refs.callList.querySelector(`[data-call-id="${encodeURIComponent(id)}"]`);
+      if (card) {
+        card.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "center" });
+        flashCallCard(card, 2600);
+      }
+      setStatus(`${FLOW_MODE === "scheduled" ? "Trabajo programado" : "Emergencia"} enfocada desde notificacion.`, "success");
+      return true;
+    }
+    function focusEmergencyChatComposer() {
+      const call = mapCall();
+      if (!call || !canUseChat(call)) return false;
+      SECTION_OVERRIDES.chat = false;
+      applySectionState();
+      const input = document.getElementById("chatInput");
+      if (!input) return false;
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      input.focus();
+      return true;
+    }
+    function handleEmergencyNotificationAction(payload = {}) {
+      const action = payload?.action || {};
+      const kind = String(action.kind || "").trim().toLowerCase();
+      if (!kind) return;
+      if (kind === "focus-emergency") {
+        const callId = String(action.callId || "").trim();
+        if (focusCallById(callId)) return;
+        window.location.href = buildFlowUrl({ callId, mode: action.mode || FLOW_MODE });
+        return;
+      }
+      if (kind === "focus-emergency-chat") {
+        const callId = String(action.callId || "").trim();
+        if (focusCallById(callId) && focusEmergencyChatComposer()) return;
+        window.location.href = buildFlowUrl({ callId, openChat: true, mode: action.mode || FLOW_MODE });
+      }
+    }
+    function callNotifySnapshot(call = {}) {
+      const id = String(call.id || "").trim();
+      const status = String(call.status || "").toLowerCase();
+      const dispatchMode = flowMode(call);
+      const assignedEmployeeId = String(call.assignedEmployeeId || "").trim();
+      const updatedMs = toMillis(call.updatedAtMs || call.updatedAt || call.createdAtMs || call.createdAt);
+      const createdMs = toMillis(call.createdAtMs || call.createdAt || call.updatedAtMs || call.updatedAt);
+      const rejectedAtMs = toMillis(call.paymentRejectedAtMs || call.paymentRejectedAt);
+      const amount = Number(call.finalAmount ?? call.quotedAmount ?? 0);
+      return { id, status, dispatchMode, assignedEmployeeId, updatedMs, createdMs, rejectedAtMs, amount, raw: call };
+    }
+    function processLiveNotifications(calls = []) {
+      const rows = Array.isArray(calls) ? calls : [];
+      const nextState = new Map();
+
+      rows.forEach((call) => {
+        const snap = callNotifySnapshot(call);
+        if (!snap.id) return;
+        nextState.set(snap.id, snap);
+      });
+
+      if (!EMERGENCY_NOTIFY_PRIMED) {
+        const baselineKeys = [];
+        nextState.forEach((snap) => {
+          baselineKeys.push(`emergency:status:${snap.id}:${snap.status}:${snap.updatedMs}`);
+          if (snap.rejectedAtMs) baselineKeys.push(`emergency:rejected:${snap.id}:${snap.rejectedAtMs}`);
+        });
+        rememberEmergencyNotificationKeys(baselineKeys);
+        EMERGENCY_NOTIFY_STATE = nextState;
+        EMERGENCY_NOTIFY_PRIMED = true;
+        return;
+      }
+
+      nextState.forEach((snap) => {
+        const prev = EMERGENCY_NOTIFY_STATE.get(snap.id);
+        const modeLabel = flowLabel(snap.raw);
+
+        if (ROLE === "employee") {
+          if (!prev && snap.status === "pending") {
+            notifyEmergencyUser({
+              dedupeKey: `emergency:employee:new-pending:${snap.id}:${snap.createdMs || snap.updatedMs}`,
+              type: "emergencies",
+              priority: "low",
+              tone: "info",
+              title: snap.dispatchMode === "scheduled" ? "Nuevo trabajo programado en cola" : "Nueva emergencia en cola",
+              message: snap.dispatchMode === "scheduled"
+                ? "Hay un trabajo programado pendiente listo para aceptar."
+                : "Hay una nueva emergencia pendiente lista para aceptar.",
+              action: { kind: "focus-emergency", callId: snap.id, mode: snap.dispatchMode },
+            });
+          }
+
+          const assignedToMe = snap.assignedEmployeeId === USER?.uid;
+          if (assignedToMe) {
+            const becameMine = !prev || prev.assignedEmployeeId !== USER?.uid;
+            const statusChanged = !prev || prev.status !== snap.status;
+
+            if (becameMine && snap.status === "accepted") {
+              notifyEmergencyUser({
+                dedupeKey: `emergency:employee:assigned:${snap.id}:${snap.updatedMs}`,
+                type: "emergencies",
+                priority: "high",
+                tone: "success",
+                title: snap.dispatchMode === "scheduled" ? "Trabajo programado asignado" : "Emergencia asignada",
+                message: `Te asignaron un ${modeLabel} en ${snap.raw.location || "ubicacion no indicada"}.`,
+                action: { kind: "focus-emergency-chat", callId: snap.id, mode: snap.dispatchMode },
+              });
+            }
+
+            if (statusChanged && snap.status === "awaiting_payment_proof") {
+              const deposit = Number.isFinite(snap.amount) ? Math.round(snap.amount * 0.20 * 100) / 100 : 0;
+              notifyEmergencyUser({
+                dedupeKey: `emergency:employee:awaiting-proof:${snap.id}:${snap.updatedMs}`,
+                type: "payments",
+                priority: "high",
+                tone: "warning",
+                title: "Debes subir comprobante",
+                message: `Cliente confirmó pago. Deposita 20% (${deposit.toLocaleString("es-GT")}) y sube comprobante.`,
+                action: { kind: "focus-emergency-chat", callId: snap.id, mode: snap.dispatchMode },
+              });
+            }
+
+            if (snap.rejectedAtMs && snap.rejectedAtMs !== Number(prev?.rejectedAtMs || 0)) {
+              notifyEmergencyUser({
+                dedupeKey: `emergency:employee:proof-rejected:${snap.id}:${snap.rejectedAtMs}`,
+                type: "payments",
+                priority: "high",
+                tone: "error",
+                title: "Comprobante rechazado",
+                message: "El jefe rechazó el comprobante. Debes reenviarlo.",
+                action: { kind: "focus-emergency-chat", callId: snap.id, mode: snap.dispatchMode },
+              });
+            }
+
+            if (statusChanged && snap.status === "completed") {
+              notifyEmergencyUser({
+                dedupeKey: `emergency:employee:completed:${snap.id}:${snap.updatedMs}`,
+                type: "payments",
+                priority: "low",
+                tone: "success",
+                title: snap.dispatchMode === "scheduled" ? "Trabajo programado completado" : "Emergencia completada",
+                message: snap.dispatchMode === "scheduled"
+                  ? "Pago aprobado. Este trabajo programado se cerró correctamente."
+                  : "Pago aprobado. Esta emergencia se cerró correctamente.",
+                action: { kind: "focus-emergency", callId: snap.id, mode: snap.dispatchMode },
+              });
+            }
+          }
+        }
+
+        if (ROLE === "boss") {
+          if (!prev && snap.status === "pending") {
+            notifyEmergencyUser({
+              dedupeKey: `emergency:boss:new:${snap.id}:${snap.createdMs || snap.updatedMs}`,
+              type: "emergencies",
+              priority: "medium",
+              tone: "info",
+              title: snap.dispatchMode === "scheduled" ? "Nuevo trabajo programado" : "Nueva emergencia",
+              message: snap.dispatchMode === "scheduled"
+                ? `${snap.raw.clientName || snap.raw.clientEmail || "Cliente"} programó una visita.`
+                : `${snap.raw.clientName || snap.raw.clientEmail || "Cliente"} reportó una emergencia.`,
+              action: { kind: "focus-emergency", callId: snap.id, mode: snap.dispatchMode },
+            });
+          }
+          if (prev && prev.status !== "payment_pending_review" && snap.status === "payment_pending_review") {
+            notifyEmergencyUser({
+              dedupeKey: `emergency:boss:review:${snap.id}:${snap.updatedMs}`,
+              type: "payments",
+              priority: "high",
+              tone: "warning",
+              title: "Pago pendiente de aprobación",
+              message: "Un técnico envió comprobante y requiere aprobación final.",
+              action: { kind: "focus-emergency-chat", callId: snap.id, mode: snap.dispatchMode },
+            });
+          }
+        }
+      });
+
+      EMERGENCY_NOTIFY_STATE = nextState;
+    }
+    function workflowPeekText(call) {
+      if (!call) return "Sin paso activo.";
+      const status = String(call.status || "").toLowerCase();
+      if (status === "pending") return ROLE === "client" ? `Esperando que un tecnico acepte tu ${flowLabel(call)}.` : `Hay un ${flowLabel(call)} listo para aceptar.`;
+      if (status === "accepted") return ROLE === "employee" ? "Define el cobro cuando termines el trabajo." : isScheduledMode(call) ? "Trabajo programado en curso con seguimiento activo." : "Trabajo en curso con seguimiento en vivo.";
+      if (status === "awaiting_client_close") return ROLE === "client" ? "Confirma pago, foto final y puntuacion." : "Esperando confirmacion final del cliente.";
+      if (status === "awaiting_payment_proof") {
+        if (ROLE === "employee" && (call.paymentRejectedAt || call.paymentRejectedAtMs)) {
+          return "Comprobante rechazado: revisa el motivo y vuelve a enviarlo.";
+        }
+        return ROLE === "employee" ? "Sube tu comprobante para el jefe." : "Esperando comprobante del tecnico.";
+      }
+      if (status === "payment_pending_review") return ROLE === "boss" ? "Aprueba el pago final." : "Esperando aprobacion del jefe.";
+      if (status === "completed") return "Flujo completado.";
+      return "Seguimiento activo.";
+    }
+    function deriveAutoCollapsedSections() {
+      const call = mapCall();
+      const status = String(call?.status || "").toLowerCase();
+      const clientHasOpenFlow = CALLS.some((item) => isClientBlockingStatus(item.status));
+      return {
+        form: ROLE === "client" ? clientHasOpenFlow : true,
+        tracking: ["awaiting_payment_proof", "payment_pending_review", "completed"].includes(status),
+        list: Boolean(call && status && status !== "pending"),
+        workflow:
+          !call
+          || status === "completed"
+          || (ROLE === "client" && ["awaiting_payment_proof", "payment_pending_review"].includes(status))
+          || (ROLE === "employee" && ["awaiting_client_close", "payment_pending_review"].includes(status))
+          || (ROLE === "boss" && status !== "payment_pending_review"),
+        chat:
+          !canUseChat(call)
+          || ["awaiting_payment_proof", "payment_pending_review", "completed"].includes(status)
+      };
+    }
+    function applySectionState() {
+      const call = mapCall();
+      const stageKey = `${ROLE}:${call?.id || "none"}:${String(call?.status || "none").toLowerCase()}`;
+      if (stageKey !== LAST_SECTION_STAGE_KEY) {
+        Object.keys(SECTION_OVERRIDES).forEach((key) => { delete SECTION_OVERRIDES[key]; });
+        LAST_SECTION_STAGE_KEY = stageKey;
+      }
+      const activeCount = CALLS.filter((item) => {
+        if (ROLE === "client") return isClientBlockingStatus(item.status);
+        if (ROLE === "employee") return item.assignedEmployeeId === USER?.uid && isEmployeeBlockingStatus(item.status);
+        return isActiveStatus(item.status);
+      }).length;
+      const pendingCount = CALLS.filter((item) => String(item.status || "").toLowerCase() === "pending").length;
+      const autoState = deriveAutoCollapsedSections();
+      refs.formPeek.textContent = ROLE !== "client"
+        ? "Disponible solo para clientes."
+        : activeCount
+          ? `Ya enviaste un ${flowLabel(call)}. Este formulario se volverá a abrir cuando completes tu parte.`
+          : `Formulario listo para un nuevo ${flowActionLabel()}.`;
+      refs.trackingPeek.textContent = call ? `${fmtStatus(call.status)} · ${call.location || "Sin ubicacion"}${formatSchedule(call) ? ` · ${formatSchedule(call)}` : ""}${coordsOk(call.clientCoords) || coordsOk(call.employeeCoords) ? " · GPS activo" : ""}` : "Sin seguimiento activo.";
+      refs.listPeek.textContent = `${activeCount} activa(s) · ${pendingCount} pendiente(s).`;
+      refs.workflowPeek.textContent = workflowPeekText(call);
+      refs.chatPeek.textContent = canUseChat(call) ? `${CHAT_MESSAGES.length} mensaje(s) · canal activo con ${call?.assignedEmployeeName || call?.assignedEmployeeEmail || "tecnico"}.` : `Se abrirá cuando el ${flowLabel(call)} esté aceptado.`;
+      [
+        ["form", refs.formCard],
+        ["tracking", refs.trackingCard],
+        ["list", refs.listCard],
+        ["workflow", refs.workflowCard],
+        ["chat", refs.chatCard]
+      ].forEach(([name, card]) => {
+        if (!card) return;
+        const collapsed = Object.prototype.hasOwnProperty.call(SECTION_OVERRIDES, name) ? SECTION_OVERRIDES[name] : autoState[name];
+        card.classList.toggle("collapsed", collapsed);
+        const btn = card.querySelector(`[data-section-toggle="${name}"]`);
+        if (btn) {
+          btn.textContent = collapsed ? "Expandir" : "Minimizar";
+          btn.setAttribute("aria-expanded", String(!collapsed));
+        }
+      });
+      if (refs.trackingCard && !refs.trackingCard.classList.contains("collapsed")) {
+        requestAnimationFrame(() => { if (MAP) MAP.invalidateSize(); });
+      }
+    }
+    function setStatus(msg, tone = "neutral") {
+      refs.statusLine.textContent = msg;
+      refs.statusLine.style.borderColor = tone === "error" ? "rgba(239,68,68,.4)" : tone === "success" ? "rgba(34,197,94,.4)" : tone === "warning" ? "rgba(250,204,21,.4)" : "rgba(148,163,184,.18)";
+      refs.statusLine.style.color = tone === "error" ? "#fecaca" : tone === "success" ? "#bbf7d0" : tone === "warning" ? "#fde68a" : "#d7e5f6";
+      refs.statusLine.classList.toggle("hidden", useQuietClientScheduledChrome() && tone === "neutral");
+    }
+    function gpsBadge(msg, tone = "") { refs.gpsBadge.textContent = msg; refs.gpsBadge.className = `tag${tone ? ` ${tone}` : ""}`; }
+    function roleLabel(r) { return r === "client" ? "Vista cliente" : r === "employee" ? "Vista empleado" : r === "boss" ? "Vista jefe" : "Sin rol"; }
+    function mapCall() {
+      if (PREFERRED_CALL_ID) {
+        const preferred = CALLS.find((c) => String(c?.id || "") === String(PREFERRED_CALL_ID));
+        if (preferred) {
+          if (ROLE === "client" && isClientBlockingStatus(preferred.status)) return preferred;
+          if (ROLE === "employee" && (preferred.assignedEmployeeId === USER?.uid || String(preferred.status || "").toLowerCase() === "pending")) return preferred;
+          if (ROLE === "boss") return preferred;
+        }
+      }
+      if (ROLE === "client") return CALLS.find((c) => isClientBlockingStatus(c.status)) || CALLS[0] || null;
+      if (ROLE === "employee") return CALLS.find((c) => c.assignedEmployeeId === USER?.uid && isActiveStatus(c.status)) || CALLS.find((c) => c.status === "pending") || CALLS[0] || null;
+      return CALLS.find((c) => isActiveStatus(c.status)) || CALLS[0] || null;
+    }
+    function shareOwn(call) {
+      if (!call || !isActiveStatus(call.status)) return false;
+      if (ROLE === "client") return call.clientId === USER?.uid && isClientBlockingStatus(call.status);
+      return call.assignedEmployeeId === USER?.uid && call.status === "accepted";
+    }
+    function configView() {
+      refs.roleBadge.textContent = roleLabel(ROLE);
+      refs.roleBadge.className = `tag ${ROLE === "client" ? "green" : "blue"}`;
+      refs.roleBadge.classList.toggle("hidden", useQuietClientScheduledChrome());
+      refs.backButton.onclick = () => { window.location.href = home(); };
+      refs.scheduleFields.classList.toggle("hidden", FLOW_MODE !== "scheduled");
+      refs.etaField.classList.toggle("hidden", FLOW_MODE === "scheduled");
+      refs.gpsBadge.textContent = FLOW_MODE === "scheduled" ? "Seguimiento listo" : "GPS listo";
+      document.title = FLOW_MODE === "scheduled" ? "Trabajos programados | Straight Wire Electric" : "Solicitudes de emergencia | Straight Wire Electric";
+      if (ROLE === "client") {
+        refs.pageTitle.textContent = FLOW_MODE === "scheduled" ? "Programar trabajo" : "Reportar emergencia";
+        refs.pageSubtitle.textContent = FLOW_MODE === "scheduled"
+          ? "Programa una visita y da seguimiento al servicio desde aqui."
+          : "Envia una emergencia y comparte tu ubicacion en tiempo real hasta que un tecnico la acepte.";
+        refs.formTitle.textContent = FLOW_MODE === "scheduled" ? "Nuevo trabajo programado" : "Nueva emergencia";
+        refs.formSubtitle.textContent = FLOW_MODE === "scheduled"
+          ? "Solo puedes tener 1 trabajo programado abierto hasta que confirmes el pago final."
+          : "Solo puedes tener 1 emergencia abierta hasta que confirmes el pago final.";
+        refs.clientName.value = String(USER?.email || "").trim();
+        refs.listTitle.textContent = FLOW_MODE === "scheduled" ? "Tus trabajos programados" : "Tus emergencias";
+        refs.listSubtitle.textContent = FLOW_MODE === "scheduled"
+          ? "Veras aqui el estado, el tecnico asignado, el chat y el seguimiento del trabajo programado."
+          : "Veras aqui el estado, el tecnico asignado, el chat y el GPS en vivo.";
+        refs.workflowSubtitle.textContent = "Cuando el tecnico termine, aqui confirmarás monto, foto final y puntuacion.";
+        refs.chatTitle.textContent = FLOW_MODE === "scheduled" ? "Chat del trabajo" : "Chat de emergencia";
+        refs.chatSubtitle.textContent = FLOW_MODE === "scheduled"
+          ? "El chat se abrira automaticamente cuando un tecnico acepte tu trabajo programado."
+          : "El chat se abrira automaticamente cuando un tecnico acepte tu emergencia.";
+        refs.submitButton.textContent = flowSubmitLabel();
+        applyScheduledDefaults();
+      } else {
+        refs.formCard.classList.add("hidden");
+        refs.pageTitle.textContent = ROLE === "boss"
+          ? (FLOW_MODE === "scheduled" ? "Control de trabajos programados" : "Control de emergencias")
+          : (FLOW_MODE === "scheduled" ? "Cola de trabajos programados" : "Cola de emergencias");
+        refs.pageSubtitle.textContent = ROLE === "boss"
+          ? (FLOW_MODE === "scheduled" ? "Monitorea visitas programadas, chat, cierre y pagos." : "Monitorea emergencias y ubicaciones en tiempo real.")
+          : (FLOW_MODE === "scheduled" ? "Acepta trabajos programados pendientes y coordina el servicio con el cliente." : "Acepta emergencias pendientes y comparte tu ubicacion con el cliente.");
+        refs.listTitle.textContent = ROLE === "boss"
+          ? `Todos los ${flowLabelPlural()}`
+          : `${FLOW_MODE === "scheduled" ? "Trabajos programados" : "Emergencias"} operativos`;
+        refs.listSubtitle.textContent = ROLE === "boss"
+          ? "Puedes ver pendientes, aceptadas y resueltas."
+          : FLOW_MODE === "scheduled"
+            ? "Solo veras pendientes y los trabajos programados que tu hayas aceptado."
+            : "Solo veras pendientes y las emergencias que tu hayas aceptado.";
+        refs.workflowSubtitle.textContent = ROLE === "boss" ? "Desde aqui aprobarias el pago final del tecnico." : "Desde aqui finalizas, cobras y luego subes tu comprobante para el jefe.";
+        refs.chatTitle.textContent = FLOW_MODE === "scheduled" ? "Chat operativo" : "Chat de emergencia";
+        refs.chatSubtitle.textContent = FLOW_MODE === "scheduled"
+          ? "El chat se habilita en cuanto aceptas el trabajo programado."
+          : "El chat se habilita en cuanto aceptas una emergencia.";
+      }
+      refs.statusLine.classList.toggle("hidden", useQuietClientScheduledChrome());
+    }
+    function mapReady() {
+      if (MAP || !window.L) return MAP;
+      MAP = window.L.map(refs.trackingMap).setView([14.6349, -90.5069], 12);
+      window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap" }).addTo(MAP);
+      return MAP;
+    }
+    function clearMarkers(keys) {
+      for (const [key, marker] of MARKERS.entries()) {
+        if (!keys.has(key)) {
+          marker.remove();
+          MARKERS.delete(key);
+        }
+      }
+    }
+    function popupHtml(label, text, coords) {
+      const accuracy = Number(coords?.accuracy);
+      const precise = Number.isFinite(accuracy) && accuracy > 0 ? `Precision aprox. ${Math.round(accuracy)}m` : "Precision no disponible";
+      return `<div><strong>${esc(label)}</strong><div>${esc(text)}</div><div>${esc(precise)}</div><div>${esc(nowAge(coords))}</div></div>`;
+    }
+    function placeMarker(key, coords, label, color, text) {
+      if (!MAP || !coordsOk(coords)) return;
+      const latLng = [Number(coords.lat), Number(coords.lng)];
+      let marker = MARKERS.get(key);
+      if (!marker) {
+        marker = window.L.circleMarker(latLng, { radius: 11, color, weight: 3, fillColor: color, fillOpacity: .28 }).addTo(MAP);
+        MARKERS.set(key, marker);
+      } else {
+        marker.setLatLng(latLng);
+      }
+      marker.bindPopup(popupHtml(label, text, coords));
+    }
+    function renderMap() {
+      const call = mapCall();
+      const map = mapReady();
+      if (!map) return;
+      const active = new Set();
+      if (!call) {
+        refs.trackingTitle.textContent = FLOW_MODE === "scheduled" ? "Seguimiento del trabajo" : "Mapa en vivo";
+        refs.trackingStatus.textContent = FLOW_MODE === "scheduled" ? "Esperando un trabajo programado activo para mostrar seguimiento." : "Esperando una emergencia activa para mostrar ubicaciones.";
+        refs.trackingBadge.textContent = "Sin seguimiento";
+        refs.trackingCopy.textContent = ROLE === "client"
+          ? (FLOW_MODE === "scheduled" ? "Cuando programes un trabajo, aqui veras el seguimiento del servicio y luego la ubicacion del tecnico." : "Cuando envies una emergencia, aqui se vera tu punto y luego el del tecnico.")
+          : (FLOW_MODE === "scheduled" ? "Cuando aceptes un trabajo programado, aqui veras al cliente y al tecnico." : "Cuando aceptes una emergencia, aqui se vera al cliente y al tecnico.");
+        clearMarkers(active);
+        requestAnimationFrame(() => map.invalidateSize());
+        return;
+      }
+      refs.trackingTitle.textContent = `${FLOW_MODE === "scheduled" ? "Seguimiento" : "Mapa en vivo"}: ${call.clientName || call.clientEmail || "Cliente"}`;
+      refs.trackingStatus.textContent = `${fmtStatus(call.status)} · ${call.location || "Sin ubicacion"} · ${formatSchedule(call) || fmtDate(call.createdAt || call.createdAtMs)}`;
+      refs.trackingBadge.textContent = fmtStatus(call.status);
+      const points = [];
+      if (coordsOk(call.clientCoords)) {
+        active.add("client");
+        points.push([Number(call.clientCoords.lat), Number(call.clientCoords.lng)]);
+        placeMarker("client", call.clientCoords, call.clientName || call.clientEmail || "Cliente", "#22c55e", "Ubicacion del cliente");
+      }
+      if (coordsOk(call.employeeCoords)) {
+        active.add("employee");
+        points.push([Number(call.employeeCoords.lat), Number(call.employeeCoords.lng)]);
+        placeMarker("employee", call.employeeCoords, call.assignedEmployeeName || call.assignedEmployeeEmail || "Tecnico", "#3b82f6", "Ubicacion del tecnico");
+      }
+      clearMarkers(active);
+      if (!points.length) {
+        refs.trackingCopy.textContent = "Todavia no hay coordenadas disponibles. Permite GPS o espera la aceptacion del tecnico.";
+      } else if (points.length === 1) {
+        refs.trackingCopy.textContent = call.employeeCoords ? "El tecnico ya esta compartiendo ubicacion." : "El cliente ya esta compartiendo ubicacion.";
+        map.setView(points[0], 15);
+      } else {
+        refs.trackingCopy.textContent = "Cliente y tecnico ya estan compartiendo ubicacion en tiempo real.";
+        map.fitBounds(points, { padding: [42, 42] });
+      }
+      requestAnimationFrame(() => map.invalidateSize());
+      applySectionState();
+    }
+    function lockForm() {
+      if (ROLE !== "client") return;
+      const active = CALLS.find((c) => isClientBlockingStatus(c.status));
+      const disabled = Boolean(active);
+      for (const el of refs.form.elements) el.disabled = disabled;
+      refs.lockBadge.textContent = disabled ? `Formulario bloqueado por ${flowLabel(active)} activa` : "Formulario libre";
+      refs.lockBadge.className = `tag ${disabled ? "yellow" : "green"}`;
+      refs.formSubtitle.textContent = disabled
+        ? `Ya tienes un ${flowLabel(active)} abierto. Espera a confirmar el pago para enviar otro.`
+        : `Formulario disponible. Puedes programar ${flowActionLabelWithArticle()} cuando la necesites.`;
+    }
+    function setLocalCoords(callId, field, coords) { CALLS = CALLS.map((c) => c.id === callId ? { ...c, [field]: coords } : c); }
+    async function sendCoords(callId, coords) {
+      const res = await apiFetch(`/api/marketplace/emergency-calls/${callId}/location`, { method: "POST", body: JSON.stringify(coords) });
+      if (res?.data?.id) CALLS = CALLS.map((c) => c.id === res.data.id ? res.data : c);
+    }
+    function normCoords(raw) {
+      if (!raw) return null;
+      const lat = Number(raw.latitude ?? raw.lat);
+      const lng = Number(raw.longitude ?? raw.lng);
+      const accuracy = Number(raw.accuracy);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+      return { lat: Number(lat.toFixed(GPS_DECIMALS)), lng: Number(lng.toFixed(GPS_DECIMALS)), accuracy: Number.isFinite(accuracy) ? Math.round(accuracy) : null, updatedAtMs: Date.now() };
+    }
+    function stopGps() {
+      if (GEO != null && navigator.geolocation) navigator.geolocation.clearWatch(GEO);
+      GEO = null;
+      LAST_CALL_ID = "";
+      LAST_SENT_AT = 0;
+      LAST_SENT_KEY = "";
+    }
+    async function onGps(position) {
+      const call = mapCall();
+      if (!call || !shareOwn(call)) return;
+      const coords = normCoords(position?.coords);
+      if (!coords) return;
+      const field = ROLE === "client" ? "clientCoords" : "employeeCoords";
+      setLocalCoords(call.id, field, coords);
+      renderCalls();
+      renderMap();
+      const key = `${call.id}:${field}:${coords.lat}:${coords.lng}`;
+      const now = Date.now();
+      if (LAST_CALL_ID !== call.id) { LAST_CALL_ID = call.id; LAST_SENT_AT = 0; LAST_SENT_KEY = ""; }
+      if (now - LAST_SENT_AT < GPS_SEND_MS) return;
+      if (key === LAST_SENT_KEY && now - LAST_SENT_AT < GPS_SEND_MS) return;
+      LAST_SENT_AT = now;
+      LAST_SENT_KEY = key;
+      try {
+        await sendCoords(call.id, coords);
+        gpsBadge("GPS compartiendo", "green");
+      } catch (err) {
+        console.error("[emergency] gps send failed", err);
+        gpsBadge("GPS con error", "red");
+      }
+    }
+    function onGpsError(err) {
+      console.warn("[emergency] gps error", err);
+      gpsBadge(err?.code === 1 ? "GPS denegado" : "GPS sin senal", "yellow");
+    }
+    function refreshGps() {
+      const call = mapCall();
+      if (!("geolocation" in navigator)) { gpsBadge("GPS no soportado", "yellow"); stopGps(); return; }
+      if (!call || !shareOwn(call)) { gpsBadge(ROLE === "client" ? "GPS en espera" : "GPS listo al aceptar", ""); stopGps(); return; }
+      if (GEO != null && LAST_CALL_ID === call.id) return;
+      stopGps();
+      LAST_CALL_ID = call.id;
+      gpsBadge("GPS buscando senal", "");
+      GEO = navigator.geolocation.watchPosition((pos) => { onGps(pos); }, (err) => { onGpsError(err); }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 12000 });
+    }
+    function currentCoords() {
+      if (!("geolocation" in navigator)) return Promise.resolve(null);
+      return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition((pos) => resolve(normCoords(pos.coords)), (err) => { onGpsError(err); resolve(null); }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 9000 });
+      });
+    }
+    function captureInteractiveFocus() {
+      const active = document.activeElement;
+      if (!active || !active.id) return null;
+      if (!refs.chatPanel.contains(active) && !refs.workflowPanel.contains(active)) return null;
+      return {
+        id: active.id,
+        selectionStart: typeof active.selectionStart === "number" ? active.selectionStart : null,
+        selectionEnd: typeof active.selectionEnd === "number" ? active.selectionEnd : null,
+        scrollTop: typeof active.scrollTop === "number" ? active.scrollTop : null
+      };
+    }
+    function restoreInteractiveFocus(snapshot) {
+      if (!snapshot?.id) return;
+      const field = document.getElementById(snapshot.id);
+      if (!field || typeof field.focus !== "function") return;
+      field.focus({ preventScroll: true });
+      if (typeof snapshot.selectionStart === "number" && typeof field.setSelectionRange === "function") {
+        field.setSelectionRange(snapshot.selectionStart, snapshot.selectionEnd ?? snapshot.selectionStart);
+      }
+      if (typeof snapshot.scrollTop === "number") {
+        field.scrollTop = snapshot.scrollTop;
+      }
+    }
+    function canUseChat(call) {
+      if (!call || !chatEnabledStatus(call.status)) return false;
+      if (ROLE === "boss") return true;
+      if (ROLE === "client") return call.clientId === USER?.uid;
+      return call.assignedEmployeeId === USER?.uid;
+    }
+    function chatAttachmentUsed() {
+      return CHAT_MESSAGES.reduce((sum, msg) => {
+        if (msg.senderId !== USER?.uid || msg.senderRole !== "client") return sum;
+        return sum + (Array.isArray(msg.attachments) ? msg.attachments.length : 0);
+      }, 0);
+    }
+    function statusTone(status) {
+      if (status === "completed") return "green";
+      if (status === "payment_pending_review" || status === "accepted") return "blue";
+      return "yellow";
+    }
+    async function loadChat(silent = false) {
+      const call = mapCall();
+      if (!canUseChat(call)) {
+        CHAT_MESSAGES = [];
+        CHAT_FILES = [];
+        CHAT_DRAFT_TEXT = "";
+        renderChat();
+        return;
+      }
+      try {
+        const res = await apiFetch(`/api/marketplace/emergency-calls/${call.id}/chat?limit=80`);
+        CHAT_MESSAGES = Array.isArray(res?.data) ? res.data : [];
+        const liveChatInput = document.getElementById("chatInput");
+        if (liveChatInput) {
+          CHAT_DRAFT_TEXT = liveChatInput.value;
+        }
+        renderChat();
+      } catch (err) {
+        console.error("[emergency] chat load failed", err);
+        if (!silent) setStatus(err?.message || "No se pudo cargar el chat.", "error");
+        CHAT_MESSAGES = [];
+        renderChat(err?.message || "No se pudo cargar el chat.");
+      }
+    }
+    function renderChat(errorMessage = "") {
+      const call = mapCall();
+      const canChat = canUseChat(call);
+      const used = chatAttachmentUsed();
+      refs.chatLimitTag.textContent = `Fotos cliente: ${used}/${MAX_CLIENT_CHAT_ATTACHMENTS}`;
+      if (!call || !canChat) {
+        refs.chatPanel.dataset.chatCallId = "";
+        refs.chatPanel.innerHTML = `<div class="empty">${errorMessage || `Todavia no hay chat disponible para este ${flowLabel(call)}.`}</div>`;
+        applySectionState();
+        return;
+      }
+      const messagesHtml = CHAT_MESSAGES.length
+        ? CHAT_MESSAGES.map((msg) => {
+          const mine = msg.senderId === USER?.uid;
+          const attachmentsHtml = Array.isArray(msg.attachments) && msg.attachments.length
+            ? `<div class="chat-files">${msg.attachments.map((url) => `<a class="chat-file-pill" href="${esc(url)}" target="_blank">Foto</a>`).join("")}</div>`
+            : "";
+          return `<div class="chat-msg ${mine ? "mine" : ""}"><div class="bubble"><strong>${esc(msg.senderName || msg.senderRole || "Usuario")}</strong><div>${esc(msg.text || "")}</div>${attachmentsHtml}</div><div class="meta">${esc(fmtDate(msg.createdAt))}</div></div>`;
+        }).join("")
+        : `<div class="empty">No hay mensajes todavía.</div>`;
+      const remaining = Math.max(0, MAX_CLIENT_CHAT_ATTACHMENTS - used - CHAT_FILES.length);
+      const helperText = ROLE === "client"
+        ? `Te quedan ${remaining} foto(s) disponibles en este chat.`
+        : `Puedes responder en tiempo real mientras el ${flowLabel(call)} avanza.`;
+      const filesHtml = CHAT_FILES.map((file, index) => `<span class="chat-file-pill">${esc(file.name)} <button type="button" data-remove-chat="${index}">x</button></span>`).join("");
+      const currentCallId = refs.chatPanel.dataset.chatCallId || "";
+      const canPatchExistingComposer =
+        currentCallId === String(call.id) &&
+        !!document.getElementById("chatInput") &&
+        !!document.getElementById("chatMessagesBox");
+      if (canPatchExistingComposer) {
+        const channelBox = refs.chatPanel.querySelector("[data-chat-channel]");
+        const msgBox = document.getElementById("chatMessagesBox");
+        const helperNode = refs.chatPanel.querySelector("[data-chat-helper]");
+        const filesNode = refs.chatPanel.querySelector("[data-chat-files]");
+        const shouldStickToBottom = !!msgBox && (document.activeElement?.id === "chatInput" || Math.abs((msgBox.scrollHeight - msgBox.clientHeight) - msgBox.scrollTop) < 20);
+        if (channelBox) {
+          channelBox.innerHTML = `<strong>Canal activo</strong><div>${esc(call.clientName || call.clientEmail || "Cliente")} con ${esc(call.assignedEmployeeName || call.assignedEmployeeEmail || "tecnico")}</div>`;
+        }
+        if (msgBox) {
+          msgBox.innerHTML = messagesHtml;
+          if (shouldStickToBottom) msgBox.scrollTop = msgBox.scrollHeight;
+        }
+        if (helperNode) helperNode.textContent = helperText;
+        if (filesNode) filesNode.innerHTML = filesHtml;
+        applySectionState();
+        return;
+      }
+      refs.chatPanel.dataset.chatCallId = String(call.id);
+      refs.chatPanel.innerHTML = `
+        <div class="chat-actions">
+          <div class="box" data-chat-channel><strong>Canal activo</strong><div>${esc(call.clientName || call.clientEmail || "Cliente")} con ${esc(call.assignedEmployeeName || call.assignedEmployeeEmail || "tecnico")}</div></div>
+        </div>
+        <div class="chat-messages" id="chatMessagesBox">${messagesHtml}</div>
+        <div class="chat-composer">
+          <textarea id="chatInput" placeholder="Escribe un mensaje...">${esc(CHAT_DRAFT_TEXT)}</textarea>
+          <div class="row">
+            <button class="btn btn-secondary" type="button" data-action="chat-pick">Agregar foto</button>
+            <button class="btn btn-blue" type="button" data-action="chat-send">Enviar mensaje</button>
+            <input id="chatFilesInput" type="file" accept="image/*" multiple class="hidden" />
+          </div>
+          <div class="helper" data-chat-helper>${helperText}</div>
+          <div class="chat-files" data-chat-files>${filesHtml}</div>
+        </div>`;
+      const msgBox = document.getElementById("chatMessagesBox");
+      if (msgBox) msgBox.scrollTop = msgBox.scrollHeight;
+      applySectionState();
+    }
+    function workflowValue(call, key, fallback = "") {
+      const draftValue = WORKFLOW_DRAFT[key];
+      if (draftValue !== undefined && draftValue !== null && draftValue !== "") return draftValue;
+      return call?.[key] ?? fallback;
+    }
+    function workflowRenderKey(call) {
+      if (!call) return "empty";
+      return JSON.stringify({
+        role: ROLE,
+        id: call.id || "",
+        status: String(call.status || "").toLowerCase(),
+        assignedEmployeeId: call.assignedEmployeeId || "",
+        quotedAmount: call.quotedAmount ?? "",
+        finalAmount: call.finalAmount ?? "",
+        clientRating: call.clientRating ?? "",
+        finalPhotoUrl: call.finalPhotoUrl || "",
+        paymentProofUrl: call.paymentProofUrl || "",
+        paymentRejectedAt: call.paymentRejectedAt || call.paymentRejectedAtMs || "",
+        paymentRejectedBy: call.paymentRejectedBy || "",
+        paymentRejectionReason: call.paymentRejectionReason || ""
+      });
+    }
+    function paymentRejectionMeta(call) {
+      if (!call) return null;
+      const rejectedAt = call.paymentRejectedAt || call.paymentRejectedAtMs;
+      if (!rejectedAt) return null;
+      const reason = String(call.paymentRejectionReason || "").trim() || "Sin motivo indicado.";
+      const reviewedBy = String(call.paymentRejectedBy || "").trim();
+      return {
+        reason,
+        reviewedBy: reviewedBy || "Jefe",
+        when: fmtDate(rejectedAt)
+      };
+    }
+    function renderWorkflow() {
+      const call = mapCall();
+      const nextWorkflowKey = workflowRenderKey(call);
+      const activeField = document.activeElement;
+      const isEditingWorkflowField = !!activeField && refs.workflowPanel.contains(activeField) && (
+        activeField.tagName === "INPUT" ||
+        activeField.tagName === "TEXTAREA" ||
+        activeField.tagName === "SELECT"
+      );
+      if (isEditingWorkflowField && nextWorkflowKey === LAST_WORKFLOW_RENDER_KEY) {
+        applySectionState();
+        return;
+      }
+      LAST_WORKFLOW_RENDER_KEY = nextWorkflowKey;
+      if (!call) {
+        refs.workflowPanel.innerHTML = `<div class="empty">Selecciona o acepta un ${flowReadyLabel()} para continuar el flujo.</div>`;
+        applySectionState();
+        return;
+      }
+      const status = String(call.status || "").toLowerCase();
+      const paidAmount = Number(call.finalAmount ?? call.quotedAmount ?? 0);
+      const safePaidAmount = Number.isFinite(paidAmount) ? paidAmount : 0;
+      const depositAmount = Math.round(safePaidAmount * 0.20 * 100) / 100;
+      const rejectionMeta = paymentRejectionMeta(call);
+      if (ROLE === "employee" && status === "accepted" && call.assignedEmployeeId === USER?.uid) {
+        refs.workflowPanel.innerHTML = `
+          <div class="box"><strong>Cerrar trabajo y definir cobro</strong><div>Cuando termines el trabajo, indica cuánto cobrarás para que el cliente confirme pago, foto final y puntuación.</div></div>
+          <div class="field"><label for="workflowAmount">Monto a cobrar</label><input id="workflowAmount" type="number" min="0" step="0.01" value="${esc(workflowValue(call, "resolveAmount", call.quotedAmount ?? ""))}" /></div>
+          <button class="btn btn-primary" type="button" data-action="workflow-resolve" data-id="${esc(call.id)}">Finalizar trabajo y cobrar</button>`;
+        applySectionState();
+        return;
+      }
+      if (ROLE === "employee" && status === "awaiting_client_close" && call.assignedEmployeeId === USER?.uid) {
+        refs.workflowPanel.innerHTML = `
+          <div class="box"><strong>Cobro enviado al cliente</strong><div>Ya enviaste el monto a cobrar. Ahora el cliente debe confirmar cuánto pagó, subir la foto final y dejar puntuación.</div></div>
+          <div class="grid2">
+            <div class="box"><strong>Monto enviado</strong><div>Q${esc(call.quotedAmount ?? 0)}</div></div>
+            <div class="box"><strong>Estado</strong><div>Esperando confirmación del cliente</div></div>
+          </div>`;
+        applySectionState();
+        return;
+      }
+      if (ROLE === "client" && status === "awaiting_client_close") {
+        refs.workflowPanel.innerHTML = `
+          <div class="box"><strong>Confirma pago y cierra el servicio</strong><div>El tecnico indicó un cobro sugerido de Q${esc(call.quotedAmount ?? 0)}. Aquí confirmas cuánto pagaste, subes foto del trabajo terminado y dejas puntuación para cerrar este ${flowLabel(call)}.</div></div>
+          <div class="field"><label for="workflowCloseAmount">Cuanto pagaste</label><input id="workflowCloseAmount" type="number" min="0" step="0.01" value="${esc(workflowValue(call, "closeAmount", call.quotedAmount ?? ""))}" /></div>
+          <div class="field"><label for="workflowRating">Puntuacion</label><select id="workflowRating"><option value="5"${String(workflowValue(call, "rating", "5")) === "5" ? " selected" : ""}>5</option><option value="4"${String(workflowValue(call, "rating", "5")) === "4" ? " selected" : ""}>4</option><option value="3"${String(workflowValue(call, "rating", "5")) === "3" ? " selected" : ""}>3</option><option value="2"${String(workflowValue(call, "rating", "5")) === "2" ? " selected" : ""}>2</option><option value="1"${String(workflowValue(call, "rating", "5")) === "1" ? " selected" : ""}>1</option></select></div>
+          <div class="field"><label for="workflowFinalPhoto">Foto del trabajo terminado</label><input id="workflowFinalPhoto" type="file" accept="image/*" /></div>
+          ${WORKFLOW_FINAL_FILE ? `<div class="helper">Archivo listo: ${esc(WORKFLOW_FINAL_FILE.name)}</div>` : ""}
+          <button class="btn btn-primary" type="button" data-action="workflow-client-close" data-id="${esc(call.id)}">Confirmar pago y cierre</button>`;
+        applySectionState();
+        return;
+      }
+      if (ROLE === "employee" && status === "awaiting_payment_proof" && call.assignedEmployeeId === USER?.uid) {
+        refs.workflowPanel.innerHTML = `
+          ${rejectionMeta ? `
+          <div class="box" style="border:1px solid rgba(239,68,68,.44); background:rgba(239,68,68,.12);">
+            <strong>Comprobante rechazado por el jefe</strong>
+            <div>${esc(rejectionMeta.reason)}</div>
+            <div class="helper" style="color:#fecaca; margin-top:6px;">Revisó: ${esc(rejectionMeta.reviewedBy)} · ${esc(rejectionMeta.when)}</div>
+          </div>` : ""}
+          <div class="box"><strong>El cliente ya confirmó</strong><div>Monto pagado: Q${esc(safePaidAmount.toLocaleString())} · Rating: ${esc(call.clientRating ?? "-")}/5</div></div>
+          <div class="grid2">
+            <div class="box"><strong>Tu depósito al jefe (20%)</strong><div>Q${esc(depositAmount.toLocaleString())}</div></div>
+            <div class="box"><strong>Base del cálculo</strong><div>20% de lo pagado por el cliente</div></div>
+          </div>
+          <div class="box"><strong>Alerta al jefe</strong><div>Al subir este comprobante, el sistema manda una notificación al numero WhatsApp configurado por el jefe.</div></div>
+          ${call.finalPhotoUrl ? `<img class="preview-image" src="${esc(call.finalPhotoUrl)}" alt="Trabajo terminado" />` : ""}
+          <div class="field"><label for="workflowProofFile">Comprobante para jefe</label><input id="workflowProofFile" type="file" accept="image/*" /></div>
+          ${WORKFLOW_PROOF_FILE ? `<div class="helper">Archivo listo: ${esc(WORKFLOW_PROOF_FILE.name)}</div>` : ""}
+          <button class="btn btn-blue" type="button" data-action="workflow-payment-proof" data-id="${esc(call.id)}">${rejectionMeta ? "Reenviar comprobante y notificar al jefe" : "Enviar comprobante y notificar al jefe"}</button>`;
+        applySectionState();
+        return;
+      }
+      if (ROLE === "employee" && status === "payment_pending_review" && call.assignedEmployeeId === USER?.uid) {
+        refs.workflowPanel.innerHTML = `
+          <div class="box"><strong>Comprobante enviado al jefe</strong><div>Tu depósito está en revisión.</div></div>
+          <div class="grid2">
+            <div class="box"><strong>Monto pagado por cliente</strong><div>Q${esc(safePaidAmount.toLocaleString())}</div></div>
+            <div class="box"><strong>Depósito esperado (20%)</strong><div>Q${esc(depositAmount.toLocaleString())}</div></div>
+          </div>
+          <div class="box"><strong>Reenviar aviso</strong><div>Si el jefe todavía no lo revisa, puedes volver a mandarle la notificación al numero configurado en su panel.</div></div>
+          ${call.paymentProofUrl ? `<img class="preview-image" src="${esc(call.paymentProofUrl)}" alt="Comprobante enviado" />` : ""}
+          <button class="btn btn-blue" type="button" data-action="workflow-notify-boss-payment" data-id="${esc(call.id)}">Volver a notificar al jefe</button>`;
+        applySectionState();
+        return;
+      }
+      if (ROLE === "client" && status === "awaiting_payment_proof") {
+        refs.workflowPanel.innerHTML = `<div class="empty">Ya confirmaste el pago, estamos a la orden. En este punto ya puedes ${FLOW_MODE === "scheduled" ? "programar otro trabajo" : "enviar otra emergencia"}.</div>`;
+        applySectionState();
+        return;
+      }
+      if (ROLE === "boss" && status === "payment_pending_review") {
+        refs.workflowPanel.innerHTML = `
+          <div class="box"><strong>Pago pendiente de aprobación</strong><div>Tecnico: ${esc(call.assignedEmployeeName || call.assignedEmployeeEmail || "-")} · Cliente: ${esc(call.clientName || call.clientEmail || "-")}</div></div>
+          <div class="grid2">
+            <div class="box"><strong>Monto</strong><div>Q${esc(call.finalAmount ?? call.quotedAmount ?? 0)}</div></div>
+            <div class="box"><strong>Puntuacion</strong><div>${esc(call.clientRating ?? "-")}/5</div></div>
+          </div>
+          ${call.finalPhotoUrl ? `<img class="preview-image" src="${esc(call.finalPhotoUrl)}" alt="Trabajo terminado" />` : ""}
+          ${call.paymentProofUrl ? `<img class="preview-image" src="${esc(call.paymentProofUrl)}" alt="Comprobante" />` : "<div class='helper'>Todavia no hay comprobante.</div>"}
+          <button class="btn btn-primary" type="button" data-action="workflow-approve" data-id="${esc(call.id)}">Aprobar pago final</button>`;
+        applySectionState();
+        return;
+      }
+      if (ROLE === "client" && status === "payment_pending_review") {
+        refs.workflowPanel.innerHTML = `<div class="empty">Ya confirmaste el pago, estamos a la orden. Tu ${flowLabel(call)} quedó cerrado y el jefe está revisando el comprobante del técnico.</div>`;
+        applySectionState();
+        return;
+      }
+      if (status === "awaiting_payment_proof") {
+        refs.workflowPanel.innerHTML = `<div class="empty">El cliente ya confirmó pago. Ahora el tecnico debe enviar comprobante al jefe.</div>`;
+        applySectionState();
+        return;
+      }
+      if (status === "payment_pending_review") {
+        refs.workflowPanel.innerHTML = `<div class="empty">El comprobante ya fue enviado. Esperando aprobación del jefe.</div>`;
+        applySectionState();
+        return;
+      }
+      if (status === "completed") {
+        refs.workflowPanel.innerHTML = `<div class="empty">${FLOW_MODE === "scheduled" ? "Trabajo programado completado." : "Emergencia completada."} El tecnico ya puede tomar ${FLOW_MODE === "scheduled" ? "otro trabajo programado" : "otra solicitud de emergencia"}.</div>`;
+        applySectionState();
+        return;
+      }
+      refs.workflowPanel.innerHTML = `<div class="empty">Chat y siguiente paso se habilitarán cuando el ${flowLabel(call)} sea aceptado.</div>`;
+      applySectionState();
+    }
+    async function sendChatMessage() {
+      const call = mapCall();
+      if (!canUseChat(call)) return;
+      const input = document.getElementById("chatInput");
+      const text = input?.value?.trim() || "";
+      if (!text && CHAT_FILES.length === 0) return;
+      if (ROLE === "client") {
+        const used = chatAttachmentUsed();
+        if (used + CHAT_FILES.length > MAX_CLIENT_CHAT_ATTACHMENTS) {
+          alert(`Solo puedes enviar ${Math.max(0, MAX_CLIENT_CHAT_ATTACHMENTS - used)} foto(s) más en este chat.`);
+          return;
+        }
+      }
+      const attachments = [];
+      for (const file of CHAT_FILES) {
+        const up = await uploadImage(file);
+        attachments.push(up?.url || up?.secure_url || "");
+      }
+      await apiFetch(`/api/marketplace/emergency-calls/${call.id}/chat`, {
+        method: "POST",
+        body: JSON.stringify({ text, attachments })
+      });
+      CHAT_FILES = [];
+      CHAT_DRAFT_TEXT = "";
+      if (input) input.value = "";
+      await loadChat(true);
+    }
+    function actionButtons(call) {
+      const status = String(call.status || "").toLowerCase();
+      const buttons = [];
+      if (ROLE !== "client" && status === "pending") buttons.push(`<button class="btn btn-blue" data-action="accept" data-id="${esc(call.id)}">${esc(flowAcceptLabel(call))}</button>`);
+      if (ROLE === "boss") buttons.push(`<button class="btn btn-danger" data-action="delete" data-id="${esc(call.id)}">Borrar</button>`);
+      return buttons.join("");
+    }
+    function tag(label, tone = "") { return `<span class="tag${tone ? ` ${tone}` : ""}">${esc(label)}</span>`; }
+    function renderCalls() {
+      const list = sortCalls(CALLS);
+      if (!list.length) { refs.callList.innerHTML = `<div class="empty">No hay ${flowLoadingLabel()} para mostrar.</div>`; applySectionState(); return; }
+      refs.callList.innerHTML = list.map((call) => {
+        const callId = String(call.id || "").trim();
+        const isPreferred = callId && callId === PREFERRED_CALL_ID;
+        const scheduledText = formatSchedule(call);
+        const tags = [
+          tag(fmtStatus(call.status), statusTone(call.status)),
+          tag(fmtPriority(call.priority), call.priority === "critical" ? "red" : "yellow"),
+          isScheduledMode(call)
+            ? tag(scheduledText || "Horario pendiente", "blue")
+            : tag(`${call.eta || 30} min`)
+        ];
+        if (coordsOk(call.clientCoords)) tags.push(tag(`GPS cliente · ${nowAge(call.clientCoords)}`, "green"));
+        if (coordsOk(call.employeeCoords)) tags.push(tag(`GPS tecnico · ${nowAge(call.employeeCoords)}`, "blue"));
+        return `
+          <article class="call${isPreferred ? " call-focus" : ""}" data-call-id="${encodeURIComponent(callId)}" style="${isPreferred ? "border-color:rgba(96,165,250,.75); box-shadow:0 0 0 1px rgba(96,165,250,.45), 0 14px 32px rgba(2,8,23,.56);" : ""}">
+            <div class="call-top">
+              <div>
+                <div class="title" style="margin:0 0 4px;">${esc(call.clientName || call.clientEmail || "Cliente sin nombre")}</div>
+                <div class="meta">${esc(call.phone || "Sin telefono")} · ${esc(call.location || "Sin ubicacion")}<br>${esc(isScheduledMode(call) ? (scheduledText ? `Programado: ${scheduledText}` : "Horario por confirmar") : fmtDate(call.createdAt || call.createdAtMs))}</div>
+              </div>
+              <div class="row">${tags.join("")}</div>
+            </div>
+            <div class="grid2">
+              <div class="box"><strong>${isScheduledMode(call) ? "Detalle del servicio" : "Problema"}</strong><div>${esc(call.issue || "Sin descripcion")}</div></div>
+              <div class="box"><strong>Tecnico</strong><div>${esc(call.assignedEmployeeName || call.assignedEmployeeEmail || (call.status === "pending" ? "Sin asignar" : "No disponible"))}</div></div>
+              <div class="box"><strong>GPS cliente</strong><div>${coordsOk(call.clientCoords) ? esc(`${call.clientCoords.lat}, ${call.clientCoords.lng}`) : "Aun sin compartir"}</div></div>
+              <div class="box"><strong>GPS tecnico</strong><div>${coordsOk(call.employeeCoords) ? esc(`${call.employeeCoords.lat}, ${call.employeeCoords.lng}`) : "Aun sin compartir"}</div></div>
+            </div>
+            <div class="row">${actionButtons(call)}</div>
+          </article>`;
+      }).join("");
+      applySectionState();
+    }
+    async function loadCalls(silent = false) {
+      try {
+        const res = await apiFetch(`/api/marketplace/emergency-calls?limit=80&mode=${encodeURIComponent(FLOW_MODE)}`);
+        CALLS = Array.isArray(res?.data) ? res.data : [];
+        processLiveNotifications(CALLS);
+        const liveGuard = window.__SWE_LIVE_INPUT_GUARD__;
+        if (liveGuard) liveGuard.captureCurrent();
+        const focusSnapshot = captureInteractiveFocus();
+        lockForm();
+        renderCalls();
+        renderMap();
+        renderWorkflow();
+        refreshGps();
+        await loadChat(true);
+        if (REQUEST_CHAT_ON_LOAD) {
+          focusEmergencyChatComposer();
+          REQUEST_CHAT_ON_LOAD = false;
+        }
+        if (liveGuard) liveGuard.scheduleRestore();
+        if (focusSnapshot?.id && focusSnapshot.id !== "chatInput") {
+          restoreInteractiveFocus(focusSnapshot);
+        }
+        if (!silent) setStatus(`${FLOW_MODE === "scheduled" ? "Trabajos programados" : "Emergencias"} actualizadas.`, "success");
+      } catch (err) {
+        console.error("[emergency] load failed", err);
+        refs.callList.innerHTML = `<div class="empty">No se pudo cargar la lista de ${flowLoadingLabel()}.</div>`;
+        refs.workflowPanel.innerHTML = `<div class="empty">No se pudo cargar el flujo.</div>`;
+        refs.chatPanel.innerHTML = `<div class="empty">No se pudo cargar el chat.</div>`;
+        setStatus(err?.message || `No se pudo cargar la lista de ${flowLoadingLabel()}.`, "error");
+      }
+    }
+    async function createPayload() {
+      const payload = {
+        clientName: refs.clientName.value.trim(),
+        phone: refs.phone.value.trim(),
+        location: refs.location.value.trim(),
+        priority: refs.priority.value,
+        issue: refs.issue.value.trim(),
+        dispatchMode: FLOW_MODE,
+        clientCoords: await currentCoords()
+      };
+      if (FLOW_MODE === "scheduled") {
+        const scheduledDate = refs.scheduledDate.value.trim();
+        const scheduledTime = refs.scheduledTime.value.trim();
+        if (!scheduledDate || !scheduledTime) {
+          throw new Error("Selecciona fecha y hora para el trabajo programado.");
+        }
+        payload.scheduledDate = scheduledDate;
+        payload.scheduledTime = scheduledTime;
+        payload.scheduledFor = `${scheduledDate}T${scheduledTime}:00`;
+      } else {
+        payload.eta = Number(refs.eta.value || 30);
+      }
+      return payload;
+    }
+    function resetClientForm() {
+      refs.form.reset();
+      refs.clientName.value = String(USER?.email || "").trim();
+      refs.priority.value = "urgent";
+      refs.eta.value = "30";
+      applyScheduledDefaults();
+    }
+    async function onSubmit(event) {
+      event.preventDefault();
+      try {
+        refs.submitButton.disabled = true;
+        refs.submitButton.textContent = FLOW_MODE === "scheduled" ? "Programando..." : "Enviando...";
+        setStatus(FLOW_MODE === "scheduled" ? "Creando trabajo programado..." : "Creando emergencia...", "warning");
+        const payload = await createPayload();
+        const res = await apiFetch("/api/marketplace/emergency-calls", { method: "POST", body: JSON.stringify(payload) });
+        if (res?.data?.id) CALLS = sortCalls([res.data, ...CALLS.filter((c) => c.id !== res.data.id)]);
+        resetClientForm();
+        setStatus(
+          FLOW_MODE === "scheduled"
+            ? "Trabajo programado creado. Ahora puedes seguirlo en el mapa."
+            : "Emergencia enviada. Ahora puedes seguirla en el mapa.",
+          "success"
+        );
+        await loadCalls(true);
+      } catch (err) {
+        console.error("[emergency] create failed", err);
+        setStatus(err?.message || `No se pudo ${FLOW_MODE === "scheduled" ? "programar el trabajo" : "enviar la emergencia"}.`, "error");
+        alert(err?.message || `No se pudo ${FLOW_MODE === "scheduled" ? "programar el trabajo" : "enviar la emergencia"}.`);
+      } finally {
+        refs.submitButton.disabled = false;
+        refs.submitButton.textContent = flowSubmitLabel();
+      }
+    }
+    async function onAction(event) {
+      const btn = event.target.closest("[data-action]");
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      try {
+        btn.disabled = true;
+        if (action === "accept") {
+          setStatus(`Aceptando ${flowLabel(CALLS.find((item) => String(item?.id) === String(id)))}...`, "warning");
+          await apiFetch(`/api/marketplace/emergency-calls/${id}/accept`, { method: "POST" });
+          setStatus(`${FLOW_MODE === "scheduled" ? "Trabajo programado" : "Emergencia"} aceptada. Se abrió el chat y el cliente ya puede ver tu ubicación.`, "success");
+        } else if (action === "delete") {
+          if (!window.confirm(`Se borrará este ${flowReadyLabel(CALLS.find((item) => String(item?.id) === String(id)))}. Continuar?`)) return;
+          setStatus(`Borrando ${flowReadyLabel(CALLS.find((item) => String(item?.id) === String(id)))}...`, "warning");
+          await apiFetch(`/api/marketplace/emergency-calls/${id}`, { method: "DELETE" });
+          setStatus(`${FLOW_MODE === "scheduled" ? "Trabajo programado" : "Emergencia"} borrada.`, "success");
+        }
+        await loadCalls(true);
+      } catch (err) {
+        console.error("[emergency] action failed", err);
+        setStatus(err?.message || "No se pudo completar la accion.", "error");
+        alert(err?.message || "No se pudo completar la accion.");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+    async function onWorkflowAction(event) {
+      const btn = event.target.closest("[data-action]");
+      if (!btn) return;
+      const id = btn.dataset.id || mapCall()?.id;
+      if (!id) return;
+      try {
+        btn.disabled = true;
+        if (btn.dataset.action === "workflow-resolve") {
+          const amount = Number(document.getElementById("workflowAmount")?.value || 0);
+          await apiFetch(`/api/marketplace/emergency-calls/${id}/resolve`, { method: "POST", body: JSON.stringify({ amount }) });
+          WORKFLOW_DRAFT.resolveAmount = "";
+          setStatus("Monto enviado al cliente. Ahora el cliente debe confirmar pago, foto final y puntuación.", "success");
+        } else if (btn.dataset.action === "workflow-client-close") {
+          const finalAmount = Number(document.getElementById("workflowCloseAmount")?.value || 0);
+          const clientRating = Number(document.getElementById("workflowRating")?.value || 5);
+          if (!WORKFLOW_FINAL_FILE) { alert("Sube la foto final del trabajo."); return; }
+          const upload = await uploadImage(WORKFLOW_FINAL_FILE);
+          const finalPhotoUrl = upload?.url || upload?.secure_url || "";
+          await apiFetch(`/api/marketplace/emergency-calls/${id}/close`, { method: "POST", body: JSON.stringify({ finalAmount, clientRating, finalPhotoUrl }) });
+          WORKFLOW_FINAL_FILE = null;
+          WORKFLOW_DRAFT = { resolveAmount: "", closeAmount: "", rating: "5" };
+          setStatus(
+            FLOW_MODE === "scheduled"
+              ? "Ya confirmaste el pago. Ya puedes programar otro trabajo si lo necesitas."
+              : "Ya confirmaste el pago, estamos a la orden. Ya puedes enviar otra emergencia si la necesitas.",
+            "success"
+          );
+        } else if (btn.dataset.action === "workflow-payment-proof") {
+          if (!WORKFLOW_PROOF_FILE) { alert("Sube el comprobante del pago."); return; }
+          const currentCall = CALLS.find((item) => String(item?.id) === String(id));
+          const isResubmission = Boolean(currentCall?.paymentRejectedAt || currentCall?.paymentRejectedAtMs);
+          const upload = await uploadImage(WORKFLOW_PROOF_FILE);
+          const proofUrl = upload?.url || upload?.secure_url || "";
+          await apiFetch(`/api/marketplace/emergency-calls/${id}/payment-proof`, { method: "POST", body: JSON.stringify({ proofUrl }) });
+          WORKFLOW_PROOF_FILE = null;
+          const paidAmount = Number(currentCall?.finalAmount ?? currentCall?.quotedAmount ?? 0);
+          const depositAmount = Number.isFinite(paidAmount) ? Math.round(paidAmount * 0.20 * 100) / 100 : 0;
+          setStatus(
+            `${isResubmission ? "Comprobante reenviado y jefe notificado" : "Comprobante enviado y jefe notificado"}. Depósito reportado: Q${depositAmount.toLocaleString()}.`,
+            "success"
+          );
+        } else if (btn.dataset.action === "workflow-notify-boss-payment") {
+          const notifyRes = await apiFetch(`/api/marketplace/emergency-calls/${id}/notify-boss-payment`, { method: "POST" });
+          const notification = notifyRes?.data?.notification || {};
+          const status = String(notification?.status || "").toLowerCase();
+          setStatus(
+            status === "sent"
+              ? "WhatsApp reenviado al jefe."
+              : status === "queued"
+                ? "Notificación reenviada al jefe y puesta en cola."
+                : "Notificación reenviada al jefe.",
+            "success"
+          );
+        } else if (btn.dataset.action === "workflow-approve") {
+          await apiFetch(`/api/marketplace/emergency-calls/${id}/approve-payment`, { method: "POST" });
+          setStatus(`Pago aprobado. El técnico ya puede tomar ${FLOW_MODE === "scheduled" ? "otro trabajo programado" : "otra emergencia"}.`, "success");
+        } else if (btn.dataset.action === "chat-pick") {
+          document.getElementById("chatFilesInput")?.click();
+          return;
+        } else if (btn.dataset.action === "chat-send") {
+          await sendChatMessage();
+          setStatus("Mensaje enviado.", "success");
+        }
+        await loadCalls(true);
+      } catch (err) {
+        console.error("[emergency] workflow failed", err);
+        setStatus(err?.message || "No se pudo completar el paso actual.", "error");
+        alert(err?.message || "No se pudo completar el paso actual.");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+    function startPolling() { if (POLL) clearInterval(POLL); POLL = window.setInterval(() => { loadCalls(true); }, POLL_MS); }
+    async function boot(user) {
+      if (!user) { window.location.replace(`login-gateway.html?returnTo=${encodeURIComponent(currentReturnTo())}`); return; }
+      try {
+        const authResult = await validateRoleWithBackend(user, { debugLabel: "[emergency]" });
+        if (!authResult?.role) { window.location.replace(`login-gateway.html?returnTo=${encodeURIComponent(currentReturnTo())}`); return; }
+        ROLE = authResult.role;
+        USER = user;
+        EMERGENCY_NOTIFY_PRIMED = false;
+        EMERGENCY_NOTIFY_STATE = new Map();
+        initEmergencyNotifier();
+        configView();
+        if (!useQuietClientScheduledChrome()) {
+          setStatus(`Sesion validada. Cargando ${flowLoadingLabel()}...`, "neutral");
+        }
+        await loadCalls(true);
+        startPolling();
+      } catch (err) {
+        console.error("[emergency] boot failed", err);
+        setStatus(err?.message || "No se pudo validar la sesion.", "error");
+      }
+    }
+    refs.form.addEventListener("submit", onSubmit);
+    bindTemporalPicker(refs.scheduledDate);
+    bindTemporalPicker(refs.scheduledTime);
+    refs.refreshButton.addEventListener("click", () => { loadCalls(false); });
+    document.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-section-toggle]");
+      if (!btn) return;
+      const name = btn.dataset.sectionToggle;
+      const card = refs[`${name}Card`];
+      if (!card) return;
+      SECTION_OVERRIDES[name] = !card.classList.contains("collapsed");
+      applySectionState();
+    });
+    refs.callList.addEventListener("click", onAction);
+    refs.workflowPanel.addEventListener("click", onWorkflowAction);
+    refs.chatPanel.addEventListener("click", async (event) => {
+      const removeIndex = event.target?.dataset?.removeChat;
+      if (removeIndex !== undefined) {
+        CHAT_FILES.splice(Number(removeIndex), 1);
+        renderChat();
+        return;
+      }
+      await onWorkflowAction(event);
+    });
+    refs.chatPanel.addEventListener("change", (event) => {
+      if (event.target?.id === "chatFilesInput") {
+        const files = Array.from(event.target.files || []);
+        const remaining = Math.max(0, MAX_CLIENT_CHAT_ATTACHMENTS - chatAttachmentUsed() - CHAT_FILES.length);
+        const allowed = ROLE === "client" ? files.slice(0, remaining) : files;
+        CHAT_FILES = [...CHAT_FILES, ...allowed];
+        renderChat();
+      }
+    });
+    refs.chatPanel.addEventListener("input", (event) => {
+      if (event.target?.id === "chatInput") {
+        CHAT_DRAFT_TEXT = event.target.value;
+      }
+    });
+    refs.workflowPanel.addEventListener("change", (event) => {
+      if (event.target?.id === "workflowFinalPhoto") {
+        WORKFLOW_FINAL_FILE = event.target.files?.[0] || null;
+        renderWorkflow();
+      } else if (event.target?.id === "workflowProofFile") {
+        WORKFLOW_PROOF_FILE = event.target.files?.[0] || null;
+        renderWorkflow();
+      } else if (event.target?.id === "workflowRating") {
+        WORKFLOW_DRAFT.rating = event.target.value;
+      }
+    });
+    refs.workflowPanel.addEventListener("input", (event) => {
+      if (event.target?.id === "workflowAmount") {
+        WORKFLOW_DRAFT.resolveAmount = event.target.value;
+      } else if (event.target?.id === "workflowCloseAmount") {
+        WORKFLOW_DRAFT.closeAmount = event.target.value;
+      }
+    });
+    window.addEventListener("beforeunload", () => { stopGps(); if (POLL) clearInterval(POLL); });
+    onAuthStateChanged(auth, (user) => { boot(user); });
+  </script>
+</body>
+</html>

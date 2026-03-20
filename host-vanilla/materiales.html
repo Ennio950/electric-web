@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Cotizacion Universal</title>
+  <link rel="stylesheet" href="./css/app.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero-card">
+      <div>
+        <h1>Sistema de Cotizacion Universal</h1>
+        <p>Crea plantillas para cualquier oficio y calcula materiales, desperdicio y costos por pasos.</p>
+      </div>
+      <div class="hero-right">
+        <span id="projectBadge" class="status-chip status-warn">Sin proyecto</span>
+        <button id="btnReloadDefaults" type="button" class="ghost-btn">Recargar demos</button>
+      </div>
+    </header>
+
+    <section class="layout-grid">
+      <aside class="left-column">
+        <section class="card">
+          <h2>Progreso guiado</h2>
+          <div id="stepperTrack" class="stepper-track"></div>
+        </section>
+
+        <section class="card card-primary">
+          <h2>Paso 1: Elegir plantilla</h2>
+          <label class="field-label">
+            Plantilla activa
+            <select id="templateSelect"></select>
+          </label>
+          <p id="templateMeta" class="muted">Selecciona o crea una plantilla para iniciar.</p>
+          <div class="actions wrap">
+            <button id="btnNewTemplate" type="button">Nueva plantilla</button>
+            <button id="btnEditTemplate" type="button" class="ghost-btn">Editar plantilla</button>
+            <button id="btnDuplicateTemplate" type="button" class="ghost-btn">Duplicar</button>
+            <button id="btnDeleteTemplate" type="button" class="danger-btn">Eliminar</button>
+          </div>
+          <div class="actions wrap">
+            <button id="btnExportTemplate" type="button" class="ghost-btn">Exportar plantilla</button>
+            <label class="file-btn">
+              Importar plantilla
+              <input id="fileImportTemplate" type="file" accept="application/json" />
+            </label>
+          </div>
+        </section>
+
+        <section class="card card-primary">
+          <h2>Paso 2: Preparacion automatica</h2>
+          <p id="connectionText" class="muted">Conectando con el constructor...</p>
+          <div class="actions wrap align-center">
+            <span id="connectionChip" class="status-chip status-warn">Conectando...</span>
+            <button id="btnPrepare" type="button" class="ghost-btn">Reintentar</button>
+          </div>
+        </section>
+
+        <section class="card card-primary">
+          <h2>Paso 3: Escribir datos y calcular</h2>
+          <div id="inputsContainer" class="inputs-container"></div>
+          <ul id="inputErrors" class="error-list"></ul>
+          <div class="actions wrap">
+            <button id="btnCalculate" type="button">Calcular precio</button>
+            <button id="btnDemo" type="button" class="ghost-btn">Modo demo</button>
+            <button id="btnResetInputs" type="button" class="ghost-btn">Limpiar</button>
+          </div>
+          <div class="actions wrap">
+            <button id="btnSaveProject" type="button" class="ghost-btn">Guardar proyecto</button>
+            <button id="btnExportProject" type="button" class="ghost-btn">Exportar proyecto</button>
+            <label class="file-btn">
+              Importar proyecto
+              <input id="fileImportProject" type="file" accept="application/json" />
+            </label>
+          </div>
+        </section>
+      </aside>
+
+      <section class="center-column">
+        <section class="card result-card">
+          <header class="result-head">
+            <div>
+              <h2 id="resultTitle">Resultados</h2>
+              <p class="muted">Paso 4: total general, desglose de materiales y detalle tecnico.</p>
+            </div>
+            <div class="actions wrap">
+              <button id="btnOpenPro3D" type="button" class="ghost-btn">Vista 3D Pro</button>
+              <button id="btnGeneratePdf" type="button" class="ghost-btn">Generar PDF</button>
+            </div>
+          </header>
+
+          <div class="total-banner">
+            <span>Total general</span>
+            <strong id="totalValue">Q 0.00</strong>
+          </div>
+
+          <ul id="resultErrors" class="error-list"></ul>
+
+          <div id="breakdownGrid" class="breakdown-grid"></div>
+
+          <div class="table-wrap">
+            <table class="materials-table">
+              <thead>
+                <tr>
+                  <th>Material</th>
+                  <th>Cantidad</th>
+                  <th>Unidad</th>
+                  <th>Desperdicio</th>
+                  <th>Precio Unit</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="materialsBody">
+                <tr>
+                  <td colspan="6" class="empty-row">Calcula para ver resultados.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <details id="technicalToggle" class="technical-details">
+            <summary>Detalle tecnico (variables y formulas)</summary>
+            <pre id="technicalContent">Sin detalle tecnico.</pre>
+          </details>
+        </section>
+
+        <details class="card viewer-card" open>
+          <summary>Vista 3D simplificada</summary>
+          <canvas id="mini3dCanvas" class="mini-3d-canvas" width="640" height="280"></canvas>
+          <p class="muted">Arrastra para rotar y usa la rueda para zoom.</p>
+        </details>
+      </section>
+    </section>
+  </main>
+
+  <section id="pro3dModal" class="pro3d-modal hidden">
+    <article class="pro3d-card">
+      <header>
+        <h2>Vista 3D Pro</h2>
+        <button id="btnClosePro3D" type="button" class="ghost-btn">Cerrar</button>
+      </header>
+      <p class="muted">Modelo simplificado (sin BIM): caja 3D con dimensiones principales.</p>
+      <canvas id="pro3dCanvas" class="pro-3d-canvas" width="1200" height="680"></canvas>
+    </article>
+  </section>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

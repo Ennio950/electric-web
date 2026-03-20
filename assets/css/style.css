@@ -1,0 +1,1484 @@
+/* ============================================================
+   1. RESET, BASE Y FONDO GLOBAL
+   ============================================================ */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    margin: 0;
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), 
+        url("../images/bg-electric.webp");
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+img,
+svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Sombra global para lectura sobre el fondo */
+h1, h2, h3, h4, p, li, label, span {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ============================================================
+   2. REGLA MAESTRA PARA LOGOS (INDEX, LOGIN, CLIENTE)
+   ============================================================ */
+img[src*="logo.webp"], 
+.main-logo, 
+.role-container img, 
+.login-container img,
+form img {
+    width: 100% !important;
+    max-width: 250px !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto 20px auto !important;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+/* ============================================================
+   3. CONTENEDORES DE INTERFAZ (INDEX / LOGIN / FORM)
+   ============================================================ */
+.role-container, .login-container, .form-wrapper {
+    width: 95%;
+    max-width: 450px;
+      background: rgba(255,255,255,0.14) !important;
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #fff;
+
+    backdrop-filter: blur(10px);
+    padding: 40px 30px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #000; /* Texto oscuro dentro de tarjetas blancas */
+}
+
+/* Ajuste para que el texto dentro de contenedores blancos NO tenga sombra blanca */
+.role-container *, .login-container *, .form-wrapper * {
+    text-shadow: none !important;
+    color: #000;
+}
+
+/* Botones de Selección de Rol */
+.roles { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+
+.role-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+.role-btn:hover { transform: translateY(-3px); }
+.role-btn strong { display: block; color: #ffffff !important; font-size: 1.1rem; }
+.role-btn span { color: rgba(255,255,255,0.8) !important; font-size: 0.85rem; }
+
+.role-btn.client { background: #2563eb; }
+.role-btn.employee { background: #16a34a; }
+.role-btn.boss { background: #7c3aed; }
+
+/* ============================================================
+   4. DISEÑO DEL FORMULARIO
+   ============================================================ */
+#estimate-form { width: 100%; text-align: left; }
+#estimate-form label { display: block; margin-top: 15px; font-weight: 600; color: #2563eb; }
+
+#estimate-form input, #estimate-form select, #estimate-form textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #000;
+}
+
+.btn-primary {
+    width: 100%;
+    background: #2563eb;
+    color: white !important;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 25px;
+}
+
+/* ============================================================
+   5. VISTA PREVIA DEL ESTIMADO (PANTALLA)
+   ============================================================ */
+.main-wrapper { width: 100%; display: flex; justify-content: center; padding: 20px; }
+.estimate-paper { width: 100%; max-width: 800px; padding: 20px; }
+
+.company-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid rgba(255,255,255,0.5);
+    padding-bottom: 15px;
+}
+
+.pdf-logo { width: 160px; height: auto; }
+.estimate-table { width: 100%; border-collapse: collapse; margin: 25px 0; }
+.estimate-table th, .estimate-table td { padding: 10px; border: 1px solid rgba(255,255,255,0.5); }
+
+/* ============================================================
+   6. CONFIGURACIÓN ESPECIAL PARA EXPORTACIÓN PDF
+   ============================================================ */
+.pdf-export-mode {
+    background: #ffffff !important;
+    padding: 40px !important;
+    color: #000000 !important;
+    display: block !important; /* Evita errores de centrado en PDF */
+}
+
+.pdf-export-mode * {
+    color: #000000 !important;
+    text-shadow: none !important;
+    border-color: #000000 !important;
+}
+
+.pdf-export-mode .grand-total-row {
+    background-color: #00bfff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+/* ============================================================
+   SOLUCIÓN FINAL: CONTROL TOTAL DE PÁGINA Y ESCALA
+   ============================================================ */
+@media print {
+    @page {
+        size: letter;
+        margin: 0.5in;
+    }
+
+    html, body {
+        background: white !important;
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        font-size: 12pt !important;
+    }
+
+    .main-wrapper, 
+    .estimate-paper, 
+    .pdf-export-mode {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .estimate-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 20px !important;
+        table-layout: fixed !important;
+    }
+
+    .estimate-table th, 
+    .estimate-table td {
+        border: 1px solid #000 !important;
+        padding: 8px !important;
+        word-wrap: break-word !important;
+    }
+
+    .estimate-table th:nth-child(1) { width: 55%; }
+    .estimate-table th:nth-child(2) { width: 10%; }
+    .estimate-table th:nth-child(3) { width: 15%; }
+    .estimate-table th:nth-child(4) { width: 20%; }
+
+    tr { page-break-inside: avoid !important; }
+    .totals-box { page-break-inside: avoid !important; float: right; width: 250px; }
+
+    .pdf-logo {
+        width: 180px !important;
+        height: auto !important;
+        margin-bottom: 15px !important;
+    }
+
+    #pdfBtn, .background-image, .role-container {
+        display: none !important;
+    }
+}
+
+/* ============================================================
+   ESTIMATE (VISTA EN PANTALLA) - PAPEL BLANCO PRO
+   ============================================================ */
+
+.estimate-paper {
+  background: rgba(255, 255, 255, 0.96);
+  color: #111;
+  border-radius: 14px;
+  padding: 28px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.35);
+}
+
+/* Quitar sombras globales SOLO dentro del estimate */
+.estimate-paper * {
+  text-shadow: none !important;
+  color: #111;
+}
+
+.company-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  min-height: 0;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.company-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0;
+  min-height: 0;
+}
+
+.header-left {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin: 0 0 1px 0;
+}
+
+.company-header .pdf-logo {
+  width: 158px !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+.header-company-info h2 {
+  margin: 0;
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.header-company-info .company-info-line {
+  margin: 1px 0;
+  font-size: 0.92rem;
+  line-height: 1.25;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.header-company-info .company-info-line strong {
+  font-weight: 700;
+}
+
+.quote-meta {
+  flex: 0 0 220px;
+  min-width: 220px;
+  align-self: flex-start;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.quote-title {
+  margin: 0 0 6px 0;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.quote-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 2px 0;
+}
+
+.quote-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.quote-value {
+  font-weight: 600;
+}
+
+.pdf-logo {
+  width: 170px;
+  height: auto;
+  margin: 0;
+}
+
+.tagline {
+  font-weight: 600;
+  color: #2563eb;
+  margin-bottom: 6px;
+}
+
+.pdf-divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 14px 0;
+}
+
+.client-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 6px 0 14px;
+}
+
+.client-info-card {
+  border: 1px solid #d1d5db;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.info-card-title {
+  margin: -8px -10px 8px -10px;
+  padding: 2px 8px;
+  background: #e5e7eb;
+  border-bottom: 1px solid #d1d5db;
+  font-weight: 700;
+}
+
+.client-info-line {
+  margin: 4px 0;
+}
+
+.estimate-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0 10px 0;
+  table-layout: fixed;
+}
+
+.estimate-table th,
+.estimate-table td {
+  border: 1px solid #111;
+  padding: 10px;
+  vertical-align: top;
+  word-wrap: break-word;
+}
+
+.estimate-table thead th {
+  background: #f3f4f6;
+  font-weight: 700;
+}
+
+.footer-section {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+.notes-box {
+  flex: 1 1 auto;
+  border: 1px solid #111;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.notes-box h4 {
+  margin: 0;
+}
+
+.notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.notes-reset-btn {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #111;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.notes-editor {
+  width: 100%;
+  min-height: 130px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+  line-height: 1.45;
+  color: #111;
+  background: #fff;
+  resize: none;
+  overflow: hidden;
+}
+
+.notes-editor:focus {
+  outline: 2px solid #93c5fd;
+  border-color: #93c5fd;
+}
+
+.notes-preview {
+  display: none;
+  width: 100%;
+  min-height: 130px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+  line-height: 1.45;
+  color: #111;
+  background: #fff;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.totals-box {
+  flex: 0 0 320px;
+  border: 1px solid #111;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.totals-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.totals-table td {
+  padding: 8px 6px;
+}
+
+.totals-table .label { font-weight: 700; }
+.totals-table .value { text-align: right; font-weight: 700; }
+
+.grand-total-row td {
+  background: #00bfff;
+  color: #000 !important;
+}
+
+/* ============================================================
+   MODO EXPORTACIÓN PDF (ESTO ES LO QUE REALMENTE USA html2pdf)
+   ============================================================ */
+
+.pdf-export-mode {
+  width: 190mm !important;
+  max-width: none !important;
+
+  background: #ffffff !important;
+  color: #000000 !important;
+
+  padding: 12mm !important;
+  margin: 0 !important;
+
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.pdf-export-mode.pdf-export-ios,
+.pdf-export-mode.pdf-export-mac {
+  width: 186mm !important;
+  padding: 10mm !important;
+}
+
+.pdf-export-mode,
+.pdf-export-mode * {
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+.pdf-export-mode .estimate-table th,
+.pdf-export-mode .estimate-table td,
+.pdf-export-mode .company-header {
+  border-color: #000000 !important;
+}
+
+.pdf-export-mode .estimate-table {
+  border-collapse: collapse !important;
+  margin: 0 !important;
+}
+
+.pdf-export-mode thead { display: table-header-group; }
+.pdf-export-mode tfoot { display: table-footer-group; }
+.pdf-export-mode tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+.pdf-export-mode { box-sizing: border-box !important; }
+
+.pdf-table-pages {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.pdf-table-pages .estimate-table {
+  margin: 0 !important;
+}
+
+.pdf-table-pages .estimate-table-continuation {
+  margin-top: 0 !important;
+}
+
+.pdf-export-mode,
+.pdf-export-mode * {
+  -webkit-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+.pdf-export-mode .footer-section,
+.pdf-export-mode .notes-box,
+.pdf-export-mode .totals-box {
+  break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+
+.pdf-export-mode .footer-section {
+  display: block !important;
+  margin-top: 2mm !important;
+}
+
+.pdf-export-mode .notes-box,
+.pdf-export-mode .totals-box {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.pdf-export-mode .totals-box {
+  margin-top: 4mm !important;
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.pdf-export-mode .force-page-break,
+.pdf-export-mode .force-page-break-before,
+.pdf-export-mode.pdf-export-ios .force-page-break {
+  break-before: page !important;
+  page-break-before: always !important;
+}
+
+.pdf-export-mode.pdf-export-mac .estimate-table tr,
+.pdf-export-mode.pdf-export-mac .estimate-table td,
+.pdf-export-mode.pdf-export-mac .estimate-table th {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+.pdf-root,
+.pdf-root * {
+  -webkit-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+.pdf-root {
+  background: #ffffff !important;
+  background-image: none !important;
+  display: block !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  min-height: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.pdf-root .main-wrapper {
+  padding: 0 !important;
+  display: block !important;
+}
+
+.pdf-root .estimate-paper {
+  box-shadow: none !important;
+}
+
+.pdf-root .notes-reset-btn {
+  display: none !important;
+}
+
+.pdf-export-mode .notes-editor {
+  border-style: solid !important;
+  border-color: #111 !important;
+  resize: none !important;
+}
+
+.pdf-export-mode .notes-preview {
+  border-color: #111 !important;
+}
+
+#pdfBtn { position: fixed; top: 20px; left: 20px; z-index: 999; }
+.pdf-export-mode ~ #pdfBtn { display: none !important; }
+
+/* ============================================================
+   ✅ EMPLOYEE PANEL: BADGES PRO PARA URGENCIA EN "Recent Activity"
+   (esto se aplica a tus .row .amount del panel)
+   ============================================================ */
+
+/* Base estilo pill */
+.row .amount{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(0,0,0,0.35);
+}
+
+/* Si viene vacío, no se muestra (evita guiones/espacios raros) */
+.row .amount:empty { display: none; }
+
+/* Colores por urgencia */
+.row .amount.urg-urgent{
+  background: rgba(239,68,68,0.92);
+  border-color: rgba(255,255,255,0.28);
+  color: #fff;
+}
+
+.row .amount.urg-normal{
+  background: rgba(34,197,94,0.22);
+  border-color: rgba(255,255,255,0.22);
+  color: #fff;
+}
+
+.row .amount.urg-low{
+  background: rgba(59,130,246,0.22);
+  border-color: rgba(255,255,255,0.22);
+  color: #fff;
+}
+/* ==========================
+   FIX iPhone (Safari) PDF
+   Evita clipping de html2canvas en flex
+========================== */
+.pdf-export-mode.pdf-export-ios .footer-section{
+  display: block !important;      /* quitar flex SOLO en export */
+}
+
+.pdf-export-mode.pdf-export-ios .notes-box,
+.pdf-export-mode.pdf-export-ios .totals-box{
+  width: 100% !important;         /* apilado */
+  flex: none !important;
+}
+
+.pdf-export-mode.pdf-export-ios .totals-box{
+  margin-top: 10mm !important;    /* separacion */
+}
+
+/* Extra (opcional pero recomendado) */
+.pdf-export-mode.pdf-export-ios{
+  background-attachment: scroll !important; /* iOS: fixed da bugs */
+}
+
+@media (max-width: 760px) {
+  .company-header {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 0;
+  }
+
+  .company-main {
+    min-height: 0;
+  }
+
+  .quote-meta {
+    min-width: 0;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .client-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-back{
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 9999;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(0,0,0,0.40);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+
+  box-shadow: 0 18px 34px rgba(0,0,0,0.25);
+  transition: transform .12s ease, filter .12s ease;
+}
+
+.btn-back:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.btn-back:active{
+  transform: translateY(0px);
+}
+/* ============================================================
+   ✅ ESTIMATE FORM (MÓVIL) - ITEMS TABLE RESPONSIVE PRO
+   Convierte filas de tabla en "cards" para que QTY sí se mire.
+   ============================================================ */
+
+/* Asegura que inputs dentro de tablas no se colapsen */
+table input, table select, table textarea{
+  min-width: 0;
+}
+
+/* QTY: nunca más se vuelve microscópico */
+table input[type="number"]{
+  min-width: 70px;
+}
+
+/* =========================
+   MODO MÓVIL
+========================= */
+@media (max-width: 680px){
+
+  /* Ocultamos encabezado y hacemos layout tipo cards */
+  table thead{
+    display: none !important;
+  }
+
+  table{
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 12px !important; /* separación entre "cards" */
+  }
+
+  table tbody{
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Cada TR es una card */
+  table tbody tr{
+    display: grid !important;
+    grid-template-columns: 1fr 90px 120px; /* desc / qty / price */
+    grid-template-areas:
+      "desc desc desc"
+      "qty  price amount"
+      "del  del   del";
+    gap: 10px !important;
+
+    padding: 14px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    background: rgba(0,0,0,0.25) !important;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.25) !important;
+  }
+
+  /* Quitamos bordes internos de celdas */
+  table tbody td{
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Mapeo por orden de columnas:
+     1: Description, 2: Qty, 3: Unit Price, 4: Amount, 5: Delete */
+  table tbody td:nth-child(1){ grid-area: desc; }
+  table tbody td:nth-child(2){ grid-area: qty; }
+  table tbody td:nth-child(3){ grid-area: price; }
+  table tbody td:nth-child(4){ grid-area: amount; text-align: right; }
+  table tbody td:nth-child(5){ grid-area: del; justify-self: end; }
+
+  /* Labels arriba de cada campo (sin tocar HTML) */
+  table tbody td:nth-child(1)::before{
+    content: "Description";
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 900;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  table tbody td:nth-child(2)::before{
+    content: "Qty";
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 900;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  table tbody td:nth-child(3)::before{
+    content: "Unit Price";
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 900;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  table tbody td:nth-child(4)::before{
+    content: "Amount";
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 900;
+    opacity: 0.85;
+    margin-bottom: 6px;
+    text-align: right;
+  }
+
+  /* Inputs dentro de la tabla: full width en móvil */
+  table tbody input,
+  table tbody select{
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px 12px !important;
+    border-radius: 14px !important;
+  }
+
+  /* Qty centrado y más legible */
+  table tbody td:nth-child(2) input{
+    text-align: center !important;
+    font-weight: 900 !important;
+  }
+
+  /* Amount más pro */
+  table tbody td:nth-child(4){
+    font-weight: 1000 !important;
+    font-size: 1.05rem !important;
+    align-self: end;
+  }
+
+  /* Botón eliminar: que no quede gigante */
+table tbody td:nth-child(5) button,
+  table tbody td:nth-child(5) .btn,
+  table tbody td:nth-child(5) .delete-btn{
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ============================================================
+   CHAT MODAL (empleado/cliente)
+============================================================ */
+.hidden{ display:none !important; }
+
+.chat-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 4000;
+}
+
+.chat-modal{
+  width: min(900px, 96vw);
+  height: min(620px, 90vh);
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 18px;
+  box-shadow: 0 25px 65px rgba(0,0,0,0.45);
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  padding: 14px;
+}
+
+.chat-header{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.18);
+}
+
+.chat-participants{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items:center;
+}
+.chip{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.chip .avatar{
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(255,255,255,0.2);
+}
+.chip-name{ font-weight: 900; line-height: 1.1; }
+.chip-meta{ font-size: 0.82rem; opacity: 0.85; }
+
+.chat-body{
+  flex:1;
+  overflow-y: auto;
+  padding: 12px 6px;
+  display:flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-msg{
+  max-width: 82%;
+  display:flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.chat-msg.left{ align-self: flex-start; }
+.chat-msg.right{ align-self: flex-end; }
+.chat-msg .bubble{
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+}
+.chat-msg.right .bubble{
+  background: #22c55e;
+  color: #0b1b10;
+  border-color: rgba(255,255,255,0.10);
+}
+.chat-msg .meta{
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
+.chat-footer{
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.chat-input-row{
+  display:flex;
+  gap: 10px;
+}
+.chat-input-row input{
+  flex:1;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.25);
+  color: #fff;
+}
+.chat-cooldown{ font-size: 0.85rem; opacity: 0.85; }
+.chat-error{ color: #fca5a5; font-size: 0.88rem; min-height: 18px; }
+
+@media (max-width: 640px){
+  .chat-modal{ height: 90vh; padding: 12px; }
+  .chat-input-row{ flex-direction: column; }
+  .chat-input-row button{ width: 100%; }
+}
+
+/* ============================================================
+   Estimate Preview Pro Overrides (2026-02-11)
+   ============================================================ */
+
+.main-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 22px;
+}
+
+.estimate-paper {
+  background: rgba(255, 255, 255, 0.97);
+  color: #111;
+  border-radius: 14px;
+  padding: 28px;
+  width: 100%;
+  max-width: 920px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+}
+
+.estimate-paper .company-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 200px) minmax(230px, 260px);
+  gap: 14px;
+  align-items: center;
+  border-bottom: 2px solid #d1d5db;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.estimate-paper .header-brand {
+  min-height: 82px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.estimate-paper .header-company-info {
+  min-width: 0;
+  align-self: end;
+}
+
+.estimate-paper .pdf-logo {
+  width: 170px !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  display: block !important;
+  object-fit: contain;
+}
+
+.estimate-paper .header-company-info {
+  display: grid;
+  gap: 1px;
+}
+
+.estimate-paper .header-company-info .company-info-line {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.25;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.estimate-paper .quote-meta {
+  min-width: 0;
+  width: 100%;
+  max-width: 260px;
+  align-self: center;
+  padding-bottom: 1px;
+}
+
+.estimate-paper .quote-title {
+  margin: 0 0 4px;
+  font-size: 2.8rem;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  font-weight: 800;
+}
+
+.estimate-paper .quote-row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: start;
+  gap: 6px;
+  margin: 0;
+  line-height: 1.18;
+}
+
+.estimate-paper .quote-row + .quote-row {
+  margin-top: 2px;
+}
+
+.estimate-paper .quote-label {
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.estimate-paper .quote-value {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.estimate-paper #quoteCreatorId {
+  font-size: 0.84rem;
+  line-height: 1.2;
+}
+
+.estimate-paper .pdf-divider {
+  border: none;
+  border-top: 1px solid #d1d5db;
+  margin: 10px 0 12px;
+}
+
+.estimate-paper .client-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+  align-items: stretch;
+}
+
+.estimate-paper .client-info-card {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 132px;
+}
+
+.estimate-paper .info-card-title {
+  margin: 0;
+  padding: 6px 10px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.estimate-paper .info-card-body {
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.estimate-paper .client-info-line {
+  margin: 0;
+  line-height: 1.33;
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+}
+
+.estimate-paper #billingAddressValue,
+.estimate-paper #serviceAddressValue {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px), (hover: none), (pointer: coarse) {
+  body {
+    background-attachment: scroll;
+    align-items: flex-start;
+    padding: 16px 0;
+  }
+
+  .role-container,
+  .login-container,
+  .form-wrapper {
+    width: min(100%, 450px);
+    padding: 24px 18px;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .estimate-paper {
+    padding: 20px;
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.estimate-paper .estimate-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  table-layout: fixed;
+}
+
+.estimate-paper .estimate-table thead {
+  display: table-header-group;
+}
+
+.estimate-paper .estimate-table th,
+.estimate-paper .estimate-table td {
+  border: 1px solid #111;
+  padding: 6px 8px;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-size: 0.85rem;
+}
+
+.estimate-paper .estimate-table th {
+  background: #f3f4f6;
+  font-weight: 700;
+}
+
+.estimate-paper .estimate-table tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.estimate-paper .footer-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 14px;
+  align-items: start;
+  margin-top: 12px;
+}
+
+.estimate-paper .notes-box,
+.estimate-paper .totals-box {
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: #fff;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.estimate-paper .notes-box {
+  padding: 10px;
+}
+
+.estimate-paper .totals-box {
+  padding: 10px;
+}
+
+.estimate-paper .notes-header {
+  margin-bottom: 8px;
+}
+
+.estimate-paper .notes-box h4 {
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.estimate-paper .notes-editor,
+.estimate-paper .notes-preview {
+  min-height: 118px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #111;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.estimate-paper .notes-editor {
+  padding: 9px;
+  resize: none;
+}
+
+.estimate-paper .notes-preview {
+  padding: 9px;
+}
+
+.estimate-paper .totals-table td {
+  padding: 6px 2px;
+}
+
+.estimate-paper .grand-total-row td {
+  background: #00bfff;
+  color: #000 !important;
+}
+
+.pdf-export-mode .company-header {
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 200px) minmax(230px, 260px) !important;
+  align-items: center !important;
+}
+
+.pdf-export-mode .header-brand {
+  min-height: 76px !important;
+  margin-bottom: 0 !important;
+}
+
+.pdf-export-mode .client-info-grid,
+.pdf-export-mode .client-info-card,
+.pdf-export-mode .notes-box,
+.pdf-export-mode .totals-box,
+.pdf-export-mode .estimate-table tr,
+.pdf-export-mode .estimate-table td,
+.pdf-export-mode .estimate-table th {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+.pdf-export-mode .notes-preview {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+}
+
+@media (max-width: 900px) {
+  .estimate-paper .company-header {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .estimate-paper .header-brand {
+    justify-content: flex-start;
+    min-height: 74px;
+  }
+
+  .estimate-paper .quote-meta {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .estimate-paper .client-info-grid,
+  .estimate-paper .footer-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .estimate-paper {
+    padding: 18px;
+    border-radius: 10px;
+  }
+
+  .estimate-paper .quote-title {
+    font-size: 2.4rem;
+  }
+
+  .estimate-paper table thead {
+    display: table-header-group !important;
+  }
+
+  .estimate-paper table {
+    border-spacing: 0 !important;
+    border-collapse: collapse !important;
+  }
+
+  .estimate-paper table tbody {
+    display: table-row-group !important;
+  }
+
+  .estimate-paper table tbody tr {
+    display: table-row !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .estimate-paper table tbody td {
+    border: 1px solid #111 !important;
+    padding: 6px 7px !important;
+  }
+
+  .estimate-paper table tbody td::before {
+    content: none !important;
+    display: none !important;
+  }
+}
+
+@media print {
+  @page {
+    size: letter;
+    margin: 10mm;
+  }
+
+  body {
+    background: #fff !important;
+    background-image: none !important;
+    display: block !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #pdfBtn {
+    display: none !important;
+  }
+
+  .main-wrapper {
+    padding: 0 !important;
+  }
+
+  .estimate-paper {
+    max-width: none !important;
+    width: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  .estimate-paper .company-header,
+  .estimate-paper .client-info-grid,
+  .estimate-paper .client-info-card,
+  .estimate-paper .notes-box,
+  .estimate-paper .totals-box,
+  .estimate-paper .estimate-table tr,
+  .estimate-paper .estimate-table td,
+  .estimate-paper .estimate-table th {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .estimate-paper .estimate-table {
+    page-break-inside: auto !important;
+  }
+
+  .estimate-paper .estimate-table thead {
+    display: table-header-group !important;
+  }
+
+  .estimate-paper .estimate-table td,
+  .estimate-paper .estimate-table th,
+  .estimate-paper #billingAddressValue,
+  .estimate-paper #serviceAddressValue,
+  .estimate-paper .notes-preview {
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    white-space: pre-wrap !important;
+  }
+}

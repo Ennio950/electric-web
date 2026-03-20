@@ -1,0 +1,158 @@
+{
+  "id": "r5D1vL8Qx3NtK9Pm",
+  "name": "Electric Web Copia Native AI Team (Windows Host)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ManualTrigger_AITeamWindows",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "45 1 * * *"
+            }
+          ]
+        }
+      },
+      "id": "ScheduleTrigger_AITeamWindows",
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia\\autodev-lab\\n8n\\native-multi-agent-runner.mjs\" deepseek"
+      },
+      "id": "ExecuteCommand_DeepSeekWindows",
+      "name": "Run DeepSeek CPU Analysis",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        620,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia\\autodev-lab\\n8n\\native-multi-agent-runner.mjs\" codex"
+      },
+      "id": "ExecuteCommand_CodexWindows",
+      "name": "Run Codex Native Pass",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        960,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia\\autodev-lab\\n8n\\native-multi-agent-runner.mjs\" claude"
+      },
+      "id": "ExecuteCommand_ClaudeWindows",
+      "name": "Run Claude Review",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node \"C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia\\autodev-lab\\n8n\\native-multi-agent-runner.mjs\" convert"
+      },
+      "id": "ExecuteCommand_ConvertWindows",
+      "name": "Run Native Converter",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run DeepSeek CPU Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run DeepSeek CPU Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run DeepSeek CPU Analysis": {
+      "main": [
+        [
+          {
+            "node": "Run Codex Native Pass",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Codex Native Pass": {
+      "main": [
+        [
+          {
+            "node": "Run Claude Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Claude Review": {
+      "main": [
+        [
+          {
+            "node": "Run Native Converter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "electric-web-copia-native-ai-team-windows-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

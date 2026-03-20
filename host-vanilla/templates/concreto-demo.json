@@ -1,0 +1,87 @@
+{
+  "id": "tpl-concreto-v1",
+  "name": "Concreto Universal",
+  "version": "1.0.0",
+  "meta": {
+    "categoria": "construccion",
+    "notas": "Plantilla demo para concreto con merma y empaques."
+  },
+  "inputs": [
+    { "key": "length", "label": "Largo", "type": "number", "unit": "m", "required": true, "min": 0.1, "default": 10 },
+    { "key": "width", "label": "Ancho", "type": "number", "unit": "m", "required": true, "min": 0.1, "default": 6 },
+    { "key": "thickness", "label": "Espesor", "type": "number", "unit": "m", "required": true, "min": 0.05, "default": 0.12 },
+    {
+      "key": "bagWeight",
+      "label": "Peso del saco",
+      "type": "select",
+      "required": true,
+      "default": 50,
+      "options": [
+        { "label": "42 kg", "value": 42 },
+        { "label": "50 kg", "value": 50 }
+      ]
+    },
+    { "key": "wastePct", "label": "Merma (%)", "type": "number", "min": 0, "max": 30, "default": 8 }
+  ],
+  "computed": [
+    { "key": "volume", "label": "Volumen", "unit": "m3", "expr": "inputs.length * inputs.width * inputs.thickness" },
+    { "key": "volumeWithWaste", "label": "Volumen con merma", "unit": "m3", "expr": "computed.volume * (1 + inputs.wastePct/100)" },
+    { "key": "cementKg", "label": "Cemento kg", "unit": "kg", "expr": "computed.volumeWithWaste * 350" },
+    { "key": "sandM3", "label": "Arena m3", "unit": "m3", "expr": "computed.volumeWithWaste * 0.52" },
+    { "key": "gravelM3", "label": "Grava m3", "unit": "m3", "expr": "computed.volumeWithWaste * 0.78" },
+    { "key": "waterL", "label": "Agua L", "unit": "l", "expr": "computed.volumeWithWaste * 180" },
+    { "key": "cementBags", "label": "Sacos cemento", "unit": "unit", "expr": "ceil(computed.cementKg / inputs.bagWeight)" }
+  ],
+  "materials": [
+    { "id": "m-cement-bag", "name": "Cemento (saco)", "baseUnit": "unit", "unitCost": 9.5, "packaging": { "packSize": 1, "packUnit": "unit" }, "rounding": "ceil" },
+    { "id": "m-sand", "name": "Arena", "baseUnit": "m3", "unitCost": 28, "packaging": { "packSize": 0.5, "packUnit": "m3" }, "rounding": "ceil" },
+    { "id": "m-gravel", "name": "Grava", "baseUnit": "m3", "unitCost": 34, "packaging": { "packSize": 0.5, "packUnit": "m3" }, "rounding": "ceil" },
+    { "id": "m-water", "name": "Agua", "baseUnit": "l", "unitCost": 0.02, "rounding": "round" }
+  ],
+  "rules": [
+    {
+      "id": "r-high-volume-warning",
+      "when": "computed.volumeWithWaste > 20",
+      "actions": [
+        { "kind": "addWarning", "message": "Volumen alto: revisar logística de bombeo/transporte." }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "id": "o-cement",
+      "materialId": "m-cement-bag",
+      "qtyExpr": "computed.cementBags",
+      "unit": "unit",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    },
+    {
+      "id": "o-sand",
+      "materialId": "m-sand",
+      "qtyExpr": "computed.sandM3",
+      "unit": "m3",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    },
+    {
+      "id": "o-gravel",
+      "materialId": "m-gravel",
+      "qtyExpr": "computed.gravelM3",
+      "unit": "m3",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    },
+    {
+      "id": "o-water",
+      "materialId": "m-water",
+      "qtyExpr": "computed.waterL",
+      "unit": "l",
+      "category": "otros",
+      "rounding": "round"
+    }
+  ]
+}

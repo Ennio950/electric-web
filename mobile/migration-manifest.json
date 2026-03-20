@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "canonicalMobileSource": "apps/mobile",
+  "selectedStack": "expo-router-react-native",
+  "legacyInputs": [
+    "index.html",
+    "login-gateway.html",
+    "login-empleado.html",
+    "login-jefe.html",
+    "panel-cliente.html",
+    "panel-empleado.html",
+    "panel-jefe.html",
+    "client-requests.html",
+    "emergency.html",
+    "materials.html",
+    "schedule.html",
+    "estimate-form.html",
+    "estimate-history.html",
+    "estimate-template.html"
+  ],
+  "notes": [
+    "No generar una segunda app movil paralela.",
+    "Usar handoffs entre data/backend y UI para evitar choques entre Codex y Claude."
+  ]
+}

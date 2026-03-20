@@ -1,0 +1,421 @@
+[
+  {
+    "id": "task-001",
+    "titulo": "Extraer llamada API repetida de app/(auth)/apply-employee.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(auth)/apply-employee.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-002",
+    "titulo": "Extraer llamada API repetida de app/(auth)/magic-client.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(auth)/magic-client.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-003",
+    "titulo": "Extraer llamada API repetida de app/(auth)/signup-client.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(auth)/signup-client.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-004",
+    "titulo": "Extraer llamada API repetida de app/(boss)/admin/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(boss)/admin/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-005",
+    "titulo": "Extraer llamada API repetida de app/(boss)/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(boss)/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-006",
+    "titulo": "Extraer llamada API repetida de app/(boss)/payments/[id].tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(boss)/payments/[id].tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-007",
+    "titulo": "Extraer llamada API repetida de app/(boss)/payments/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(boss)/payments/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-008",
+    "titulo": "Extraer llamada API repetida de app/(boss)/queue/[id].tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(boss)/queue/[id].tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-009",
+    "titulo": "Extraer llamada API repetida de app/(boss)/queue/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(boss)/queue/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-010",
+    "titulo": "Extraer llamada API repetida de app/(boss)/settings/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(boss)/settings/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-011",
+    "titulo": "Extraer llamada API repetida de app/(client)/emergency/[id].tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(client)/emergency/[id].tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-012",
+    "titulo": "Extraer llamada API repetida de app/(client)/emergency/new.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(client)/emergency/new.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-013",
+    "titulo": "Extraer llamada API repetida de app/(client)/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(client)/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-014",
+    "titulo": "Extraer llamada API repetida de app/(client)/requests/[id].tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(client)/requests/[id].tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-015",
+    "titulo": "Extraer llamada API repetida de app/(client)/requests/new.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(client)/requests/new.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-016",
+    "titulo": "Extraer llamada API repetida de app/(employee)/emergency/[id].tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(employee)/emergency/[id].tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-018",
+    "titulo": "Extraer llamada API repetida de app/(employee)/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(employee)/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-019",
+    "titulo": "Extraer llamada API repetida de app/(employee)/profile/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(employee)/profile/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-020",
+    "titulo": "Extraer llamada API repetida de app/(employee)/requests/[id].tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(employee)/requests/[id].tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-021",
+    "titulo": "Revisar fetch directo en src/lib/imageUpload.ts",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/src/lib/imageUpload.ts"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-022",
+    "titulo": "Separar logica de pantalla grande app/(auth)/apply-employee.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "screen-helper-separation",
+    "archivosObjetivo": [
+      "apps/mobile/app/(auth)/apply-employee.tsx"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-023",
+    "titulo": "Separar logica de pantalla grande app/(boss)/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "screen-helper-separation",
+    "archivosObjetivo": [
+      "apps/mobile/app/(boss)/index.tsx"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-024",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/boss.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/boss.controller.js"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-025",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/client.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/client.controller.js"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-026",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/clientJobs.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "seguro_automatico",
+    "estado": "pendiente",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/clientJobs.controller.js",
+      "straight-wire-backend/src/utils/controllerErrors.js"
+    ],
+    "requiereRevision": false
+  },
+  {
+    "id": "task-027",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/employee.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/employee.controller.js"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-028",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/employeeJobs.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "seguro_automatico",
+    "estado": "pendiente",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/employeeJobs.controller.js",
+      "straight-wire-backend/src/utils/controllerErrors.js"
+    ],
+    "requiereRevision": false
+  },
+  {
+    "id": "task-029",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/marketplace.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/marketplace.controller.js"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-030",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/mobile.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/mobile.controller.js"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-031",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/public.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/public.controller.js"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-032",
+    "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/whatsappWebhook.controller.js",
+    "areaObjetivo": "backend",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "backend-controller-error-utility",
+    "archivosObjetivo": [
+      "straight-wire-backend/src/controllers/whatsappWebhook.controller.js"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-033",
+    "titulo": "Revisar contrato mobile-backend de errores y servicios",
+    "areaObjetivo": "mobile-backend",
+    "clasificacion": "manual",
+    "estado": "requiere_revision",
+    "categoriaFix": "mobile-backend-contract-review",
+    "archivosObjetivo": [
+      "apps/mobile/src/lib/api.ts",
+      "straight-wire-backend/src/controllers/clientJobs.controller.js"
+    ],
+    "requiereRevision": true
+  },
+  {
+    "id": "task-034",
+    "titulo": "Extraer llamada API repetida de app/(employee)/requests/index.tsx",
+    "areaObjetivo": "mobile",
+    "clasificacion": "semiautomatico",
+    "estado": "pendiente",
+    "categoriaFix": "api-service-extraction",
+    "archivosObjetivo": [
+      "apps/mobile/app/(employee)/requests/index.tsx",
+      "apps/mobile/src/services/apiService.ts"
+    ],
+    "requiereRevision": true
+  }
+]

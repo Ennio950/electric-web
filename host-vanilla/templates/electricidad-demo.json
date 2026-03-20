@@ -1,0 +1,85 @@
+{
+  "id": "tpl-electricidad-v1",
+  "name": "Electricidad Universal",
+  "version": "1.0.0",
+  "meta": {
+    "categoria": "electrico",
+    "notas": "Plantilla demo para cableado con empaques y extra."
+  },
+  "inputs": [
+    { "key": "meters", "label": "Metros lineales", "type": "number", "unit": "m", "required": true, "default": 40, "min": 1 },
+    { "key": "points", "label": "Puntos de instalacion", "type": "int", "required": true, "default": 12, "min": 1 },
+    { "key": "extraPct", "label": "% extra", "type": "number", "default": 10, "min": 0, "max": 50 },
+    { "key": "pipeFactor", "label": "Factor tuberia", "type": "number", "default": 1.15, "min": 0.1 }
+  ],
+  "computed": [
+    { "key": "wireMeters", "label": "Cable total", "unit": "m", "expr": "inputs.meters * (1 + inputs.extraPct/100)" },
+    { "key": "pipeMeters", "label": "Tuberia total", "unit": "m", "expr": "inputs.meters * inputs.pipeFactor * (1 + inputs.extraPct/100)" },
+    { "key": "boxCount", "label": "Cajas", "unit": "unit", "expr": "ceil(inputs.points * 1.1)" }
+  ],
+  "materials": [
+    {
+      "id": "m-wire",
+      "name": "Cable universal",
+      "baseUnit": "m",
+      "unitCost": 0.85,
+      "packaging": { "packSize": 100, "packUnit": "m" },
+      "rounding": "ceil"
+    },
+    {
+      "id": "m-pipe",
+      "name": "Tuberia universal",
+      "baseUnit": "m",
+      "unitCost": 1.4,
+      "packaging": { "packSize": 3, "packUnit": "m" },
+      "rounding": "ceil"
+    },
+    {
+      "id": "m-box",
+      "name": "Caja registro",
+      "baseUnit": "unit",
+      "unitCost": 2.3,
+      "packaging": { "packSize": 10, "packUnit": "unit" },
+      "rounding": "ceil"
+    }
+  ],
+  "rules": [
+    {
+      "id": "r-extra-high",
+      "when": "inputs.extraPct >= 20",
+      "actions": [
+        { "kind": "addWarning", "message": "Extra alto: verificar ruta y reservas." },
+        { "kind": "multiplyOutput", "outputId": "o-box", "factor": 1.05 }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "id": "o-wire",
+      "materialId": "m-wire",
+      "qtyExpr": "computed.wireMeters",
+      "unit": "m",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    },
+    {
+      "id": "o-pipe",
+      "materialId": "m-pipe",
+      "qtyExpr": "computed.pipeMeters",
+      "unit": "m",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    },
+    {
+      "id": "o-box",
+      "materialId": "m-box",
+      "qtyExpr": "computed.boxCount",
+      "unit": "unit",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    }
+  ]
+}

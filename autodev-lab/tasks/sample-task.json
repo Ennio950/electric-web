@@ -1,0 +1,16 @@
+{
+  "id": "sample-task",
+  "titulo": "Ejecutar backlog seguro mobile y backend",
+  "descripcion": "Generar backlog ejecutable, seleccionar una tarea segura y aplicar un fix pequeno y reversible.",
+  "modulo": "mobile-backend",
+  "estado": "pendiente",
+  "reintentos": 0,
+  "modo": "SAFE_AUTODEV_EXECUTABLE_BACKLOG_MOBILE_BACKEND",
+  "areaObjetivo": "mobile-backend",
+  "plataformaObjetivo": "react-native-expo + node-express",
+  "aplicacionObjetivo": "apps/mobile + straight-wire-backend",
+  "creadoEn": "2026-03-14T00:00:00.000Z",
+  "actualizadoEn": "2026-03-14T00:00:00.000Z",
+  "resumenResultado": "Tarea de ejemplo lista para ejecutar backlog seguro mobile + backend.",
+  "categoriaFix": "executable-backlog-orchestration"
+}

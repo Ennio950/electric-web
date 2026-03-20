@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estimate History</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    :root {
+      --eh-card: rgba(10, 16, 32, 0.84);
+      --eh-border: rgba(148, 163, 184, 0.3);
+      --eh-text: #f8fafc;
+      --eh-muted: #cbd5e1;
+      --eh-shadow: 0 28px 52px rgba(2, 6, 23, 0.56);
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      color: var(--eh-text);
+      min-height: 100vh;
+    }
+
+    .eh-page {
+      width: min(1240px, 95%);
+      margin: 20px auto 28px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .eh-top {
+      border: 1px solid var(--eh-border);
+      border-radius: 18px;
+      background: var(--eh-card);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--eh-shadow);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .eh-top h1 {
+      margin: 0;
+      font-size: 1.32rem;
+      line-height: 1.1;
+    }
+
+    .eh-top p {
+      margin: 4px 0 0;
+      color: var(--eh-muted);
+      font-size: 0.9rem;
+    }
+
+    .eh-links {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .eh-link {
+      text-decoration: none;
+      border-radius: 999px;
+      border: 1px solid var(--eh-border);
+      color: var(--eh-text);
+      font-weight: 700;
+      padding: 9px 12px;
+      background: rgba(15, 23, 42, 0.72);
+    }
+
+    .eh-link-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-color: rgba(147, 197, 253, 0.5);
+      color: #fff;
+    }
+
+    .eh-card {
+      border: 1px solid var(--eh-border);
+      border-radius: 16px;
+      background: var(--eh-card);
+      box-shadow: var(--eh-shadow);
+      backdrop-filter: blur(12px);
+      padding: 12px;
+    }
+
+    .eh-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .eh-kpi {
+      border: 1px solid var(--eh-border);
+      border-radius: 10px;
+      padding: 9px 10px;
+      background: rgba(2, 6, 23, 0.54);
+    }
+
+    .eh-kpi p {
+      margin: 0;
+      color: var(--eh-muted);
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .eh-kpi strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #e2e8f0;
+    }
+
+    .eh-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .eh-search {
+      width: min(360px, 100%);
+      border: 1px solid var(--eh-border);
+      border-radius: 10px;
+      padding: 10px 11px;
+      color: var(--eh-text);
+      background: rgba(2, 6, 23, 0.56);
+      outline: none;
+    }
+
+    .eh-btn {
+      border-radius: 10px;
+      border: 1px solid var(--eh-border);
+      background: rgba(15, 23, 42, 0.72);
+      color: var(--eh-text);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 9px 12px;
+    }
+
+    .eh-btn-danger {
+      color: #fee2e2;
+      background: rgba(127, 29, 29, 0.34);
+      border-color: rgba(248, 113, 113, 0.45);
+    }
+
+    .eh-table-wrap {
+      border: 1px solid var(--eh-border);
+      border-radius: 12px;
+      overflow: auto;
+      background: rgba(2, 6, 23, 0.38);
+      max-height: 68vh;
+    }
+
+    .eh-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1080px;
+    }
+
+    .eh-table th,
+    .eh-table td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      vertical-align: top;
+      font-size: 0.84rem;
+    }
+
+    .eh-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(15, 23, 42, 0.92);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-size: 0.73rem;
+      color: #e2e8f0;
+    }
+
+    .eh-meta {
+      color: var(--eh-muted);
+      margin-top: 2px;
+    }
+
+    .eh-status {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(15, 23, 42, 0.58);
+      text-transform: capitalize;
+    }
+
+    .eh-actions {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .eh-empty {
+      margin: 12px 0 0;
+      color: var(--eh-muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 980px) {
+      .eh-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 660px) {
+      .eh-kpis {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="eh-page">
+    <header class="eh-top">
+      <div>
+        <h1>Estimate History</h1>
+        <p>Review generated estimates, reuse past jobs, and continue from templates.</p>
+      </div>
+      <div class="eh-links">
+        <a class="eh-link" href="panel-empleado.html">Back to panel</a>
+        <a class="eh-link eh-link-primary" href="estimate-form.html">Create estimate</a>
+      </div>
+    </header>
+
+    <section class="eh-card">
+      <div class="eh-kpis">
+        <div class="eh-kpi">
+          <p>Total estimates</p>
+          <strong id="kpiTotalCount">0</strong>
+        </div>
+        <div class="eh-kpi">
+          <p>This month revenue</p>
+          <strong id="kpiMonthRevenue">$0.00</strong>
+        </div>
+        <div class="eh-kpi">
+          <p>Average ticket</p>
+          <strong id="kpiAverage">$0.00</strong>
+        </div>
+        <div class="eh-kpi">
+          <p>With quote number</p>
+          <strong id="kpiWithQuote">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="eh-card">
+      <div class="eh-toolbar">
+        <input id="historySearch" class="eh-search" type="search" placeholder="Search by quote, client, address, employee..." />
+        <button id="clearHistoryBtn" type="button" class="eh-btn eh-btn-danger">Clear history</button>
+      </div>
+
+      <div class="eh-table-wrap">
+        <table class="eh-table">
+          <thead>
+            <tr>
+              <th>Quote</th>
+              <th>Date</th>
+              <th>Client</th>
+              <th>Addresses</th>
+              <th>Total</th>
+              <th>Created by</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <p id="historyEmpty" class="eh-empty">No estimates in history yet.</p>
+    </section>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./assets/js/session.js";
+    requireAuth("employee");
+
+    const STORAGE_KEYS = {
+      estimate: "estimate",
+      estimateDraft: "estimateDraft",
+      history: "estimatesHistory"
+    };
+
+    const historyBody = document.getElementById("historyBody");
+    const historyEmpty = document.getElementById("historyEmpty");
+    const historySearch = document.getElementById("historySearch");
+    const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+
+    const kpiTotalCount = document.getElementById("kpiTotalCount");
+    const kpiMonthRevenue = document.getElementById("kpiMonthRevenue");
+    const kpiAverage = document.getElementById("kpiAverage");
+    const kpiWithQuote = document.getElementById("kpiWithQuote");
+
+    let historyRecords = [];
+
+    function parseJson(raw, fallback) {
+      try {
+        const value = JSON.parse(raw);
+        return value == null ? fallback : value;
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function money(value) {
+      const num = Number(value || 0);
+      return `$${num.toFixed(2)}`;
+    }
+
+    function formatDate(rawDate) {
+      const date = new Date(rawDate);
+      if (Number.isNaN(date.getTime())) return "-";
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function normalizeRecord(record) {
+      if (!record || typeof record !== "object") return null;
+      const id = String(record.id || "").trim();
+      if (!id) return null;
+      return {
+        id,
+        date: record.date || new Date().toISOString(),
+        status: String(record.status || "draft").trim(),
+        quoteNumber: String(record.quoteNumber || "").trim().toUpperCase(),
+        client: String(record.client || "").trim(),
+        phone: String(record.phone || "").trim(),
+        billingAddress: String(record.billingAddress || "").trim(),
+        serviceAddress: String(record.serviceAddress || "").trim(),
+        total: Number(record.total || 0),
+        createdByName: String(record.createdByName || "").trim(),
+        createdByCode: String(record.createdByCode || "").trim(),
+        estimateSnapshot: record.estimateSnapshot && typeof record.estimateSnapshot === "object"
+          ? record.estimateSnapshot
+          : null
+      };
+    }
+
+    function readHistory() {
+      const parsed = parseJson(localStorage.getItem(STORAGE_KEYS.history), []);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map(normalizeRecord).filter(Boolean).sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function writeHistory(records) {
+      localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(records));
+    }
+
+    function buildSnapshotFromRecord(record) {
+      if (record.estimateSnapshot) return record.estimateSnapshot;
+
+      return {
+        client: record.client,
+        phone: record.phone,
+        billingAddress: record.billingAddress,
+        serviceAddress: record.serviceAddress || record.billingAddress,
+        tax: 0,
+        items: [],
+        breakdown: {
+          serviceTotal: 0,
+          materialTotal: 0,
+          subtotal: Number(record.total || 0),
+          taxRate: 0,
+          taxAmount: 0,
+          total: Number(record.total || 0)
+        },
+        quoteNumber: record.quoteNumber
+      };
+    }
+
+    function updateKpis(records) {
+      const totalCount = records.length;
+      const withQuote = records.filter((record) => !!record.quoteNumber).length;
+      const totalRevenue = records.reduce((sum, record) => sum + Number(record.total || 0), 0);
+      const averageTicket = totalCount ? totalRevenue / totalCount : 0;
+
+      const now = new Date();
+      const monthRevenue = records
+        .filter((record) => {
+          const d = new Date(record.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        })
+        .reduce((sum, record) => sum + Number(record.total || 0), 0);
+
+      kpiTotalCount.textContent = String(totalCount);
+      kpiMonthRevenue.textContent = money(monthRevenue);
+      kpiAverage.textContent = money(averageTicket);
+      kpiWithQuote.textContent = String(withQuote);
+    }
+
+    function filterRecords(queryText) {
+      const needle = String(queryText || "").trim().toLowerCase();
+      if (!needle) return [...historyRecords];
+      return historyRecords.filter((record) => {
+        const haystack = [
+          record.quoteNumber,
+          record.client,
+          record.phone,
+          record.billingAddress,
+          record.serviceAddress,
+          record.createdByName,
+          record.createdByCode,
+          record.status
+        ].join(" ").toLowerCase();
+        return haystack.includes(needle);
+      });
+    }
+
+    function renderTable() {
+      const filtered = filterRecords(historySearch.value);
+      updateKpis(filtered);
+
+      if (!filtered.length) {
+        historyBody.innerHTML = "";
+        historyEmpty.style.display = "block";
+        return;
+      }
+
+      historyEmpty.style.display = "none";
+
+      const rows = filtered.map((record) => {
+        const createdBy = [record.createdByCode, record.createdByName].filter(Boolean).join(" ");
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(record.quoteNumber || "Pending")}</strong>
+              <div class="eh-meta">${escapeHtml(record.id)}</div>
+            </td>
+            <td>${escapeHtml(formatDate(record.date))}</td>
+            <td>
+              <strong>${escapeHtml(record.client || "-")}</strong>
+              <div class="eh-meta">${escapeHtml(record.phone || "-")}</div>
+            </td>
+            <td>
+              <div><strong>Billing:</strong> ${escapeHtml(record.billingAddress || "-")}</div>
+              <div class="eh-meta"><strong>Service:</strong> ${escapeHtml(record.serviceAddress || record.billingAddress || "-")}</div>
+            </td>
+            <td><strong>${money(record.total)}</strong></td>
+            <td>${escapeHtml(createdBy || "-")}</td>
+            <td><span class="eh-status">${escapeHtml(record.status || "draft")}</span></td>
+            <td>
+              <div class="eh-actions">
+                <button class="eh-btn" data-reuse="${record.id}" type="button">Reuse</button>
+                <button class="eh-btn" data-preview="${record.id}" type="button">Preview</button>
+                <button class="eh-btn eh-btn-danger" data-delete="${record.id}" type="button">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      historyBody.innerHTML = rows.join("");
+    }
+
+    function reuseRecord(id) {
+      const record = historyRecords.find((entry) => entry.id === id);
+      if (!record) return;
+      const snapshot = buildSnapshotFromRecord(record);
+      localStorage.setItem(STORAGE_KEYS.estimateDraft, JSON.stringify(snapshot));
+      window.location.href = "estimate-form.html";
+    }
+
+    function previewRecord(id) {
+      const record = historyRecords.find((entry) => entry.id === id);
+      if (!record) return;
+      const snapshot = buildSnapshotFromRecord(record);
+      localStorage.setItem(STORAGE_KEYS.estimate, JSON.stringify(snapshot));
+      window.location.href = "estimate-template.html";
+    }
+
+    function deleteRecord(id) {
+      const target = historyRecords.find((entry) => entry.id === id);
+      if (!target) return;
+      const ok = window.confirm(`Delete estimate ${target.quoteNumber || target.id}?`);
+      if (!ok) return;
+      historyRecords = historyRecords.filter((entry) => entry.id !== id);
+      writeHistory(historyRecords);
+      renderTable();
+    }
+
+    historyBody.addEventListener("click", (event) => {
+      const reuseId = event.target?.dataset?.reuse;
+      if (reuseId) return reuseRecord(reuseId);
+
+      const previewId = event.target?.dataset?.preview;
+      if (previewId) return previewRecord(previewId);
+
+      const deleteId = event.target?.dataset?.delete;
+      if (deleteId) return deleteRecord(deleteId);
+    });
+
+    historySearch.addEventListener("input", renderTable);
+
+    clearHistoryBtn.addEventListener("click", () => {
+      if (!historyRecords.length) return;
+      const ok = window.confirm("Clear the full estimate history?");
+      if (!ok) return;
+      historyRecords = [];
+      writeHistory(historyRecords);
+      renderTable();
+    });
+
+    historyRecords = readHistory();
+    renderTable();
+  </script>
+</body>
+
+</html>

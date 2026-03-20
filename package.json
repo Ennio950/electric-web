@@ -1,0 +1,46 @@
+{
+  "name": "uwc-template-builder-monorepo",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "builder-react",
+    "straight-wire-backend"
+  ],
+  "scripts": {
+    "build": "npm run build:engine && npm run build:builder",
+    "build:engine": "tsc -p engine/tsconfig.json",
+    "test:engine": "npm run build:engine && node --test tests/engine.test.mjs",
+    "test:shared": "node --test tests/runtime-config.test.mjs tests/company-config.test.mjs tests/text-encoding.test.mjs tests/legacy-panels.test.mjs tests/host-security.test.mjs tests/firebase-config.test.mjs tests/firestore-rules-consistency.test.mjs",
+    "test:mobile": "npm --prefix apps/mobile run typecheck",
+    "test": "npm run test:engine && npm run test:shared && npm run test:mobile && npm --prefix builder-react run test && npm --prefix straight-wire-backend run test",
+    "test:e2e": "playwright test",
+    "dev:backend": "npm --prefix straight-wire-backend run dev",
+    "dev:builder": "npm --prefix builder-react run dev -- --host 127.0.0.1",
+    "dev:mobile": "npm --prefix apps/mobile run start",
+    "mobile:start": "node scripts/start-mobile-preview.js",
+    "viewer:start": "node viewer/server.mjs",
+    "workflow:bootstrap:git": "node scripts/bootstrap-agent-workspaces.js",
+    "workflow:bootstrap:workspaces": "node scripts/bootstrap-agent-workspaces.js --with-worktrees",
+    "workflow:start": "node scripts/loop-until-stopped.js --agent both",
+    "workflow:start:dry": "node scripts/loop-until-stopped.js --agent both --dry-run --max-cycles 1",
+    "workflow:resume": "node scripts/resume-workflow.js --agent both",
+    "workflow:validate": "node scripts/validate-task.js --all",
+    "android:mobile": "npm --prefix apps/mobile run android",
+    "ios:mobile": "npm --prefix apps/mobile run ios",
+    "build:builder": "npm --prefix builder-react run build",
+    "build:builder:watch": "npm --prefix builder-react run build:watch",
+    "start:prod": "npm --prefix straight-wire-backend run start",
+    "dev:host": "npx --yes http-server . -p 5500 -a 127.0.0.1 -c-1 -P http://127.0.0.1:8081",
+    "dev": "concurrently -n backend,builder-watch \"npm run dev:backend\" \"npm run build:builder:watch\"",
+    "dev:full": "concurrently -n backend,builder,host \"npm run dev:backend\" \"npm run dev:builder\" \"npm run dev:host\"",
+    "dev:all": "concurrently -k -n workflow,viewer,mobile \"npm run workflow:start\" \"npm run viewer:start\" \"npm run mobile:start\""
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "concurrently": "^9.2.1",
+    "typescript": "^5.6.3"
+  }
+}
+

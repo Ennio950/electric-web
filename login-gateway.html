@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Cliente | Electric Web</title>
+    <script src="assets/js/company-branding-bootstrap.js?v=20260310a"></script>
+    <link rel="stylesheet" href="assets/css/portal-auth.css?v=20260310c" />
+</head>
+
+<body class="auth-shell font-sans text-white min-h-screen flex items-center justify-center p-4" data-portal-theme="client">
+
+    <!-- Dark Gradient Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Floating Back Button -->
+    <a href="index.html"
+        class="fixed top-6 left-6 z-50 flex items-center gap-2 px-5 py-2.5 bg-black/30 backdrop-blur-md border border-white/10 rounded-full text-white text-sm font-bold hover:bg-black/50 hover:scale-105 transition-all shadow-lg group">
+        <span class="group-hover:-translate-x-1 transition-transform font-bold text-electric">&larr;</span> Volver al inicio
+    </a>
+
+    <!-- Main Card -->
+    <div class="glass-card w-full max-w-[480px] p-8 md:p-10 rounded-2xl animate-fade-in-up relative z-10">
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <img src="assets/images/logo.webp" alt="Electric Web" data-company-logo="1"
+                class="w-[220px] md:w-[260px] h-auto mx-auto mb-3 drop-shadow-lg object-contain" decoding="async" fetchpriority="high">
+            <p class="text-gray-400 text-sm tracking-wide" id="page-subtitle">Ingresa para gestionar tus servicios</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-msg"
+            class="hidden bg-red-900/40 border border-red-500/30 text-red-200 text-sm p-3 rounded-lg mb-6 text-center backdrop-blur-sm">
+        </div>
+
+        <!-- Auth Form -->
+        <form id="auth-form" class="space-y-6">
+
+            <!-- Email -->
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1 tracking-wider">Correo
+                    Electronico</label>
+                <input type="email" id="email" required
+                    class="input-hud w-full px-4 py-3.5 rounded-xl outline-none placeholder-gray-600 text-sm"
+                    placeholder="cliente@ejemplo.com">
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label
+                    class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1 tracking-wider">Contrasena</label>
+                <div class="relative password-field">
+                    <input type="password" id="password" required
+                        class="input-hud w-full px-4 py-3.5 rounded-xl outline-none placeholder-gray-600 text-sm pr-12 password-input"
+                        placeholder="********">
+                    <button type="button" id="toggle-pass"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-electric transition-colors p-1 password-toggle-btn"
+                        title="Ver contrasena">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confirm Password (Hidden by default) -->
+            <div id="confirm-pass-container" class="hidden">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1 tracking-wider">Confirmar
+                    Contrasena</label>
+                <input type="password" id="confirm-password"
+                    class="input-hud w-full px-4 py-3.5 rounded-xl outline-none placeholder-gray-600 text-sm"
+                    placeholder="********">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submit-btn"
+                class="btn-glow w-full text-black font-black py-3.5 rounded-xl flex items-center justify-center gap-2 uppercase tracking-wide text-sm">
+                <span id="btn-text">INICIAR SESION</span>
+                <div id="spinner" class="loader hidden"></div>
+            </button>
+
+        </form>
+
+        <!-- Divider -->
+        <div class="relative my-8">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-white/10"></div>
+            </div>
+            <div class="relative flex justify-center text-xs uppercase font-bold tracking-widest text-gray-500">
+                <span class="px-3 bg-[#141414]">O continua con</span>
+            </div>
+        </div>
+
+        <!-- Google Button -->
+        <button id="google-btn"
+            class="w-full bg-white text-gray-900 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center gap-3 text-sm border border-transparent hover:border-gray-200 shadow-sm">
+            <img src="assets/images/google.svg" class="w-5 h-5" alt="Google">
+            Google
+        </button>
+        <div id="google-domain-help" class="auth-note hidden"></div>
+
+        <!-- Toggle Mode -->
+        <div class="mt-8 text-center text-sm text-gray-400">
+            <span id="toggle-text">&iquest;No tienes cuenta?</span>
+            <button id="toggle-mode-btn"
+                class="text-electric font-bold hover:text-yellow-300 ml-1 transition-colors hover:underline underline-offset-4">
+                Crear Cuenta
+            </button>
+        </div>
+
+    </div>
+    <script type="module" src="assets/js/company-branding.js?v=20260228e"></script>
+    <script type="module" src="assets/js/login-gateway.js?v=20260310d"></script>
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+{
+  "id": "tpl-carpinteria-v1",
+  "name": "Carpinteria Universal",
+  "version": "1.0.1",
+  "meta": {
+    "categoria": "carpinteria",
+    "notas": "Plantilla demo para tableros, tornillos y canto."
+  },
+  "inputs": [
+    { "key": "pieces", "label": "Piezas", "type": "int", "required": true, "default": 12, "min": 1 },
+    { "key": "pieceLength", "label": "Largo pieza", "type": "number", "unit": "m", "required": true, "default": 1.8, "min": 0.1 },
+    { "key": "pieceWidth", "label": "Ancho pieza", "type": "number", "unit": "m", "required": true, "default": 0.45, "min": 0.05 },
+    { "key": "wastePct", "label": "Merma %", "type": "number", "default": 12, "min": 0, "max": 40 }
+  ],
+  "computed": [
+    { "key": "totalArea", "label": "Area total", "unit": "m2", "expr": "inputs.pieces * inputs.pieceLength * inputs.pieceWidth" },
+    { "key": "areaWithWaste", "label": "Area con merma", "unit": "m2", "expr": "computed.totalArea * (1 + inputs.wastePct/100)" },
+    { "key": "sheetCount", "label": "Hojas", "unit": "unit", "expr": "ceil(round(computed.areaWithWaste / 2.88, 6))" },
+    { "key": "screwCount", "label": "Tornillos", "unit": "unit", "expr": "ceil(inputs.pieces * 18 * (1 + inputs.wastePct/100))" },
+    { "key": "edgeMeters", "label": "Canto m", "unit": "m", "expr": "inputs.pieces * (inputs.pieceLength + inputs.pieceWidth) * 2 * (1 + inputs.wastePct/100)" }
+  ],
+  "materials": [
+    {
+      "id": "m-sheet",
+      "name": "Tablero 18mm",
+      "baseUnit": "unit",
+      "unitCost": 34,
+      "packaging": { "packSize": 1, "packUnit": "unit" },
+      "rounding": "ceil"
+    },
+    {
+      "id": "m-screw",
+      "name": "Tornillo",
+      "baseUnit": "unit",
+      "unitCost": 0.06,
+      "packaging": { "packSize": 100, "packUnit": "unit" },
+      "rounding": "ceil"
+    },
+    {
+      "id": "m-edge",
+      "name": "Canto PVC",
+      "baseUnit": "m",
+      "unitCost": 0.9,
+      "packaging": { "packSize": 50, "packUnit": "m" },
+      "rounding": "ceil"
+    }
+  ],
+  "rules": [
+    {
+      "id": "r-large-order",
+      "when": "inputs.pieces >= 25",
+      "actions": [
+        { "kind": "addWarning", "message": "Orden grande: considerar descuento por volumen." }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "id": "o-sheet",
+      "materialId": "m-sheet",
+      "qtyExpr": "computed.sheetCount",
+      "unit": "unit",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    },
+    {
+      "id": "o-screw",
+      "materialId": "m-screw",
+      "qtyExpr": "computed.screwCount",
+      "unit": "unit",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    },
+    {
+      "id": "o-edge",
+      "materialId": "m-edge",
+      "qtyExpr": "computed.edgeMeters",
+      "unit": "m",
+      "category": "materiales",
+      "applyPackaging": true,
+      "rounding": "ceil"
+    }
+  ]
+}

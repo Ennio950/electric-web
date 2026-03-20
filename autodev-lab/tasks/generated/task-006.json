@@ -1,0 +1,30 @@
+{
+  "id": "task-006",
+  "titulo": "Extraer llamada API repetida de app/(boss)/payments/[id].tsx",
+  "descripcion": "Normalizar la importacion directa de api.ts en app/(boss)/payments/[id].tsx.",
+  "modulo": "mobile",
+  "estado": "requiere_revision",
+  "reintentos": 0,
+  "modo": "SAFE_AUTODEV_EXECUTABLE_BACKLOG_MOBILE_BACKEND",
+  "areaObjetivo": "mobile",
+  "plataformaObjetivo": "react-native-expo",
+  "aplicacionObjetivo": "apps/mobile",
+  "creadoEn": "2026-03-15T02:39:24.452Z",
+  "actualizadoEn": "2026-03-15T02:40:46.939Z",
+  "resumenResultado": "Tarea generada y pendiente de orquestacion.",
+  "categoriaFix": "api-service-extraction",
+  "clasificacion": "manual",
+  "archivosObjetivo": [
+    "apps/mobile/app/(boss)/payments/[id].tsx",
+    "apps/mobile/src/services/apiService.ts"
+  ],
+  "requiereRevision": true,
+  "taskKind": "generated",
+  "taskKey": "mobile-api:app/(boss)/payments/[id].tsx",
+  "fixPayload": {
+    "kind": "mobile-api-service-extraction",
+    "targetFile": "app/(boss)/payments/[id].tsx",
+    "serviceFunction": null
+  },
+  "taskPath": "autodev-lab/tasks/generated/task-006.json"
+}

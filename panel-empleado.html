@@ -1,0 +1,2294 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Panel | Straight Wire Electric</title>
+  <script src="assets/js/company-branding-bootstrap.js?v=20260301b"></script>
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script defer src="assets/vendor/face-api/face-api.min.js"></script>
+
+  <style>
+    /* ============================================================ 
+       MASTER-DETAIL LAYOUT (Control Center)
+       ============================================================ */
+    .panel-wrapper {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      height: auto;
+      display: flex;
+      padding: 16px;
+      gap: 16px;
+      overflow: visible;
+    }
+
+    /* Left Side: Master List */
+    .master-panel {
+      width: 380px;
+      min-width: 320px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Right Side: Detail View */
+    .detail-panel {
+      flex: 1;
+      background: rgba(30, 30, 30, 0.85);
+      /* Darker contrast for workspace */
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    /* Scrollable Areas */
+    .scroll-y {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .scroll-y::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scroll-y::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 900px) {
+      .panel-wrapper {
+        flex-direction: column;
+        padding: 10px;
+      }
+
+      .master-panel {
+        width: 100%;
+        height: auto;
+        min-height: 40vh;
+        min-height: 40dvh;
+      }
+
+      .detail-panel {
+        width: 100%;
+        height: auto;
+        min-height: 44vh;
+        min-height: 44dvh;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .panel-wrapper {
+        min-height: 100dvh;
+      }
+
+      .master-panel {
+        height: auto;
+        min-height: 100dvh;
+        display: flex;
+      }
+
+      .detail-panel {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        border-radius: 0;
+      }
+
+      .detail-panel.active {
+        display: flex;
+      }
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-title {
+      font-weight: 900;
+      font-size: 0.95rem;
+      opacity: 0.95;
+      margin-bottom: 10px;
+    }
+
+    .kpi {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .kpi .num {
+      font-size: 2rem;
+      font-weight: 1000;
+      line-height: 1;
+    }
+
+    .kpi .hint {
+      font-size: 0.88rem;
+      opacity: 0.9;
+    }
+
+    .badge {
+      font-size: 0.8rem;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .action-btn {
+      width: 100%;
+      text-align: left;
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      transition: transform .12s ease, filter .12s ease, background .12s ease;
+      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.25);
+      text-shadow: none !important;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    .action-btn .label {
+      font-weight: 1000;
+      font-size: 0.95rem;
+      margin-bottom: 3px;
+      color: #fff !important;
+    }
+
+    .action-btn .desc {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      color: rgba(255, 255, 255, 0.92) !important;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 12px 12px;
+    }
+
+    .row .left {
+      display: grid;
+      gap: 2px;
+    }
+
+    .row .who {
+      font-weight: 1000;
+    }
+
+    .row .meta {
+      font-size: 0.84rem;
+      opacity: 0.9;
+    }
+
+    .row .right {
+      text-align: right;
+      display: grid;
+      gap: 2px;
+      min-width: 90px;
+    }
+
+    .row .amount {
+      font-weight: 1000;
+    }
+
+    .row .status {
+      font-size: 0.8rem;
+      opacity: 0.95;
+    }
+
+    /* PRO: si amount viene vacio, no se muestra ni ocupa espacio */
+    .row .amount:empty {
+      display: none;
+    }
+
+    .span-2 {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .span-2 {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .span-2 {
+        grid-column: span 1;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .brand {
+        min-width: auto;
+      }
+    }
+
+    /* ============================================================
+   MOBILE FIX (Panel Empleado)
+   - Evita encimados del topbar en celular
+   - Acciones en grid responsivo
+   ============================================================ */
+
+    /* Permite que el topbar pueda envolver sin romperse */
+    .topbar {
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    /* El brand NO debe forzar ancho minimo en movil */
+    .brand {
+      min-width: 0 !important;
+      flex: 1 1 auto;
+    }
+
+    /* Evita que textos largos empujen */
+    .brand>div {
+      min-width: 0;
+    }
+
+    .brand h1,
+    .brand p {
+      word-break: break-word;
+    }
+
+    /* Que el grupo de acciones se adapte */
+    .top-actions {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    /* ======== BREAKPOINT MOBILE ======== */
+    @media (max-width: 720px) {
+
+      .panel-wrapper {
+        padding: 14px;
+        align-items: flex-start;
+        /* que no quede pegado al centro */
+      }
+
+      .panel {
+        padding: 14px;
+        border-radius: 20px;
+      }
+
+      /* Topbar: columna (NO mas encimados) */
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 10px 8px 14px 8px;
+      }
+
+      /* Brand: logo + textos alineados y compactos */
+      .brand {
+        gap: 12px;
+        justify-content: flex-start;
+      }
+
+      .brand img {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        padding: 6px;
+      }
+
+      .brand h1 {
+        font-size: 1.05rem;
+        line-height: 1.15;
+      }
+
+      .brand p {
+        font-size: 0.92rem;
+        opacity: 0.95;
+      }
+
+      /* Acciones: grid de 2 columnas (pills/botones) */
+      .top-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        justify-content: stretch;
+        width: 100%;
+      }
+
+      .pill,
+      .btn {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        border-radius: 14px;
+        padding: 12px 12px;
+        font-size: 0.95rem;
+      }
+
+      /* Si quieres que el pill de fecha ocupe todo el ancho */
+      #todayPill {
+        grid-column: 1 / -1;
+      }
+    }
+
+    /* ======== EXTRA SMALL ======== */
+    @media (max-width: 420px) {
+
+      /* En telefonos muy angostos: 1 columna */
+      .top-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+
+    /* ============================================================
+       ULTRA PROMASTER SKIN (Override)
+       ============================================================ */
+    :root {
+      --emp-bg-1: #05060f;
+      --emp-bg-2: #0b1230;
+      --emp-accent: #38bdf8;
+      --emp-accent-2: #fbbf24;
+      --emp-accent-3: #22c55e;
+      --emp-text: #e5f4ff;
+      --emp-muted: #9bb2c9;
+      --emp-panel: rgba(8, 12, 28, 0.88);
+      --emp-glass: rgba(255, 255, 255, 0.06);
+      --emp-border: rgba(148, 163, 184, 0.2);
+      --emp-font-body: "Space Grotesk", sans-serif;
+      --emp-font-display: "Bebas Neue", sans-serif;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      display: block;
+      font-family: var(--emp-font-body);
+      color: var(--emp-text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(56, 189, 248, 0.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(251, 191, 36, 0.15), transparent 55%),
+        linear-gradient(135deg, var(--emp-bg-1), var(--emp-bg-2));
+      min-height: 100vh;
+      min-height: 100svh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p,
+    li,
+    label,
+    span {
+      text-shadow: none;
+    }
+
+    .panel-wrapper {
+      position: relative;
+      padding: 28px;
+      gap: 20px;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      height: auto;
+    }
+
+    .panel-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 24px),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 24px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .panel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: calc(100vh - 56px);
+      min-height: calc(100dvh - 56px);
+      height: auto;
+      padding: 22px;
+      border-radius: 28px;
+      background: linear-gradient(160deg, rgba(8, 12, 28, 0.92), rgba(8, 12, 28, 0.8));
+      border: 1px solid var(--emp-border);
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.55),
+        inset 0 0 0 1px rgba(56, 189, 248, 0.15);
+      overflow-y: auto;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.55), rgba(251, 191, 36, 0.45), rgba(34, 197, 94, 0.4));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand img {
+      width: 70px !important;
+      height: 70px !important;
+      max-width: 70px !important;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.2), rgba(8, 12, 28, 0.6));
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+      margin: 0 !important;
+    }
+
+    .brand h1 {
+      font-family: var(--emp-font-display);
+      font-size: 2.4rem;
+      letter-spacing: 0.06em;
+      margin: 0;
+    }
+
+    .brand p {
+      margin: 4px 0 0 0;
+      color: var(--emp-muted);
+      font-weight: 500;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.12);
+      color: #b6ecff;
+      font-weight: 700;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-weight: 800;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--emp-text);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 26px rgba(0, 0, 0, 0.35);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-secondary-pro {
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #c7ecff;
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .btn-primary-pro {
+      border: none;
+      color: #021316;
+      background: linear-gradient(135deg, #38bdf8, #22d3ee);
+      box-shadow: 0 16px 30px rgba(56, 189, 248, 0.35);
+    }
+
+    .btn-danger {
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fecaca;
+      background: rgba(239, 68, 68, 0.18);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      background: linear-gradient(160deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.95));
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      animation: riseIn 0.6s ease both;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(200px 120px at 10% 0%, rgba(56, 189, 248, 0.15), transparent 65%);
+      pointer-events: none;
+    }
+
+    .card-title {
+      font-family: var(--emp-font-display);
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      color: #bfe7ff;
+    }
+
+    .kpi .num {
+      font-size: 2.4rem;
+      font-weight: 900;
+    }
+
+    .kpi .hint {
+      color: var(--emp-muted);
+    }
+
+    .badge {
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.18);
+      color: #b6ecff;
+      animation: glowPulse 2.6s ease-in-out infinite;
+    }
+
+    .actions {
+      gap: 12px;
+    }
+
+    .action-btn {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(8, 12, 28, 0.9));
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .action-btn::after {
+      content: "";
+      position: absolute;
+      inset: -40% 60% auto -40%;
+      height: 120%;
+      background: linear-gradient(120deg, transparent, rgba(56, 189, 248, 0.45), transparent);
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.4s ease;
+      transform: rotate(8deg);
+    }
+
+    .action-btn:hover::after {
+      opacity: 1;
+      transform: translateX(120%) rotate(8deg);
+    }
+
+    .action-btn .label {
+      font-family: var(--emp-font-display);
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .action-btn .desc {
+      color: var(--emp-muted);
+    }
+
+    .list {
+      gap: 12px;
+    }
+
+    .row {
+      background: rgba(8, 12, 28, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .row .status {
+      color: #7dd3fc;
+      font-weight: 700;
+    }
+
+    .row-link:focus-visible {
+      outline: 2px solid rgba(56, 189, 248, 0.85);
+      outline-offset: 2px;
+    }
+
+    .card,
+    .action-btn,
+    .row {
+      content-visibility: auto;
+      contain-intrinsic-size: 220px;
+    }
+
+    @keyframes riseIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes glowPulse {
+      0%,
+      100% {
+        box-shadow: 0 0 0 rgba(56, 189, 248, 0.1);
+      }
+      50% {
+        box-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+      }
+    }
+
+    .grid .card:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .grid .card:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+    .grid .card:nth-child(3) {
+      animation-delay: 0.18s;
+    }
+
+    .grid .card:nth-child(4) {
+      animation-delay: 0.24s;
+    }
+
+    .grid .card:nth-child(5) {
+      animation-delay: 0.3s;
+    }
+
+    @media (max-width: 1100px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .panel-wrapper {
+        padding: 16px;
+        min-height: 100dvh;
+      }
+
+      .panel {
+        height: auto;
+        min-height: auto;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .top-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .panel-wrapper {
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 12px;
+      }
+
+      .panel {
+        min-height: calc(100vh - 24px);
+        min-height: calc(100dvh - 24px);
+        height: auto;
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .top-actions {
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .top-actions .pill,
+      .top-actions .btn {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+      }
+
+      #todayPill {
+        grid-column: 1 / -1;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .kpi .num {
+        font-size: 2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .panel-wrapper {
+        padding: 8px;
+      }
+
+      .panel {
+        padding: 14px;
+        border-radius: 16px;
+      }
+
+      .brand img {
+        width: 42px !important;
+        height: 42px !important;
+        max-width: 42px !important;
+        border-radius: 12px;
+      }
+
+      .brand h1 {
+        font-size: 1.8rem;
+      }
+
+      .top-actions {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 900px), (hover: none), (pointer: coarse) {
+      .panel-wrapper::before {
+        opacity: 0.14;
+      }
+
+      .panel,
+      .card,
+      .action-btn {
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+      }
+
+      .btn:hover,
+      .action-btn:hover {
+        transform: none;
+      }
+
+      .action-btn::after {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card,
+      .badge,
+      .animate-scan {
+        animation: none !important;
+      }
+
+      .btn,
+      .action-btn,
+      #scanCountdown {
+        transition: none !important;
+      }
+    }
+
+  </style>
+  <link rel="stylesheet" href="assets/css/panel-contrast.css?v=20260228g" />
+</head>
+
+<body>
+  <div class="panel-wrapper">
+    <div class="panel">
+
+      <div class="topbar">
+        <div class="brand">
+          <img src="assets/images/logo.webp" alt="Straight Wire Electric" />
+          <div>
+            <h1>Employee Panel</h1>
+            <p id="welcomeLine">Welcome, Employee</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <div class="pill" id="todayPill">Today: --/--/----</div>
+          <button type="button" class="btn btn-secondary-pro" data-panel-action="open-profile">Editar Perfil</button>
+          <button type="button" class="btn btn-secondary-pro" data-panel-action="create-estimate">Create Estimate</button>
+          <button type="button" class="btn btn-danger" data-panel-action="logout">Logout</button>
+        </div>
+      </div>
+
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-title">Estimates Today</div>
+          <div class="kpi">
+            <div>
+              <div class="num" id="kpiEstToday">0</div>
+              <div class="hint">Created in the last 24h (local)</div>
+            </div>
+            <div class="badge" id="badgeEst">OK</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Pending Requests</div>
+          <div class="kpi">
+            <div>
+              <div class="num" id="kpiPending">--</div>
+              <div class="hint">From Firestore (clientRequests)</div>
+            </div>
+            <div class="badge" id="badgePending">--</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Payment Proof Rejections</div>
+          <div class="kpi">
+            <div>
+              <div class="num" id="kpiRejectedProofs">--</div>
+              <div class="hint">Comprobantes rechazados por reenviar</div>
+            </div>
+            <div class="badge" id="badgeRejectedProofs">--</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Revenue (Month)</div>
+          <div class="kpi">
+            <div>
+              <div class="num" id="kpiRevenue">$0</div>
+              <div class="hint">Sum of estimates (local)</div>
+            </div>
+            <div class="badge" id="badgeRev">USD</div>
+          </div>
+        </div>
+
+        <div class="card span-2">
+          <div class="card-title">Quick Actions</div>
+
+          <div class="actions">
+            <button type="button" class="action-btn" data-panel-action="create-estimate">
+              <div class="label">+ Create Estimate</div>
+              <div class="desc">Build and send a quote fast</div>
+            </button>
+
+            <button type="button" class="action-btn" data-panel-action="estimate-history">
+              <div class="label">Estimate History</div>
+              <div class="desc">See generated estimates</div>
+            </button>
+
+            <button type="button" class="action-btn" data-panel-action="client-requests">
+              <div class="label">Client Requests</div>
+              <div class="desc">View submitted forms (with photo)</div>
+            </button>
+
+            <button type="button" class="action-btn" data-panel-action="schedule">
+              <div class="label">Trabajo por horario</div>
+              <div class="desc">Mismo flujo operativo, pero programado</div>
+            </button>
+
+            <button type="button" class="action-btn" data-panel-action="materials">
+              <div class="label">Materials / Inventory</div>
+              <div class="desc">Common items list and costs</div>
+            </button>
+
+            <button type="button" class="action-btn" data-panel-action="emergency">
+              <div class="label">Emergency Calls</div>
+              <div class="desc">Priority dispatch list</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Recent Activity (Firestore)</div>
+          <div class="list" id="activityList"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.2), rgba(0, 0, 0, 0.85));
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .modal {
+      background: linear-gradient(160deg, rgba(8, 12, 28, 0.95), rgba(2, 6, 23, 0.98));
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 26px;
+      padding: 30px;
+      width: min(500px, 100%);
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      opacity: 0.6;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 12px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-group input:focus {
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+    }
+
+    .profile-pic-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent-primary, #22c55e);
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .modal {
+        border-radius: 20px;
+        padding: 20px 16px;
+      }
+
+      #profileModal .modal > div[style*="display:flex; gap:10px; margin-top:30px;"] {
+        flex-direction: column;
+      }
+
+      #cameraModal .modal > div[style*="display:flex; gap:10px; margin-top:10px;"] {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <div id="profileModal" class="modal-overlay">
+    <div class="modal">
+      <h2 style="margin-top:0;">Mi Perfil de Empleado</h2>
+      <div style="text-align:center; margin-bottom:20px;">
+        <img id="editPFP" src="assets/images/logo.webp" class="profile-pic-preview" />
+        <div id="photoChangeStatus" style="margin:10px 0; font-size:0.85rem; opacity:0.8;"></div>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button id="requestPhotoBtn" type="button" class="btn btn-secondary-pro" style="font-size:0.75rem;" data-panel-action="request-photo-change">Solicitar cambio de foto</button>
+          <button id="takeSelfieBtn" type="button" class="btn btn-primary-pro" style="font-size:0.75rem; display:none;" data-panel-action="start-photo-scan">Tomar nueva selfie</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nombre Completo</label>
+        <input type="text" id="editName" placeholder="Tu nombre" />
+      </div>
+      <div class="form-group">
+        <label>Edad</label>
+        <input type="number" id="editAge" placeholder="A&ntilde;os" />
+      </div>
+      <div class="form-group">
+        <label>Direcci&oacute;n</label>
+        <input type="text" id="editAddress" placeholder="Ciudad, Zona" />
+      </div>
+      <div style="display:flex; gap:10px; margin-top:30px;">
+        <button type="button" class="btn btn-secondary-pro" style="flex:1;" data-panel-action="close-profile">Cancelar</button>
+        <button type="button" class="btn btn-primary-pro" style="flex:1;" data-panel-action="save-profile">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMERA MODAL (Selfie) -->
+  <div id="cameraModal" style="display:none;"
+    class="modal-overlay">
+    <div class="modal" style="width:min(420px, 95%); padding:20px;">
+      <h3 style="margin-top:0; text-align:center;">Escaneo Facial</h3>
+      <div
+        class="relative w-full max-w-sm aspect-[3/4] bg-black rounded-2xl overflow-hidden border-2 border-green-500 shadow-2xl shadow-green-900/50"
+        style="position:relative; width:100%; aspect-ratio:3/4; background:#000; border-radius:20px; overflow:hidden; border:2px solid #22c55e;">
+        <video id="cameraFeed" autoplay playsinline class="w-full h-full object-cover transform scale-x-[-1]"
+          style="width:100%; height:100%; object-fit:cover; transform:scaleX(-1);"></video>
+
+        <div class="absolute inset-0 pointer-events-none flex items-center justify-center"
+          style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+          <div style="width:60%; height:70%; border:2px solid rgba(34,197,94,0.5); border-radius:50%;"></div>
+        </div>
+
+        <div id="scanLine"
+          style="position:absolute; top:0; left:0; width:100%; height:4px; background:#22c55e; opacity:0.5;"></div>
+
+        <div id="scanStatus"
+          style="position:absolute; bottom:12px; left:0; width:100%; text-align:center; color:#22c55e; font-weight:800;">
+          Buscando rostro...
+        </div>
+
+        <div id="scanCountdown"
+          style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:64px; opacity:0; transform:scale(0.5); transition:all 0.3s ease; pointer-events:none;">
+          3
+        </div>
+      </div>
+
+      <p style="text-align:center; margin:10px 0; opacity:0.7;">Ubica tu rostro dentro del ovalo</p>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button type="button" class="btn btn-secondary-pro" style="flex:1;" data-panel-action="close-camera">Cancelar</button>
+        <button id="btnCapture" type="button" class="btn btn-primary-pro" style="flex:1;" data-panel-action="capture-photo">Foto manual</button>
+      </div>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
+    </div>
+  </div>
+
+  <!-- Todo el JS del panel (incluye Firestore) -->
+  <script type="module">
+    import { auth, db } from "./assets/js/firebase.js";
+    import { onAuthStateChanged, signOut } from "./assets/vendor/firebase/firebase-auth.js";
+    import { getCurrentUserProfile, canSeeProActions } from "./assets/js/pro-actions.js";
+    import { createNotifier } from "./assets/js/notify-center.js";
+    import {
+      collection,
+      query,
+      orderBy,
+      limit,
+      where,
+      getDocs
+    } from "./assets/vendor/firebase/firebase-firestore.js";
+
+    // Si todavia no tienes login real para empleados, dejalo false
+    const REQUIRE_AUTH = true;
+    let CURRENT_PROFILE = null;
+    let EMPLOYEE_NOTIFIER = null;
+    let EMPLOYEE_NOTIFY_PRIMED = false;
+    let EMPLOYEE_NOTIFY_TIMER = null;
+    let EMPLOYEE_NOTIFY_STATE = { emergencies: new Map(), requests: new Map() };
+    const EMPLOYEE_NOTIFY_POLL_MS = 9000;
+
+    function formatDate(d) {
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = d.getFullYear();
+      return `${mm}/${dd}/${yy}`;
+    }
+
+    function getHistory() {
+      try {
+        return JSON.parse(localStorage.getItem("estimatesHistory")) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setHeader(user) {
+      const now = new Date();
+      document.getElementById("todayPill").innerText = `Today: ${formatDate(now)}`;
+
+      // Priorizamos nombre guardado del perfil para evitar caer siempre en email.
+      const nameLocal = String(localStorage.getItem("employeeName") || "").trim();
+      const nameAuth = String(user?.displayName || "").trim();
+      const nameEmail = String(user?.email || "").trim();
+      const name = nameLocal || nameAuth || nameEmail || "Employee";
+
+      document.getElementById("welcomeLine").innerText = `Welcome, ${name}`;
+    }
+
+    function renderKPIsLocal() {
+      // KPIs locales para estimates (no Firestore)
+      const history = getHistory();
+      const last24 = Date.now() - (24 * 60 * 60 * 1000);
+
+      const estToday = history.filter(h => (new Date(h.date).getTime() || 0) >= last24).length;
+      const pendingLocal = history.filter(h => (h.status || "").toLowerCase() === "pending").length;
+
+      const now = new Date();
+      const month = now.getMonth();
+      const year = now.getFullYear();
+      let rev = 0;
+      history.forEach(h => {
+        const dt = new Date(h.date);
+        if (dt.getMonth() === month && dt.getFullYear() === year) {
+          rev += Number(h.total || 0);
+        }
+      });
+
+      document.getElementById("kpiEstToday").innerText = estToday;
+      document.getElementById("kpiRevenue").innerText = `$${rev.toFixed(0)}`;
+
+      document.getElementById("badgeEst").innerText = estToday >= 5 ? "BUSY" : "OK";
+      document.getElementById("badgeRev").innerText = "USD";
+
+      void pendingLocal;
+    }
+
+    function safeText(s) {
+      return String(s ?? "").replace(/[&<>"']/g, m => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[m]));
+    }
+
+    function fmtTs(ts) {
+      try {
+        if (!ts) return "--";
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return formatDate(d);
+      } catch (e) {
+        return "--";
+      }
+    }
+
+    function toMillis(rawValue) {
+      if (rawValue == null) return 0;
+      if (typeof rawValue === "number") return Number.isFinite(rawValue) ? rawValue : 0;
+      if (typeof rawValue === "string") {
+        const asNumber = Number(rawValue);
+        if (Number.isFinite(asNumber) && asNumber > 0) return asNumber;
+        const asDate = Date.parse(rawValue);
+        return Number.isFinite(asDate) ? asDate : 0;
+      }
+      if (rawValue instanceof Date) return rawValue.getTime();
+      if (typeof rawValue?.toMillis === "function") {
+        const ms = Number(rawValue.toMillis());
+        return Number.isFinite(ms) ? ms : 0;
+      }
+      if (typeof rawValue?.toDate === "function") {
+        const date = rawValue.toDate();
+        return date instanceof Date ? date.getTime() : 0;
+      }
+      return 0;
+    }
+
+    function formatMoney(value) {
+      const amount = Number(value || 0);
+      if (!Number.isFinite(amount)) return "$0";
+      return `$${amount.toLocaleString()}`;
+    }
+
+    function initEmployeeNotifier() {
+      if (EMPLOYEE_NOTIFIER) return EMPLOYEE_NOTIFIER;
+      EMPLOYEE_NOTIFIER = createNotifier({
+        title: "Alertas del empleado",
+        bellLabel: "Alertas",
+        position: "top-right",
+        storageKey: "swe:employee:notify:seen:v1",
+        historyStorageKey: "swe:electric:web:notify:history:v1",
+        typeOptions: {
+          emergencies: "Emergencias",
+          payments: "Pagos",
+          requests: "Solicitudes"
+        },
+        onItemAction: handleEmployeeNotificationAction,
+        maxItems: 36,
+        toastMs: 5000,
+        sounds: true
+      });
+      return EMPLOYEE_NOTIFIER;
+    }
+
+    function rememberEmployeeNotificationKeys(keys = []) {
+      const notifier = initEmployeeNotifier();
+      notifier.rememberKeys(Array.isArray(keys) ? keys : []);
+    }
+
+    function notifyEmployee(payload = {}) {
+      const notifier = initEmployeeNotifier();
+      return notifier.notify(payload);
+    }
+
+    function employeeFlowMode(value) {
+      return String(value || "").trim().toLowerCase() === "scheduled" ? "scheduled" : "emergency";
+    }
+
+    function employeeFlowLabel(value) {
+      return employeeFlowMode(value) === "scheduled" ? "trabajo programado" : "emergencia";
+    }
+
+    function buildEmployeeEmergencyUrl({ callId = "", openChat = false, mode = "emergency" } = {}) {
+      const params = new URLSearchParams();
+      if (employeeFlowMode(mode) === "scheduled") params.set("mode", "scheduled");
+      if (callId) params.set("focusId", callId);
+      if (openChat) params.set("openChat", "1");
+      return params.toString() ? `emergency.html?${params.toString()}` : "emergency.html";
+    }
+
+    function handleEmployeeNotificationAction(payload = {}) {
+      const action = payload?.action || {};
+      const kind = String(action.kind || "").trim().toLowerCase();
+      if (!kind) return;
+
+      if (kind === "open-emergency") {
+        const callId = String(action.callId || "").trim();
+        const wantsChat = Boolean(action.openChat);
+        const mode = employeeFlowMode(action.mode);
+        window.location.href = buildEmployeeEmergencyUrl({ callId, openChat: wantsChat, mode });
+        return;
+      }
+
+      if (kind === "open-client-requests") {
+        const requestId = String(action.requestId || "").trim();
+        window.location.href = requestId
+          ? `client-requests.html?select=${encodeURIComponent(requestId)}`
+          : "client-requests.html";
+      }
+    }
+
+    function emergencySnapshot(call = {}) {
+      const id = String(call.id || call.requestId || "").trim();
+      const status = String(call.status || "").toLowerCase();
+      const dispatchMode = employeeFlowMode(call.dispatchMode || call.mode || call.serviceType);
+      const assignedEmployeeId = String(call.assignedEmployeeId || "").trim();
+      const updatedMs = toMillis(call.updatedAtMs || call.updatedAt || call.createdAtMs || call.createdAt);
+      const createdMs = toMillis(call.createdAtMs || call.createdAt || call.updatedAtMs || call.updatedAt);
+      const rejectedAtMs = toMillis(call.paymentRejectedAtMs || call.paymentRejectedAt);
+      const finalAmount = Number(call.finalAmount ?? call.quotedAmount ?? 0);
+      return { id, status, dispatchMode, assignedEmployeeId, updatedMs, createdMs, rejectedAtMs, finalAmount };
+    }
+
+    function requestSnapshot(req = {}) {
+      const id = String(req.id || req.requestId || "").trim();
+      const status = String(req.status || "").toUpperCase();
+      const assignedEmployeeId = String(req.assignedEmployeeId || "").trim();
+      const updatedMs = toMillis(req.updatedAtMs || req.updatedAt || req.createdAtMs || req.createdAt);
+      const rejectedAtMs = toMillis(req.paymentRejectedAtMs || req.paymentRejectedAt);
+      return { id, status, assignedEmployeeId, updatedMs, rejectedAtMs };
+    }
+
+    function baselineNotificationKeys(emergenciesMap, requestsMap) {
+      const keys = [];
+      emergenciesMap.forEach((snap) => {
+        keys.push(`employee:emergency:status:${snap.id}:${snap.status}:${snap.updatedMs}`);
+        if (snap.rejectedAtMs) keys.push(`employee:emergency:reject:${snap.id}:${snap.rejectedAtMs}`);
+      });
+      requestsMap.forEach((snap) => {
+        keys.push(`employee:request:status:${snap.id}:${snap.status}:${snap.updatedMs}`);
+        if (snap.rejectedAtMs) keys.push(`employee:request:reject:${snap.id}:${snap.rejectedAtMs}`);
+      });
+      return keys;
+    }
+
+    function processEmployeeNotifications({ emergencies = [], requests = [] } = {}) {
+      const uid = String(auth.currentUser?.uid || "").trim();
+      if (!uid) return;
+
+      const prevState = EMPLOYEE_NOTIFY_STATE;
+      const nextEmergencies = new Map();
+      const nextRequests = new Map();
+
+      emergencies.forEach((call) => {
+        const snap = emergencySnapshot(call);
+        if (!snap.id) return;
+        nextEmergencies.set(snap.id, { ...snap, raw: call });
+      });
+
+      requests.forEach((req) => {
+        const snap = requestSnapshot(req);
+        if (!snap.id) return;
+        nextRequests.set(snap.id, { ...snap, raw: req });
+      });
+
+      if (!EMPLOYEE_NOTIFY_PRIMED) {
+        rememberEmployeeNotificationKeys(baselineNotificationKeys(nextEmergencies, nextRequests));
+        EMPLOYEE_NOTIFY_STATE = { emergencies: nextEmergencies, requests: nextRequests };
+        EMPLOYEE_NOTIFY_PRIMED = true;
+        return;
+      }
+
+      nextEmergencies.forEach((snap) => {
+        const prev = prevState.emergencies.get(snap.id);
+        const isPending = snap.status === "pending";
+        const flowLabel = employeeFlowLabel(snap.dispatchMode);
+        if (!prev && isPending) {
+          notifyEmployee({
+            dedupeKey: `employee:emergency:new:${snap.id}:${snap.createdMs || snap.updatedMs}`,
+            type: "emergencies",
+            priority: "low",
+            tone: "info",
+            title: snap.dispatchMode === "scheduled" ? "Nuevo trabajo programado disponible" : "Nueva emergencia disponible",
+            message: snap.dispatchMode === "scheduled"
+              ? "Entró un trabajo programado nuevo. Puedes aceptarlo desde la cola programada."
+              : "Entró una emergencia nueva. Puedes aceptarla desde la cola de emergencias.",
+            action: { kind: "open-emergency", callId: snap.id, mode: snap.dispatchMode },
+          });
+        }
+
+        const assignedToMe = snap.assignedEmployeeId === uid;
+        if (assignedToMe) {
+          const becameMine = !prev || prev.assignedEmployeeId !== uid;
+          const changedStatus = !prev || prev.status !== snap.status;
+
+          if (becameMine && snap.status === "accepted") {
+            notifyEmployee({
+              dedupeKey: `employee:emergency:assigned:${snap.id}:${snap.updatedMs}`,
+              type: "emergencies",
+              priority: "high",
+              tone: "success",
+              title: snap.dispatchMode === "scheduled" ? "Trabajo programado asignado" : "Emergencia asignada",
+              message: `Se te asignó un ${flowLabel} en ${snap.raw?.location || "ubicacion no indicada"}.`,
+              action: { kind: "open-emergency", callId: snap.id, openChat: true, mode: snap.dispatchMode },
+            });
+          }
+
+          if (changedStatus && snap.status === "awaiting_payment_proof") {
+            const depositAmount = Number.isFinite(snap.finalAmount)
+              ? Math.round(snap.finalAmount * 0.20 * 100) / 100
+              : 0;
+            notifyEmployee({
+              dedupeKey: `employee:emergency:awaiting-proof:${snap.id}:${snap.updatedMs}`,
+              type: "payments",
+              priority: "high",
+              tone: "warning",
+              title: "Sube tu comprobante de deposito",
+              message: `El cliente confirmó pago. Debes depositar 20% (${formatMoney(depositAmount)}) y subir comprobante.`,
+              action: { kind: "open-emergency", callId: snap.id, openChat: true, mode: snap.dispatchMode },
+            });
+          }
+
+          if (snap.rejectedAtMs && snap.rejectedAtMs !== Number(prev?.rejectedAtMs || 0)) {
+            notifyEmployee({
+              dedupeKey: `employee:emergency:proof-rejected:${snap.id}:${snap.rejectedAtMs}`,
+              type: "payments",
+              priority: "high",
+              tone: "error",
+              title: "Comprobante rechazado",
+              message: "El jefe pidió un nuevo comprobante. Reenvíalo para continuar.",
+              action: { kind: "open-emergency", callId: snap.id, openChat: true, mode: snap.dispatchMode },
+            });
+          }
+
+          if (changedStatus && snap.status === "completed") {
+            notifyEmployee({
+              dedupeKey: `employee:emergency:completed:${snap.id}:${snap.updatedMs}`,
+              type: "payments",
+              priority: "low",
+              tone: "success",
+              title: "Pago aprobado y cierre completo",
+              message: snap.dispatchMode === "scheduled"
+                ? "El jefe aprobó el pago final. Ya puedes tomar otro trabajo programado."
+                : "El jefe aprobó el pago final. Ya puedes tomar otra emergencia.",
+              action: { kind: "open-emergency", callId: snap.id, mode: snap.dispatchMode },
+            });
+          }
+        }
+      });
+
+      nextRequests.forEach((snap) => {
+        const prev = prevState.requests.get(snap.id);
+        const assignedToMe = snap.assignedEmployeeId === uid || !snap.assignedEmployeeId;
+        if (!assignedToMe) return;
+
+        if (snap.status === "ESPERANDO_COMPROBANTE_PAGO" && snap.rejectedAtMs && snap.rejectedAtMs !== Number(prev?.rejectedAtMs || 0)) {
+          notifyEmployee({
+            dedupeKey: `employee:request:proof-rejected:${snap.id}:${snap.rejectedAtMs}`,
+            type: "payments",
+            priority: "high",
+            tone: "error",
+            title: "Comprobante rechazado",
+            message: "Una solicitud regular requiere reenviar comprobante de pago.",
+            action: { kind: "open-client-requests", requestId: snap.id },
+          });
+        }
+
+        if (prev && prev.status !== "COMPLETADO" && snap.status === "COMPLETADO") {
+          notifyEmployee({
+            dedupeKey: `employee:request:completed:${snap.id}:${snap.updatedMs}`,
+            type: "requests",
+            priority: "low",
+            tone: "success",
+            title: "Solicitud completada",
+            message: "El pago fue aprobado y la solicitud se marcó como completada.",
+            action: { kind: "open-client-requests", requestId: snap.id },
+          });
+        }
+      });
+
+      EMPLOYEE_NOTIFY_STATE = { emergencies: nextEmergencies, requests: nextRequests };
+    }
+
+    async function loadPendingRequestsKPI() {
+      const kpi = document.getElementById("kpiPending");
+      const badge = document.getElementById("badgePending");
+
+      kpi.innerText = "...";
+      badge.innerText = "...";
+
+      try {
+        const q = query(
+          collection(db, "requests"),
+          where("status", "==", "EN_ESPERA")
+        );
+
+        const snap = await getDocs(q);
+        const n = snap.size;
+
+        kpi.innerText = String(n);
+        badge.innerText = n >= 5 ? "HIGH" : (n >= 1 ? "NORMAL" : "OK");
+
+      } catch (err) {
+        console.error("Error KPI pending:", err);
+        kpi.innerText = "--";
+        badge.innerText = "ERR";
+      }
+    }
+
+    async function loadRejectedProofsKPI(prefetched = null) {
+      const kpi = document.getElementById("kpiRejectedProofs");
+      const badge = document.getElementById("badgeRejectedProofs");
+      if (!kpi || !badge) return;
+
+      kpi.innerText = "...";
+      badge.innerText = "...";
+
+      try {
+        const uid = auth.currentUser?.uid || "";
+        const requests = Array.isArray(prefetched?.requests) ? prefetched.requests : [];
+        const emergencies = Array.isArray(prefetched?.emergencies) ? prefetched.emergencies : [];
+        if (!requests.length && !emergencies.length) {
+          const [reqRes, emergencyRes] = await Promise.all([
+            apiFetch("/api/marketplace/employee/my-requests?limit=120"),
+            apiFetch("/api/marketplace/emergency-calls?limit=120&mode=all")
+          ]);
+          prefetched = {
+            requests: Array.isArray(reqRes?.data) ? reqRes.data : [],
+            emergencies: Array.isArray(emergencyRes?.data) ? emergencyRes.data : []
+          };
+        }
+
+        const reqRows = Array.isArray(prefetched?.requests) ? prefetched.requests : requests;
+        const emergencyRows = Array.isArray(prefetched?.emergencies) ? prefetched.emergencies : emergencies;
+
+        const rejectedRequests = reqRows.filter((r) => {
+          const status = String(r?.status || "").toUpperCase();
+          const rejected = Boolean(r?.paymentRejectedAt || r?.paymentRejectedAtMs);
+          return status === "ESPERANDO_COMPROBANTE_PAGO" && rejected && String(r?.assignedEmployeeId || "") === uid;
+        }).length;
+
+        const rejectedEmergencies = emergencyRows.filter((call) => {
+          const status = String(call?.status || "").toLowerCase();
+          const rejected = Boolean(call?.paymentRejectedAt || call?.paymentRejectedAtMs);
+          return status === "awaiting_payment_proof" && rejected && String(call?.assignedEmployeeId || "") === uid;
+        }).length;
+
+        const total = rejectedRequests + rejectedEmergencies;
+
+        kpi.innerText = String(total);
+        badge.innerText = total === 0 ? "OK" : total <= 2 ? "CHECK" : "ALERT";
+      } catch (err) {
+        console.error("Error KPI rejected proofs:", err);
+        kpi.innerText = "--";
+        badge.innerText = "ERR";
+      }
+    }
+
+    async function pollEmployeeNotifications({ silent = true } = {}) {
+      const uid = String(auth.currentUser?.uid || "").trim();
+      if (!uid) return;
+
+      try {
+        const [reqRes, emergencyRes] = await Promise.all([
+          apiFetch("/api/marketplace/employee/my-requests?limit=120"),
+          apiFetch("/api/marketplace/emergency-calls?limit=120&mode=all")
+        ]);
+        const requests = Array.isArray(reqRes?.data) ? reqRes.data : [];
+        const emergencies = Array.isArray(emergencyRes?.data) ? emergencyRes.data : [];
+
+        processEmployeeNotifications({ requests, emergencies });
+        await loadRejectedProofsKPI({ requests, emergencies });
+
+        if (!silent) {
+          console.debug("[panel-empleado] notification poll updated", {
+            requests: requests.length,
+            emergencies: emergencies.length
+          });
+        }
+      } catch (err) {
+        console.error("Employee notification poll error:", err);
+      }
+    }
+
+    function stopEmployeeNotificationPolling() {
+      if (!EMPLOYEE_NOTIFY_TIMER) return;
+      clearInterval(EMPLOYEE_NOTIFY_TIMER);
+      EMPLOYEE_NOTIFY_TIMER = null;
+    }
+
+    function startEmployeeNotificationPolling() {
+      stopEmployeeNotificationPolling();
+      EMPLOYEE_NOTIFY_TIMER = setInterval(() => {
+        pollEmployeeNotifications({ silent: true }).catch(() => { });
+      }, EMPLOYEE_NOTIFY_POLL_MS);
+    }
+
+    async function renderActivityFirestore() {
+      const box = document.getElementById("activityList");
+
+      box.innerHTML = `
+        <div class="row">
+          <div class="left">
+            <div class="who">Loading...</div>
+            <div class="meta">Fetching requests</div>
+          </div>
+          <div class="right">
+            <div class="status">...</div>
+          </div>
+        </div>
+      `;
+
+      try {
+        const q = query(
+          collection(db, "requests"),
+          where("status", "==", "EN_ESPERA"),
+          orderBy("createdAt", "desc"),
+          limit(6)
+        );
+
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          box.innerHTML = `
+            <div class="row">
+              <div class="left">
+                <div class="who">No activity yet</div>
+                <div class="meta">No client requests</div>
+              </div>
+              <div class="right">
+                <div class="status">--</div>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const rows = [];
+        snap.forEach(docu => {
+          const d = docu.data();
+          const who = safeText(d.clientNickname || d.clientEmail || "Cliente");
+          const date = fmtTs(d.createdAt);
+          const st = safeText((d.status || "EN_ESPERA").toUpperCase());
+          const type = safeText(d.category || "General");
+          const urgRaw = String(d.urgencia || "").toLowerCase();
+          const urgText = safeText((d.urgencia || "").toUpperCase());
+
+          let urgClass = "";
+          if (urgRaw.includes("urg")) urgClass = "urg-urgent";
+          else if (urgRaw.includes("norm")) urgClass = "urg-normal";
+          else if (urgRaw) urgClass = "urg-low";
+
+          rows.push(`
+            <div class="row row-link" style="cursor:pointer" role="button" tabindex="0" data-nav-target="client-requests.html">
+              <div class="left">
+                <div class="who">${who}</div>
+                <div class="meta">${date} | ${type}</div>
+              </div>
+              <div class="right">
+                <div class="amount ${urgClass}">${urgText}</div>
+                <div class="status">${st}</div>
+              </div>
+            </div>
+          `);
+        });
+
+        box.innerHTML = rows.join("");
+
+      } catch (err) {
+        console.error("Activity Firestore error:", err);
+        box.innerHTML = `
+          <div class="row">
+            <div class="left">
+              <div class="who">Firestore error</div>
+              <div class="meta">Check rules / permissions</div>
+            </div>
+            <div class="right">
+              <div class="status">ERR</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function canOpenPro(profile, user = null) {
+      if (canSeeProActions(profile)) return true;
+      const email = String(user?.email || auth.currentUser?.email || "").trim().toLowerCase();
+      return email === "enniotriguerospagos@gmail.com";
+    }
+
+    // NAV real
+    // Navigation
+    function navigateTo(url) {
+      window.location.href = url;
+    }
+
+    function goCreateEstimate() {
+      navigateTo("estimate-form.html");
+    }
+
+    function goEstimateHistory() {
+      navigateTo("estimate-history.html");
+    }
+
+    function goClientRequests() {
+      navigateTo("client-requests.html");
+    }
+
+    function goSchedule() {
+      navigateTo("emergency.html?mode=scheduled");
+    }
+
+    const REACT_PRO_BASE = "builder-react/dist/index.html#";
+    const REACT_PRO_MATERIALS = `${REACT_PRO_BASE}/materials`;
+
+    async function goMaterials() {
+      if (!CURRENT_PROFILE) {
+        CURRENT_PROFILE = await getCurrentUserProfile(auth.currentUser);
+      }
+
+      if (canOpenPro(CURRENT_PROFILE, auth.currentUser)) {
+        navigateTo(REACT_PRO_MATERIALS);
+        return;
+      }
+
+      navigateTo("materials.html");
+    }
+
+    function goEmergency() {
+      navigateTo("emergency.html");
+    }
+
+    async function runPanelAction(action) {
+      switch (String(action || "").trim()) {
+        case "open-profile":
+          await openProfileModal();
+          return;
+        case "create-estimate":
+          goCreateEstimate();
+          return;
+        case "estimate-history":
+          goEstimateHistory();
+          return;
+        case "client-requests":
+          goClientRequests();
+          return;
+        case "schedule":
+          goSchedule();
+          return;
+        case "materials":
+          await goMaterials();
+          return;
+        case "emergency":
+          goEmergency();
+          return;
+        case "request-photo-change":
+          await requestPhotoChange();
+          return;
+        case "start-photo-scan":
+          await startPhotoChangeScan();
+          return;
+        case "close-profile":
+          closeProfileModal();
+          return;
+        case "save-profile":
+          await saveProfile();
+          return;
+        case "close-camera":
+          closeCamera();
+          return;
+        case "capture-photo":
+          capturePhoto();
+          return;
+        case "logout":
+          await logout();
+          return;
+        default:
+          return;
+      }
+    }
+
+    function bindPanelActions() {
+      document.addEventListener("click", (event) => {
+        if (!(event.target instanceof Element)) return;
+
+        const actionElement = event.target.closest("[data-panel-action]");
+        if (actionElement) {
+          event.preventDefault();
+          void runPanelAction(actionElement.getAttribute("data-panel-action"));
+          return;
+        }
+
+        const navElement = event.target.closest("[data-nav-target]");
+        if (!navElement) return;
+
+        event.preventDefault();
+        navigateTo(navElement.getAttribute("data-nav-target") || "");
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (!(event.target instanceof Element)) return;
+        if (event.key !== "Enter" && event.key !== " ") return;
+
+        const navElement = event.target.closest("[data-nav-target]");
+        if (!navElement) return;
+
+        event.preventDefault();
+        navigateTo(navElement.getAttribute("data-nav-target") || "");
+      });
+    }
+
+    // Profile Logic
+    import { apiFetch, uploadImage } from "./assets/js/api.js";
+    import { clearPortalSession, syncPortalSessionFromUser } from "./assets/js/portal-session.js";
+
+    async function syncEmployeeNameFromProfile() {
+      if (!auth.currentUser?.uid) return;
+      try {
+        const res = await apiFetch(`/api/employees/${auth.currentUser.uid}/profile`);
+        if (!res?.success || !res?.data) return;
+        const profileName = String(res.data.name || res.data.displayName || "").trim();
+        if (!profileName) return;
+        localStorage.setItem("employeeName", profileName);
+        setHeader(auth.currentUser);
+      } catch (e) {
+        console.warn("Could not sync employee name from profile", e);
+      }
+    }
+
+    async function openProfileModal() {
+      document.getElementById("profileModal").style.display = "flex";
+      // Fetch current data
+      try {
+        const res = await apiFetch(`/api/employees/${auth.currentUser.uid}/profile`);
+        if (res.success) {
+          const p = res.data;
+          const profileName = String(p.name || p.displayName || "").trim();
+          if (profileName) {
+            localStorage.setItem("employeeName", profileName);
+          }
+          document.getElementById("editName").value = profileName || "";
+          document.getElementById("editAge").value = p.age ?? "";
+          document.getElementById("editAddress").value = p.address || "";
+          const photo = p.profilePhoto || p.photoUrl || p.photoURL || "assets/images/logo.webp";
+          document.getElementById("editPFP").src = photo;
+          setHeader(auth.currentUser);
+        }
+      } catch (e) { console.error("Error fetching profile", e); }
+      await loadPhotoChangeStatus();
+    }
+
+    function closeProfileModal() {
+      document.getElementById("profileModal").style.display = "none";
+    }
+
+    // ===== Photo Change Flow =====
+    let PHOTO_CHANGE_STATUS = "none";
+    let SELFIE_STREAM = null;
+    let SELFIE_BLOB = null;
+    let FACE_TRACKER = null;
+    let COUNTDOWN_TIMER = null;
+    let PHOTO_REQUEST_IN_FLIGHT = false;
+    let PHOTO_SUBMIT_IN_FLIGHT = false;
+
+    function getApiErrorCode(err) {
+      return String(
+        err?.body?.error ||
+        err?.error ||
+        err?.code ||
+        err?.message ||
+        ""
+      ).toLowerCase();
+    }
+
+    function isInvalidStateError(err) {
+      const code = getApiErrorCode(err);
+      return code.includes("invalid_state") || code.includes("invalid state");
+    }
+
+    function setPhotoStatus(text, color = "#9ca3af") {
+      const el = document.getElementById("photoChangeStatus");
+      if (!el) return;
+      el.textContent = text;
+      el.style.color = color;
+    }
+
+    function updatePhotoButtons() {
+      const requestBtn = document.getElementById("requestPhotoBtn");
+      const takeBtn = document.getElementById("takeSelfieBtn");
+      if (!requestBtn || !takeBtn) return;
+
+      if (PHOTO_REQUEST_IN_FLIGHT) {
+        requestBtn.disabled = true;
+        requestBtn.textContent = "Enviando...";
+        takeBtn.disabled = true;
+        return;
+      }
+
+      if (PHOTO_CHANGE_STATUS === "pending") {
+        requestBtn.disabled = true;
+        requestBtn.textContent = "Solicitud pendiente";
+        takeBtn.disabled = true;
+        takeBtn.style.display = "none";
+      } else if (PHOTO_CHANGE_STATUS === "approved") {
+        requestBtn.disabled = true;
+        requestBtn.textContent = "Aprobado";
+        takeBtn.disabled = PHOTO_SUBMIT_IN_FLIGHT;
+        takeBtn.style.display = "inline-flex";
+      } else if (PHOTO_CHANGE_STATUS === "completed") {
+        requestBtn.disabled = false;
+        requestBtn.textContent = "Solicitar nuevo cambio";
+        takeBtn.disabled = true;
+        takeBtn.style.display = "none";
+      } else {
+        requestBtn.disabled = false;
+        requestBtn.textContent = "Solicitar cambio de foto";
+        takeBtn.disabled = true;
+        takeBtn.style.display = "none";
+      }
+    }
+
+    async function loadPhotoChangeStatus() {
+      try {
+        const res = await apiFetch("/api/employees/me/photo-change");
+        if (res.success) {
+          PHOTO_CHANGE_STATUS = res.data.status || "none";
+          if (PHOTO_CHANGE_STATUS === "pending") setPhotoStatus("Esperando aprobacion del jefe", "#fbbf24");
+          else if (PHOTO_CHANGE_STATUS === "approved") setPhotoStatus("Aprobado: ya puedes tomarte la selfie", "#22c55e");
+          else if (PHOTO_CHANGE_STATUS === "rejected") setPhotoStatus("Rechazado: puedes solicitar nuevamente", "#f87171");
+          else if (PHOTO_CHANGE_STATUS === "completed") setPhotoStatus("Cambio completado", "#38bdf8");
+          else setPhotoStatus("Sin solicitud de cambio", "#9ca3af");
+        }
+      } catch (e) {
+        console.error("Error loading photo change status", e);
+      } finally {
+        updatePhotoButtons();
+      }
+    }
+
+    async function requestPhotoChange() {
+      if (PHOTO_REQUEST_IN_FLIGHT) return;
+      PHOTO_REQUEST_IN_FLIGHT = true;
+      updatePhotoButtons();
+      try {
+        await apiFetch("/api/employees/me/photo-change/request", { method: "POST" });
+        await loadPhotoChangeStatus();
+        alert("Solicitud enviada. El jefe debe aprobar el cambio.");
+      } catch (e) {
+        console.error("requestPhotoChange error", e);
+        if (isInvalidStateError(e)) {
+          await loadPhotoChangeStatus();
+          alert("Ya tienes una solicitud activa (pendiente o aprobada). Espera la decision del jefe.");
+        } else {
+          alert(e.message || "No se pudo enviar la solicitud.");
+        }
+      } finally {
+        PHOTO_REQUEST_IN_FLIGHT = false;
+        updatePhotoButtons();
+      }
+    }
+
+    // ===== Selfie Capture (Face Scan) =====
+    (function injectScanStyle() {
+      const style = document.createElement("style");
+      style.innerHTML = `
+      @keyframes scanMove {
+        0% { top: 0; opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+      }
+      .animate-scan { animation: scanMove 2s linear infinite; }
+      `;
+      document.head.appendChild(style);
+    })();
+
+    async function loadFaceModel() {
+      if (!window.faceapi) {
+        throw new Error("Face API no disponible");
+      }
+      if (!window.faceapi.nets.ssdMobilenetv1.params) {
+        const MODEL_URL = "assets/vendor/face-api/models";
+        await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+      }
+    }
+
+    async function startPhotoChangeScan() {
+      if (PHOTO_SUBMIT_IN_FLIGHT) return;
+      if (PHOTO_CHANGE_STATUS !== "approved") {
+        alert("Debes esperar aprobacion del jefe para cambiar la foto.");
+        return;
+      }
+
+      const modal = document.getElementById("cameraModal");
+      const video = document.getElementById("cameraFeed");
+      const status = document.getElementById("scanStatus");
+      const scanLine = document.getElementById("scanLine");
+
+      try {
+        status.textContent = "Cargando motor IA...";
+        modal.style.display = "flex";
+        scanLine.classList.add("animate-scan");
+
+        await loadFaceModel();
+
+        SELFIE_STREAM = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        video.srcObject = SELFIE_STREAM;
+
+        video.onloadedmetadata = () => {
+          video.play();
+          status.textContent = "Buscando rostro...";
+          startFaceTracking(video);
+        };
+      } catch (err) {
+        console.error("Camera error", err);
+        alert("No se pudo abrir la camara.");
+        closeCamera();
+      }
+    }
+
+    function startFaceTracking(videoElement) {
+      const status = document.getElementById("scanStatus");
+      const canvas = document.getElementById("cameraCanvas");
+
+      canvas.style.display = "block";
+      canvas.style.position = "absolute";
+      canvas.style.top = "0";
+      canvas.style.left = "0";
+
+      const displaySize = { width: videoElement.videoWidth, height: videoElement.videoHeight };
+      faceapi.matchDimensions(canvas, displaySize);
+
+      let consecutiveFrames = 0;
+
+      FACE_TRACKER = setInterval(async () => {
+        if (!SELFIE_STREAM || !FACE_TRACKER) return;
+
+        try {
+          const detection = await faceapi.detectSingleFace(videoElement, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }));
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          if (!detection) {
+            status.textContent = "Buscando rostro...";
+            status.style.color = "#22c55e";
+            consecutiveFrames = 0;
+            return;
+          }
+
+          const box = detection.box;
+          ctx.save();
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          ctx.strokeStyle = "#ef4444";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(box.x, box.y, box.width, box.height);
+          ctx.restore();
+
+          const vW = videoElement.videoWidth;
+          const vH = videoElement.videoHeight;
+          const faceCX = box.x + (box.width / 2);
+          const faceCY = box.y + (box.height / 2);
+          const videoCX = vW / 2;
+          const videoCY = vH / 2;
+          const tolX = vW * 0.10;
+          const tolY = vH * 0.12;
+          const isCentered = Math.abs(faceCX - videoCX) < tolX && Math.abs(faceCY - videoCY) < tolY;
+          const isClose = box.width > (vW * 0.15);
+
+          if (isCentered && isClose) {
+            consecutiveFrames++;
+            status.textContent = "Mantenlo ahi...";
+            status.style.color = "#fbbf24";
+
+            if (consecutiveFrames > 5) {
+              clearInterval(FACE_TRACKER);
+              FACE_TRACKER = null;
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              status.textContent = "Capturando...";
+              startCountdown();
+            }
+          } else {
+            consecutiveFrames = 0;
+            status.textContent = isClose ? "Centra tu rostro..." : "Acercate mas...";
+            status.style.color = "#f87171";
+          }
+        } catch (e) {
+          console.error("Detection error", e);
+        }
+      }, 120);
+    }
+
+    function startCountdown() {
+      const cd = document.getElementById("scanCountdown");
+      let count = 3;
+      const run = () => {
+        if (count > 0) {
+          cd.textContent = count;
+          cd.style.opacity = "1";
+          cd.style.transform = "scale(1)";
+          setTimeout(() => { cd.style.transform = "scale(0.8)"; cd.style.opacity = "0.5"; }, 250);
+          count--;
+          COUNTDOWN_TIMER = setTimeout(run, 300);
+        } else {
+          capturePhoto();
+        }
+      };
+      run();
+    }
+
+    function closeCamera() {
+      const modal = document.getElementById("cameraModal");
+      const video = document.getElementById("cameraFeed");
+      const scanLine = document.getElementById("scanLine");
+
+      if (FACE_TRACKER) {
+        clearInterval(FACE_TRACKER);
+        FACE_TRACKER = null;
+      }
+      clearTimeout(COUNTDOWN_TIMER);
+
+      if (SELFIE_STREAM) {
+        SELFIE_STREAM.getTracks().forEach(track => track.stop());
+        SELFIE_STREAM = null;
+      }
+      video.srcObject = null;
+      scanLine.classList.remove("animate-scan");
+      modal.style.display = "none";
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById("cameraFeed");
+      const canvas = document.getElementById("cameraCanvas");
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const ctx = canvas.getContext("2d");
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        SELFIE_BLOB = blob;
+        closeCamera();
+        await submitSelfieChange();
+      }, "image/jpeg", 0.95);
+    }
+
+    async function submitSelfieChange() {
+      if (!SELFIE_BLOB || PHOTO_SUBMIT_IN_FLIGHT) return;
+      PHOTO_SUBMIT_IN_FLIGHT = true;
+      updatePhotoButtons();
+      try {
+        const file = new File([SELFIE_BLOB], "selfie_scan.jpg", { type: "image/jpeg" });
+        const up = await uploadImage(file);
+        const url = up.secure_url || up.url;
+        await apiFetch("/api/employees/me/photo-change/submit", {
+          method: "POST",
+          body: JSON.stringify({ photoUrl: url })
+        });
+        document.getElementById("editPFP").src = url;
+        SELFIE_BLOB = null;
+        await loadPhotoChangeStatus();
+        alert("Foto actualizada correctamente.");
+      } catch (e) {
+        console.error("Submit selfie error", e);
+        if (isInvalidStateError(e)) {
+          await loadPhotoChangeStatus();
+          alert("No se pudo aplicar la foto porque la solicitud ya no esta aprobada. Solicita un nuevo cambio.");
+        } else {
+          alert(e.message || "No se pudo actualizar la foto.");
+        }
+      } finally {
+        PHOTO_SUBMIT_IN_FLIGHT = false;
+        updatePhotoButtons();
+      }
+    }
+
+    async function saveProfile() {
+      const nameRaw = String(document.getElementById("editName").value || "").trim();
+      const ageRaw = String(document.getElementById("editAge").value || "").trim();
+      const ageParsed = ageRaw === "" ? null : Number(ageRaw);
+      if (ageRaw !== "" && (!Number.isInteger(ageParsed) || ageParsed < 0 || ageParsed > 120)) {
+        alert("Ingresa una edad valida (0-120).");
+        return;
+      }
+
+      const body = {
+        name: nameRaw,
+        displayName: nameRaw || null,
+        age: ageParsed,
+        address: document.getElementById("editAddress").value
+      };
+      try {
+        await apiFetch("/api/employees/me", { method: 'PATCH', body: JSON.stringify(body) });
+        if (nameRaw) {
+          localStorage.setItem("employeeName", nameRaw);
+        }
+        alert("Perfil actualizado!");
+        closeProfileModal();
+        setHeader(auth.currentUser);
+      } catch (e) { alert(e.message || "Error al guardar perfil"); }
+    }
+
+    async function logout() {
+      stopEmployeeNotificationPolling();
+      localStorage.removeItem("employeeName");
+      await clearPortalSession({ revoke: true });
+      try { await signOut(auth); } catch (e) { }
+      window.location.href = "login-empleado.html";
+    }
+
+    async function init(user) {
+      CURRENT_PROFILE = await getCurrentUserProfile(user);
+      if (user) {
+        await syncPortalSessionFromUser(user, "employee");
+        initEmployeeNotifier();
+      }
+      setHeader(user);
+      await syncEmployeeNameFromProfile();
+      renderKPIsLocal();
+      await loadPendingRequestsKPI();
+      await renderActivityFirestore();
+      if (user) {
+        await pollEmployeeNotifications({ silent: true });
+        startEmployeeNotificationPolling();
+      }
+    }
+
+    bindPanelActions();
+
+    if (REQUIRE_AUTH) {
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          stopEmployeeNotificationPolling();
+          EMPLOYEE_NOTIFY_PRIMED = false;
+          EMPLOYEE_NOTIFY_STATE = { emergencies: new Map(), requests: new Map() };
+          clearPortalSession({ revoke: true });
+          window.location.href = "login-empleado.html";
+          return;
+        }
+        init(user);
+      });
+    } else {
+      // Sin login (modo prueba)
+      init(null);
+    }
+  </script>
+  <script type="module" src="assets/js/company-branding.js?v=20260228e"></script>
+</body>
+
+</html>
+
+
+

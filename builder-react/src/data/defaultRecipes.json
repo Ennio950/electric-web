@@ -1,0 +1,139 @@
+﻿[
+  {
+    "id": "rcp_area_simple",
+    "name": "Consumo por area",
+    "description": "Usa baseQty en m2 y un consumo por m2.",
+    "type": "BY_AREA",
+    "baseUnit": "m2",
+    "params": [
+      { "id": "consumo", "label": "Consumo por m2", "unit": "unit/m2", "default": 1, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_material_area", "qtyExpr": "baseQty * consumo", "unit": "m2", "rounding": "round", "decimals": 2 }
+    ]
+  },
+  {
+    "id": "rcp_volume_simple",
+    "name": "Consumo por volumen",
+    "description": "Usa baseQty en m3 y un factor por m3.",
+    "type": "BY_VOLUME",
+    "baseUnit": "m3",
+    "params": [
+      { "id": "factor", "label": "Factor por m3", "unit": "unit/m3", "default": 1, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_arena", "qtyExpr": "baseQty * factor", "unit": "m3", "rounding": "round", "decimals": 3 }
+    ]
+  },
+  {
+    "id": "rcp_length_simple",
+    "name": "Consumo por longitud",
+    "description": "Usa baseQty en metros.",
+    "type": "BY_LENGTH",
+    "baseUnit": "m",
+    "params": [
+      { "id": "factor", "label": "Factor por metro", "unit": "unit/m", "default": 1, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_conduit", "qtyExpr": "baseQty * factor", "unit": "m", "rounding": "round", "decimals": 2 }
+    ]
+  },
+  {
+    "id": "rcp_count_simple",
+    "name": "Consumo por cantidad",
+    "description": "Usa baseQty en piezas o unidades.",
+    "type": "BY_COUNT",
+    "baseUnit": "pza",
+    "params": [
+      { "id": "factor", "label": "Factor por pieza", "unit": "unit/pza", "default": 1, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_tornillo", "qtyExpr": "baseQty * factor", "unit": "pza", "rounding": "ceil", "decimals": 0 }
+    ]
+  },
+  {
+    "id": "rcp_time_simple",
+    "name": "Consumo por tiempo",
+    "description": "Usa baseQty en horas.",
+    "type": "BY_TIME",
+    "baseUnit": "h",
+    "params": [
+      { "id": "factor", "label": "Factor por hora", "unit": "unit/h", "default": 1, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_hora_tecnico", "qtyExpr": "baseQty * factor", "unit": "h", "rounding": "round", "decimals": 2 }
+    ]
+  },
+  {
+    "id": "rcp_formula_libre",
+    "name": "Formula personalizada",
+    "description": "Permite una expresion basada en baseQty y parametros.",
+    "type": "BY_FORMULA",
+    "baseUnit": "unit",
+    "params": [
+      { "id": "a", "label": "Parametro A", "unit": "unit", "default": 1, "required": true },
+      { "id": "b", "label": "Parametro B", "unit": "unit", "default": 0, "required": false }
+    ],
+    "outputs": [
+      { "materialId": "mat_adhesivo", "qtyExpr": "baseQty * a + b", "unit": "kg", "rounding": "round", "decimals": 2 }
+    ]
+  },
+  {
+    "id": "rcp_mortero_base",
+    "name": "Mezcla mortero base",
+    "description": "Mezcla general por volumen de mortero.",
+    "type": "BY_VOLUME",
+    "baseUnit": "m3",
+    "params": [
+      { "id": "cementoBolsas", "label": "Bolsas cemento por m3", "unit": "bolsa/m3", "default": 7, "required": true },
+      { "id": "arenaM3", "label": "Arena m3 por m3", "unit": "m3/m3", "default": 0.56, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_cemento", "qtyExpr": "baseQty * cementoBolsas", "unit": "bolsa", "rounding": "ceil", "decimals": 0, "wastePct": 3 },
+      { "materialId": "mat_arena", "qtyExpr": "baseQty * arenaM3", "unit": "m3", "rounding": "round", "decimals": 3, "wastePct": 4 }
+    ]
+  },
+  {
+    "id": "rcp_capa_pintura",
+    "name": "Pintura por capas",
+    "description": "Calcula litros por area y numero de capas.",
+    "type": "BY_AREA",
+    "baseUnit": "m2",
+    "params": [
+      { "id": "capas", "label": "Numero de capas", "unit": "pza", "default": 2, "required": true },
+      { "id": "rendimiento", "label": "Rendimiento m2/l", "unit": "m2/l", "default": 9, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_pintura", "qtyExpr": "(baseQty * capas) / rendimiento", "unit": "l", "rounding": "round", "decimals": 2, "wastePct": 5 }
+    ]
+  },
+  {
+    "id": "rcp_ensamble_general",
+    "name": "Ensamble por pieza",
+    "description": "Para ensambles con tornilleria y adhesivo.",
+    "type": "BY_COUNT",
+    "baseUnit": "pza",
+    "params": [
+      { "id": "tornillosPorPieza", "label": "Tornillos por pieza", "unit": "pza/pza", "default": 8, "required": true },
+      { "id": "adhesivoKgPorPieza", "label": "Adhesivo kg por pieza", "unit": "kg/pza", "default": 0.08, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_tornillo", "qtyExpr": "baseQty * tornillosPorPieza", "unit": "pza", "rounding": "ceil", "decimals": 0, "wastePct": 4 },
+      { "materialId": "mat_adhesivo", "qtyExpr": "baseQty * adhesivoKgPorPieza", "unit": "kg", "rounding": "round", "decimals": 2, "wastePct": 3 }
+    ]
+  },
+  {
+    "id": "rcp_desperdicio_extra",
+    "name": "Recargo por desperdicio",
+    "description": "Aplica un extra configurable sobre baseQty.",
+    "type": "BY_FORMULA",
+    "baseUnit": "unit",
+    "params": [
+      { "id": "pctExtra", "label": "Extra %", "unit": "%", "default": 12, "required": true }
+    ],
+    "outputs": [
+      { "materialId": "mat_block", "qtyExpr": "baseQty * (1 + pctExtra/100)", "unit": "pza", "rounding": "ceil", "decimals": 0 }
+    ]
+  }
+]
+

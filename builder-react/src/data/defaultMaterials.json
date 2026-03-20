@@ -1,0 +1,174 @@
+﻿[
+  {
+    "id": "mat_cemento",
+    "name": "Cemento Portland",
+    "category": "aglomerante",
+    "baseUnit": "bolsa",
+    "unitPrice": 78,
+    "currency": "GTQ",
+    "conversions": [
+      { "from": "bolsa", "to": "kg", "factor": 42 },
+      { "from": "kg", "to": "bolsa", "factor": 0.0238095238 }
+    ]
+  },
+  {
+    "id": "mat_arena",
+    "name": "Arena lavada",
+    "category": "agregado",
+    "baseUnit": "m3",
+    "unitPrice": 190,
+    "currency": "GTQ",
+    "conversions": [
+      { "from": "m3", "to": "ft3", "factor": 35.3147 },
+      { "from": "ft3", "to": "m3", "factor": 0.0283168 }
+    ],
+    "densityKgPerM3": 1600
+  },
+  {
+    "id": "mat_grava",
+    "name": "Grava / Piedrin",
+    "category": "agregado",
+    "baseUnit": "m3",
+    "unitPrice": 215,
+    "currency": "GTQ",
+    "densityKgPerM3": 1500,
+    "conversions": []
+  },
+  {
+    "id": "mat_madera_m3",
+    "name": "Madera estructural",
+    "category": "madera",
+    "baseUnit": "m3",
+    "unitPrice": 2650,
+    "currency": "GTQ",
+    "densityKgPerM3": 700,
+    "conversions": []
+  },
+  {
+    "id": "mat_tornillo",
+    "name": "Tornillo galvanizado",
+    "category": "ferreteria",
+    "baseUnit": "pza",
+    "unitPrice": 0.45,
+    "currency": "GTQ",
+    "conversions": [
+      { "from": "caja", "to": "pza", "factor": 100 },
+      { "from": "pza", "to": "caja", "factor": 0.01 }
+    ]
+  },
+  {
+    "id": "mat_pintura",
+    "name": "Pintura acrilica",
+    "category": "acabado",
+    "baseUnit": "l",
+    "unitPrice": 42,
+    "currency": "GTQ",
+    "conversions": [
+      { "from": "gal", "to": "l", "factor": 3.78541 },
+      { "from": "l", "to": "gal", "factor": 0.264172 }
+    ]
+  },
+  {
+    "id": "mat_varilla",
+    "name": "Varilla corrugada",
+    "category": "acero",
+    "baseUnit": "m",
+    "unitPrice": 18.5,
+    "currency": "GTQ",
+    "conversions": [
+      { "from": "m", "to": "ft", "factor": 3.28084 },
+      { "from": "ft", "to": "m", "factor": 0.3048 }
+    ]
+  },
+  {
+    "id": "mat_block",
+    "name": "Block estandar",
+    "category": "mamposteria",
+    "baseUnit": "pza",
+    "unitPrice": 6,
+    "currency": "GTQ",
+    "conversions": [
+      { "from": "pallet", "to": "pza", "factor": 96 },
+      { "from": "pza", "to": "pallet", "factor": 0.0104166667 }
+    ]
+  },
+  {
+    "id": "mat_conduit",
+    "name": "Conduit PVC",
+    "category": "electrico",
+    "baseUnit": "m",
+    "unitPrice": 9.25,
+    "currency": "GTQ",
+    "conversions": []
+  },
+  {
+    "id": "mat_cable",
+    "name": "Cable THHN",
+    "category": "electrico",
+    "baseUnit": "m",
+    "unitPrice": 7.8,
+    "currency": "GTQ",
+    "conversions": []
+  },
+  {
+    "id": "mat_breaker",
+    "name": "Breaker termico",
+    "category": "electrico",
+    "baseUnit": "pza",
+    "unitPrice": 68,
+    "currency": "GTQ",
+    "conversions": []
+  },
+  {
+    "id": "mat_tuberia",
+    "name": "Tuberia PVC",
+    "category": "hidraulico",
+    "baseUnit": "m",
+    "unitPrice": 13.4,
+    "currency": "GTQ",
+    "conversions": []
+  },
+  {
+    "id": "mat_aditivo",
+    "name": "Aditivo impermeabilizante",
+    "category": "quimico",
+    "baseUnit": "l",
+    "unitPrice": 28,
+    "currency": "GTQ",
+    "conversions": [
+      { "from": "gal", "to": "l", "factor": 3.78541 },
+      { "from": "l", "to": "gal", "factor": 0.264172 }
+    ]
+  },
+  {
+    "id": "mat_adhesivo",
+    "name": "Adhesivo multiuso",
+    "category": "consumible",
+    "baseUnit": "kg",
+    "unitPrice": 24.5,
+    "currency": "GTQ",
+    "conversions": [
+      { "from": "bolsa", "to": "kg", "factor": 20 },
+      { "from": "kg", "to": "bolsa", "factor": 0.05 }
+    ]
+  },
+  {
+    "id": "mat_hora_tecnico",
+    "name": "Hora tecnico",
+    "category": "mano_obra",
+    "baseUnit": "h",
+    "unitPrice": 95,
+    "currency": "GTQ",
+    "conversions": []
+  },
+  {
+    "id": "mat_material_area",
+    "name": "Material por area",
+    "category": "insumo",
+    "baseUnit": "m2",
+    "unitPrice": 12.7,
+    "currency": "GTQ",
+    "conversions": []
+  }
+]
+

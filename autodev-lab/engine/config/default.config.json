@@ -1,0 +1,31 @@
+{
+  "nombreMotor": "AutoDev Lab Engine",
+  "version": "0.1.0",
+  "maximoReintentos": 2,
+  "modoEjecucionDefecto": "SAFE_AUTODEV_BOOTSTRAP_REACT_NATIVE",
+  "rutas": {
+    "logs": "autodev-lab/logs",
+    "reportes": "autodev-lab/reports",
+    "tareas": "autodev-lab/tasks"
+  },
+  "estrategiaMovil": "react-native-expo",
+  "integracionesPlaneadas": [
+    "n8n",
+    "OpenClaw",
+    "Codex",
+    "Claude",
+    "Ollama",
+    "WhatsApp"
+  ],
+  "limites": {
+    "general": {
+      "maxArchivosProductivosPorTarea": 5
+    },
+    "mobile": {
+      "maxArchivosProductivosPorEjecucion": 3
+    },
+    "backend": {
+      "maxArchivosProductivosPorTarea": 2
+    }
+  }
+}

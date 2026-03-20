@@ -1,0 +1,21 @@
+'use strict';
+
+function ok(res, data, status = 200) {
+  return res.status(status).json({ ok: true, data });
+}
+
+function fail(res, status, code, message, details) {
+  const error = { code, message };
+  if (details !== undefined) error.details = details;
+
+  return res.status(status).json({
+    ok: false,
+    error,
+  });
+}
+
+module.exports = {
+  ok,
+  fail,
+};
+

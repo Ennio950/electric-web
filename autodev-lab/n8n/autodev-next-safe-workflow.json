@@ -1,0 +1,85 @@
+{
+  "name": "AutoDev Next Safe Runner",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "ScheduleTrigger_AutoDev",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"Set-Location 'C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia'; node autodev-lab/scripts/run-task.js --next-safe\""
+      },
+      "id": "ExecuteCommand_RunNextSafe",
+      "name": "Run Next Safe",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"Set-Location 'C:\\Users\\ennio\\OneDrive\\Desktop\\electric-web copia'; node autodev-lab/scripts/list-tasks.js\""
+      },
+      "id": "ExecuteCommand_ListTasks",
+      "name": "List Tasks",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        860,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run Next Safe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Next Safe": {
+      "main": [
+        [
+          {
+            "node": "List Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "autodev-next-safe-runner-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

@@ -1,0 +1,28 @@
+{
+  "id": "task-030",
+  "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/mobile.controller.js",
+  "descripcion": "Extraer manejo de errores repetido a una utilidad backend pequeña y reutilizable.",
+  "modulo": "backend",
+  "estado": "pendiente",
+  "reintentos": 0,
+  "modo": "SAFE_AUTODEV_EXECUTABLE_BACKLOG_MOBILE_BACKEND",
+  "areaObjetivo": "backend",
+  "plataformaObjetivo": "node-express",
+  "aplicacionObjetivo": "straight-wire-backend",
+  "creadoEn": "2026-03-15T02:39:24.452Z",
+  "actualizadoEn": "2026-03-15T02:40:46.939Z",
+  "resumenResultado": "Tarea generada y pendiente de orquestacion.",
+  "categoriaFix": "backend-controller-error-utility",
+  "clasificacion": "semiautomatico",
+  "archivosObjetivo": [
+    "straight-wire-backend/src/controllers/mobile.controller.js"
+  ],
+  "requiereRevision": true,
+  "taskKind": "generated",
+  "taskKey": "backend-error:straight-wire-backend/src/controllers/mobile.controller.js",
+  "fixPayload": {
+    "kind": "backend-controller-error-utility",
+    "targetFile": "straight-wire-backend/src/controllers/mobile.controller.js"
+  },
+  "taskPath": "autodev-lab/tasks/generated/task-030.json"
+}

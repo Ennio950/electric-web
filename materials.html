@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materials / Inventory</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    :root {
+      --mat-bg: rgba(8, 13, 28, 0.84);
+      --mat-card: rgba(15, 23, 42, 0.82);
+      --mat-border: rgba(148, 163, 184, 0.32);
+      --mat-text: #f8fafc;
+      --mat-muted: #cbd5e1;
+      --mat-accent: #3b82f6;
+      --mat-danger: #ef4444;
+      --mat-shadow: 0 28px 52px rgba(2, 6, 23, 0.56);
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--mat-text);
+    }
+
+    .mat-page {
+      width: min(1200px, 95%);
+      margin: 22px auto 30px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .mat-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: var(--mat-bg);
+      border: 1px solid var(--mat-border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: var(--mat-shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .mat-topbar h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+
+    .mat-topbar p {
+      margin: 3px 0 0;
+      color: var(--mat-muted);
+      font-size: 0.9rem;
+    }
+
+    .mat-links {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .mat-link {
+      border-radius: 999px;
+      border: 1px solid var(--mat-border);
+      padding: 9px 12px;
+      text-decoration: none;
+      color: var(--mat-text);
+      font-weight: 700;
+      background: rgba(15, 23, 42, 0.72);
+    }
+
+    .mat-link-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-color: rgba(147, 197, 253, 0.55);
+      color: #fff;
+    }
+
+    .mat-grid {
+      display: grid;
+      grid-template-columns: 370px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .mat-card {
+      background: var(--mat-card);
+      border: 1px solid var(--mat-border);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: var(--mat-shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .mat-card h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .mat-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mat-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mat-field label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      color: #dbeafe;
+    }
+
+    .mat-field input,
+    .mat-field textarea,
+    .mat-field select {
+      width: 100%;
+      border: 1px solid var(--mat-border);
+      border-radius: 10px;
+      padding: 10px 11px;
+      color: var(--mat-text);
+      background: rgba(8, 12, 24, 0.72);
+      outline: none;
+    }
+
+    .mat-field textarea {
+      resize: vertical;
+      min-height: 82px;
+    }
+
+    .mat-required {
+      color: #93c5fd;
+    }
+
+    .mat-form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .mat-btn {
+      border: 1px solid var(--mat-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      color: var(--mat-text);
+      background: rgba(15, 23, 42, 0.72);
+      font-weight: 700;
+    }
+
+    .mat-btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-color: rgba(147, 197, 253, 0.55);
+      color: #fff;
+    }
+
+    .mat-btn-danger {
+      border-color: rgba(248, 113, 113, 0.5);
+      color: #fee2e2;
+      background: rgba(127, 29, 29, 0.35);
+    }
+
+    .mat-kpi {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .mat-kpi-box {
+      border: 1px solid var(--mat-border);
+      border-radius: 10px;
+      background: rgba(2, 6, 23, 0.56);
+      padding: 8px 10px;
+    }
+
+    .mat-kpi-label {
+      margin: 0;
+      color: var(--mat-muted);
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .mat-kpi-value {
+      margin: 4px 0 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .mat-table-wrap {
+      border: 1px solid var(--mat-border);
+      border-radius: 12px;
+      overflow: auto;
+      background: rgba(2, 6, 23, 0.38);
+      max-height: 62vh;
+    }
+
+    .mat-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    .mat-table th,
+    .mat-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.84rem;
+    }
+
+    .mat-table th {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.92);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-size: 0.74rem;
+      color: #e2e8f0;
+      z-index: 1;
+    }
+
+    .mat-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .mat-actions {
+      display: inline-flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mat-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-weight: 700;
+      font-size: 0.72rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .mat-status-off {
+      color: #fca5a5;
+      border-color: rgba(248, 113, 113, 0.45);
+      background: rgba(127, 29, 29, 0.3);
+    }
+
+    .mat-empty {
+      margin: 12px 0 0;
+      color: var(--mat-muted);
+      font-size: 0.86rem;
+    }
+
+    .mat-note {
+      margin: 10px 0 0;
+      color: var(--mat-muted);
+      font-size: 0.8rem;
+      line-height: 1.35;
+    }
+
+    .mat-toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin: 0 0 10px;
+    }
+
+    .mat-toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .mat-toolbar input,
+    .mat-toolbar select {
+      border: 1px solid var(--mat-border);
+      border-radius: 10px;
+      padding: 9px 11px;
+      color: var(--mat-text);
+      background: rgba(2, 6, 23, 0.68);
+      min-width: 150px;
+    }
+
+    .mat-toolbar .mat-search {
+      min-width: 220px;
+      flex: 1 1 220px;
+    }
+
+    .mat-view-btn {
+      border: 1px solid var(--mat-border);
+      background: rgba(2, 6, 23, 0.65);
+      color: var(--mat-text);
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mat-view-btn.active {
+      border-color: rgba(59, 130, 246, 0.7);
+      background: rgba(37, 99, 235, 0.25);
+      color: #dbeafe;
+    }
+
+    .mat-result-chip {
+      border-radius: 999px;
+      border: 1px solid var(--mat-border);
+      background: rgba(15, 23, 42, 0.72);
+      color: var(--mat-muted);
+      font-weight: 700;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+    }
+
+    .mat-cards-view {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      max-height: 62vh;
+      overflow: auto;
+      border: 1px solid var(--mat-border);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(2, 6, 23, 0.36);
+    }
+
+    .mat-item-card {
+      border: 1px solid var(--mat-border);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      display: grid;
+      gap: 6px;
+    }
+
+    .mat-item-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .mat-item-name {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .mat-item-meta {
+      margin: 0;
+      color: var(--mat-muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .mat-item-price {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #bfdbfe;
+    }
+
+    .pro-hero {
+      display: none;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      border-radius: 18px;
+      padding: 14px;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(34, 197, 94, 0.18), transparent 55%),
+        radial-gradient(circle at 95% 100%, rgba(56, 189, 248, 0.12), transparent 50%),
+        rgba(7, 16, 36, 0.88);
+      box-shadow: 0 24px 44px rgba(0, 0, 0, 0.4);
+    }
+
+    .pro-hero[data-visible="1"] {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 12px;
+    }
+
+    .pro-pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .pro-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.12);
+      color: #bae6fd;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 10px;
+    }
+
+    .pro-hero-kpis {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .pro-mini {
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 12px;
+      background: rgba(2, 6, 23, 0.6);
+      padding: 10px;
+    }
+
+    .pro-mini .lbl {
+      margin: 0;
+      color: var(--mat-muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    .pro-mini .val {
+      margin: 4px 0 0;
+      font-size: 1.18rem;
+      font-weight: 900;
+      color: #e2e8f0;
+    }
+
+    .pro-studio {
+      display: none;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px;
+    }
+
+    .pro-studio[data-visible="1"] {
+      display: grid;
+    }
+
+    .pro-card {
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(8, 14, 30, 0.86);
+      box-shadow: var(--mat-shadow);
+    }
+
+    .pro-card h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .pro-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .pro-field label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.78rem;
+      color: var(--mat-muted);
+      font-weight: 700;
+    }
+
+    .pro-field input,
+    .pro-field select {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--mat-border);
+      background: rgba(2, 6, 23, 0.7);
+      color: var(--mat-text);
+      padding: 9px 10px;
+    }
+
+    .pro-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .pro-table-wrap {
+      border: 1px solid var(--mat-border);
+      border-radius: 12px;
+      background: rgba(2, 6, 23, 0.45);
+      max-height: 320px;
+      overflow: auto;
+    }
+
+    .pro-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .pro-table th,
+    .pro-table td {
+      font-size: 0.78rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+      padding: 8px 9px;
+      text-align: left;
+    }
+
+    .pro-table th {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.94);
+      color: #dbeafe;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    .pro-total-box {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(20, 83, 45, 0.26);
+    }
+
+    .pro-total-box .lbl {
+      color: #bbf7d0;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .pro-total-box .val {
+      color: #dcfce7;
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .pro-title {
+      margin: 0;
+      font-size: 1.22rem;
+      letter-spacing: 0.02em;
+    }
+
+    .pro-hint {
+      margin: 7px 0 0;
+      color: #d1fae5;
+      line-height: 1.45;
+      font-size: 0.88rem;
+    }
+
+    .pro-total-stack {
+      display: grid;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .pro-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 10px;
+      background: rgba(2, 6, 23, 0.48);
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      color: #dbeafe;
+    }
+
+    .pro-total-row strong {
+      font-size: 0.92rem;
+      color: #f8fafc;
+    }
+
+    .pro-muted {
+      color: var(--mat-muted);
+      text-align: center;
+      font-size: 0.82rem;
+      padding: 10px;
+    }
+
+    .pro-status {
+      margin: 10px 0 0;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: rgba(2, 6, 23, 0.38);
+      color: var(--mat-muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .pro-status[data-tone="ok"] {
+      border-color: rgba(34, 197, 94, 0.45);
+      background: rgba(20, 83, 45, 0.34);
+      color: #dcfce7;
+    }
+
+    .pro-status[data-tone="warn"] {
+      border-color: rgba(250, 204, 21, 0.45);
+      background: rgba(113, 63, 18, 0.28);
+      color: #fef3c7;
+    }
+
+    .pro-status[data-tone="error"] {
+      border-color: rgba(248, 113, 113, 0.48);
+      background: rgba(127, 29, 29, 0.34);
+      color: #fee2e2;
+    }
+
+    .mat-table-wrap[hidden],
+    .mat-cards-view[hidden] {
+      display: none !important;
+    }
+
+    body.pro-mode {
+      background:
+        radial-gradient(circle at 0% 0%, rgba(30, 64, 175, 0.3), transparent 45%),
+        radial-gradient(circle at 100% 100%, rgba(8, 145, 178, 0.28), transparent 44%),
+        linear-gradient(140deg, #020617, #0b1120);
+    }
+
+    body.pro-mode .mat-card {
+      border-color: rgba(56, 189, 248, 0.38);
+      background: linear-gradient(165deg, rgba(10, 19, 40, 0.92), rgba(2, 6, 23, 0.92));
+    }
+
+    @media (max-width: 980px) {
+      .mat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mat-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mat-toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .mat-cards-view {
+        grid-template-columns: 1fr;
+      }
+
+      .pro-hero[data-visible="1"] {
+        grid-template-columns: 1fr;
+      }
+
+      .pro-studio[data-visible="1"] {
+        grid-template-columns: 1fr;
+      }
+
+      .pro-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="mat-page">
+    <header class="mat-topbar">
+      <div>
+        <h1 id="topbarTitle">Materials / Inventory</h1>
+        <p id="topbarSubtitle">Create your material catalog first, then use it directly inside Create Estimate.</p>
+      </div>
+      <div class="mat-links">
+        <a class="mat-link" id="backToPanelLink" href="panel-empleado.html">Back to panel</a>
+        <a class="mat-link mat-link-primary" id="createEstimateLink" href="estimate-form.html">Go to Create Estimate</a>
+      </div>
+    </header>
+
+    <section class="pro-hero" id="proHero" data-visible="0" aria-label="Pro command center">
+      <div>
+        <h2 class="pro-title">Pro Command Center</h2>
+        <p class="pro-hint">Millimetric workspace with reusable templates, exact quantity projection and direct handoff to Create Estimate.</p>
+        <div class="pro-pill-list">
+          <span class="pro-pill">Millimetric projection</span>
+          <span class="pro-pill">Template-based catalog</span>
+          <span class="pro-pill">Generalized workflows</span>
+          <span class="pro-pill">Pro estimate handoff</span>
+        </div>
+      </div>
+      <div class="pro-hero-kpis">
+        <article class="pro-mini">
+          <p class="lbl">Catalog coverage</p>
+          <p class="val" id="proCoverageKpi">0%</p>
+        </article>
+        <article class="pro-mini">
+          <p class="lbl">Active SKUs</p>
+          <p class="val" id="proActiveKpi">0</p>
+        </article>
+        <article class="pro-mini">
+          <p class="lbl">Categories</p>
+          <p class="val" id="proCategoryKpi">0</p>
+        </article>
+        <article class="pro-mini">
+          <p class="lbl">Last projection</p>
+          <p class="val" id="proLastProjectionKpi">$0.00</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="pro-studio" id="proStudio" data-visible="0" aria-label="Pro estimator">
+      <article class="pro-card">
+        <h3>Millimetric estimator (Pro)</h3>
+        <div class="pro-grid">
+          <div class="pro-field">
+            <label for="proProfile">Project profile</label>
+            <select id="proProfile">
+              <option value="residential">Residential service</option>
+              <option value="commercial">Commercial tenant</option>
+              <option value="industrial">Industrial load</option>
+              <option value="mixed">Mixed scope</option>
+            </select>
+          </div>
+          <div class="pro-field">
+            <label for="proTemplatePreset">Template preset</label>
+            <select id="proTemplatePreset">
+              <option value="starter-residential">Starter - Residential</option>
+              <option value="starter-commercial">Starter - Commercial</option>
+              <option value="starter-industrial">Starter - Industrial</option>
+            </select>
+          </div>
+          <div class="pro-field">
+            <label for="proRunLength">Main run length (ft)</label>
+            <input id="proRunLength" type="number" min="1" step="1" value="180" />
+          </div>
+          <div class="pro-field">
+            <label for="proPanelDistance">Panel feed distance (ft)</label>
+            <input id="proPanelDistance" type="number" min="0" step="1" value="45" />
+          </div>
+          <div class="pro-field">
+            <label for="proCircuits">Circuits</label>
+            <input id="proCircuits" type="number" min="1" step="1" value="8" />
+          </div>
+          <div class="pro-field">
+            <label for="proPoints">Devices / points</label>
+            <input id="proPoints" type="number" min="1" step="1" value="24" />
+          </div>
+          <div class="pro-field">
+            <label for="proWastePct">Waste factor (%)</label>
+            <input id="proWastePct" type="number" min="0" step="0.1" value="9" />
+          </div>
+          <div class="pro-field">
+            <label for="proLaborRate">Labor rate ($/hr)</label>
+            <input id="proLaborRate" type="number" min="0" step="0.01" value="68" />
+          </div>
+          <div class="pro-field">
+            <label for="proOverheadPct">Overhead (%)</label>
+            <input id="proOverheadPct" type="number" min="0" step="0.1" value="10" />
+          </div>
+          <div class="pro-field">
+            <label for="proContingencyPct">Contingency (%)</label>
+            <input id="proContingencyPct" type="number" min="0" step="0.1" value="6" />
+          </div>
+        </div>
+        <div class="pro-actions">
+          <button type="button" class="mat-btn mat-btn-primary" id="proGenerateBtn">Generate projection</button>
+          <button type="button" class="mat-btn" id="proApplyPresetBtn">Load profile template</button>
+          <button type="button" class="mat-btn" id="proSendDraftBtn">Send to Create Estimate</button>
+          <button type="button" class="mat-btn" id="proExportCsvBtn">Export CSV</button>
+          <button type="button" class="mat-btn mat-btn-danger" id="proClearBtn">Clear projection</button>
+        </div>
+        <p class="pro-status" id="proStatusMessage" data-tone="neutral">Use your own catalog first, then generate a pro-level projection.</p>
+      </article>
+
+      <article class="pro-card">
+        <h3>Projected bill of materials</h3>
+        <div class="pro-table-wrap">
+          <table class="pro-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Source</th>
+                <th>Qty</th>
+                <th>Unit cost</th>
+                <th>Line total</th>
+              </tr>
+            </thead>
+            <tbody id="proProjectionBody">
+              <tr>
+                <td colspan="5" class="pro-muted">Generate a projection to see a millimetric BoM.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pro-total-stack">
+          <div class="pro-total-row"><span>Materials</span><strong id="proMaterialsCost">$0.00</strong></div>
+          <div class="pro-total-row"><span>Labor</span><strong id="proLaborCost">$0.00</strong></div>
+          <div class="pro-total-row"><span>Overhead</span><strong id="proOverheadCost">$0.00</strong></div>
+          <div class="pro-total-row"><span>Contingency</span><strong id="proContingencyCost">$0.00</strong></div>
+          <div class="pro-total-box">
+            <span class="lbl">Projected total</span>
+            <span class="val" id="proProjectionTotal">$0.00</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mat-grid">
+      <article class="mat-card">
+        <h2 id="formTitle">New material</h2>
+        <form id="materialForm" class="mat-form" novalidate>
+          <div class="mat-field">
+            <label for="matName">Material name <span class="mat-required">*</span></label>
+            <input id="matName" type="text" placeholder="e.g. THHN Copper Wire" required />
+          </div>
+
+          <div class="mat-form-grid">
+            <div class="mat-field">
+              <label for="matCategory">Category</label>
+              <input id="matCategory" type="text" placeholder="Cable / Device / Pipe" />
+            </div>
+            <div class="mat-field">
+              <label for="matUnit">Unit</label>
+              <input id="matUnit" type="text" placeholder="ft, roll, pcs, box" />
+            </div>
+            <div class="mat-field">
+              <label for="matSize">Size / spec</label>
+              <input id="matSize" type="text" placeholder="#12 AWG, 2x4, 1/2 in" />
+            </div>
+            <div class="mat-field">
+              <label for="matCost">Unit price (USD) <span class="mat-required">*</span></label>
+              <input id="matCost" type="number" min="0" step="0.01" value="0" required />
+            </div>
+            <div class="mat-field">
+              <label for="matDefaultQty">Default qty</label>
+              <input id="matDefaultQty" type="number" min="0" step="0.01" value="1" />
+            </div>
+            <div class="mat-field">
+              <label for="matActive">Status</label>
+              <select id="matActive">
+                <option value="active" selected>Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mat-field">
+            <label for="matNotes">Notes</label>
+            <textarea id="matNotes" placeholder="Supplier, brand, technical notes, conversion info..."></textarea>
+          </div>
+
+          <div class="mat-form-actions">
+            <button type="submit" class="mat-btn mat-btn-primary" id="saveMaterialBtn">Save material</button>
+            <button type="button" class="mat-btn" id="clearMaterialBtn">Clear</button>
+            <button type="button" class="mat-btn mat-btn-danger" id="seedMaterialsBtn">Load starter items</button>
+          </div>
+          <p class="mat-note">Tip: these prices are used as default values when adding materials in Create Estimate.</p>
+        </form>
+      </article>
+
+      <article class="mat-card">
+        <div class="mat-kpi">
+          <div class="mat-kpi-box">
+            <p class="mat-kpi-label">Materials</p>
+            <p class="mat-kpi-value" id="kpiCount">0</p>
+          </div>
+          <div class="mat-kpi-box">
+            <p class="mat-kpi-label">Avg unit price</p>
+            <p class="mat-kpi-value" id="kpiAverage">$0.00</p>
+          </div>
+          <div class="mat-kpi-box">
+            <p class="mat-kpi-label">Active</p>
+            <p class="mat-kpi-value" id="kpiActive">0</p>
+          </div>
+        </div>
+
+        <div class="mat-toolbar" aria-label="Catalog filters and view">
+          <div class="mat-toolbar-group">
+            <input id="matSearchInput" class="mat-search" type="text" placeholder="Search by name, notes, size..." />
+            <select id="matCategoryFilter">
+              <option value="">All categories</option>
+            </select>
+            <select id="matStatusFilter">
+              <option value="all">All status</option>
+              <option value="active">Active only</option>
+              <option value="inactive">Inactive only</option>
+            </select>
+            <select id="matSortSelect">
+              <option value="recent">Most recent</option>
+              <option value="name-asc">Name A-Z</option>
+              <option value="name-desc">Name Z-A</option>
+              <option value="price-desc">Price high to low</option>
+              <option value="price-asc">Price low to high</option>
+              <option value="category-asc">Category A-Z</option>
+            </select>
+          </div>
+          <div class="mat-toolbar-group">
+            <span class="mat-result-chip" id="matResultChip">0 shown / 0 total</span>
+            <button type="button" class="mat-view-btn active" id="tableViewBtn">Table</button>
+            <button type="button" class="mat-view-btn" id="cardsViewBtn">Cards</button>
+          </div>
+        </div>
+
+        <div class="mat-table-wrap" id="materialsTableWrap">
+          <table class="mat-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Unit / Size</th>
+                <th>Price</th>
+                <th>Default Qty</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="materialsBody"></tbody>
+          </table>
+        </div>
+        <div class="mat-cards-view" id="materialsCardsView" hidden></div>
+        <p id="materialsEmpty" class="mat-empty">No materials yet. Add your first item from the form.</p>
+      </article>
+    </section>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./assets/js/session.js";
+    import { getCurrentUserProfile, requireProActionsAccess, logProAction } from "./assets/js/pro-actions.js";
+
+    const AUTH_USER = await requireAuth("employee");
+    const URL_PARAMS = new URLSearchParams(window.location.search);
+    const PRO_MODE = URL_PARAMS.get("pro") === "1";
+    const LEGACY_PRO_MODE = URL_PARAMS.get("legacy") === "1";
+
+    if (PRO_MODE && !LEGACY_PRO_MODE) {
+      window.location.replace("host-vanilla/materiales.html");
+      throw new Error("Redirecting to Pro Builder workspace");
+    }
+
+    const CURRENT_PROFILE = await getCurrentUserProfile(AUTH_USER);
+
+    if (PRO_MODE) {
+      const access = await requireProActionsAccess({
+        profile: CURRENT_PROFILE,
+        redirectTo: "panel-empleado.html",
+        showAlert: true
+      });
+      if (!access.allowed) {
+        throw new Error("Unauthorized Pro access");
+      }
+    }
+
+    const STORAGE_KEY = "materialsCatalog";
+    const ESTIMATE_DRAFT_KEY = "estimateDraft";
+    const VIEW_STORAGE_KEY = "materialsViewMode";
+
+    const materialForm = document.getElementById("materialForm");
+    const formTitle = document.getElementById("formTitle");
+    const matName = document.getElementById("matName");
+    const matCategory = document.getElementById("matCategory");
+    const matUnit = document.getElementById("matUnit");
+    const matSize = document.getElementById("matSize");
+    const matCost = document.getElementById("matCost");
+    const matDefaultQty = document.getElementById("matDefaultQty");
+    const matActive = document.getElementById("matActive");
+    const matNotes = document.getElementById("matNotes");
+    const clearMaterialBtn = document.getElementById("clearMaterialBtn");
+    const seedMaterialsBtn = document.getElementById("seedMaterialsBtn");
+    const materialsBody = document.getElementById("materialsBody");
+    const materialsCardsView = document.getElementById("materialsCardsView");
+    const materialsTableWrap = document.getElementById("materialsTableWrap");
+    const materialsEmpty = document.getElementById("materialsEmpty");
+    const topbarTitle = document.getElementById("topbarTitle");
+    const topbarSubtitle = document.getElementById("topbarSubtitle");
+    const backToPanelLink = document.getElementById("backToPanelLink");
+    const createEstimateLink = document.getElementById("createEstimateLink");
+
+    const kpiCount = document.getElementById("kpiCount");
+    const kpiAverage = document.getElementById("kpiAverage");
+    const kpiActive = document.getElementById("kpiActive");
+
+    const matSearchInput = document.getElementById("matSearchInput");
+    const matCategoryFilter = document.getElementById("matCategoryFilter");
+    const matStatusFilter = document.getElementById("matStatusFilter");
+    const matSortSelect = document.getElementById("matSortSelect");
+    const matResultChip = document.getElementById("matResultChip");
+    const tableViewBtn = document.getElementById("tableViewBtn");
+    const cardsViewBtn = document.getElementById("cardsViewBtn");
+
+    const proHero = document.getElementById("proHero");
+    const proStudio = document.getElementById("proStudio");
+    const proCoverageKpi = document.getElementById("proCoverageKpi");
+    const proActiveKpi = document.getElementById("proActiveKpi");
+    const proCategoryKpi = document.getElementById("proCategoryKpi");
+    const proLastProjectionKpi = document.getElementById("proLastProjectionKpi");
+    const proProfile = document.getElementById("proProfile");
+    const proTemplatePreset = document.getElementById("proTemplatePreset");
+    const proRunLength = document.getElementById("proRunLength");
+    const proPanelDistance = document.getElementById("proPanelDistance");
+    const proCircuits = document.getElementById("proCircuits");
+    const proPoints = document.getElementById("proPoints");
+    const proWastePct = document.getElementById("proWastePct");
+    const proLaborRate = document.getElementById("proLaborRate");
+    const proOverheadPct = document.getElementById("proOverheadPct");
+    const proContingencyPct = document.getElementById("proContingencyPct");
+    const proGenerateBtn = document.getElementById("proGenerateBtn");
+    const proApplyPresetBtn = document.getElementById("proApplyPresetBtn");
+    const proSendDraftBtn = document.getElementById("proSendDraftBtn");
+    const proExportCsvBtn = document.getElementById("proExportCsvBtn");
+    const proClearBtn = document.getElementById("proClearBtn");
+    const proStatusMessage = document.getElementById("proStatusMessage");
+    const proProjectionBody = document.getElementById("proProjectionBody");
+    const proMaterialsCost = document.getElementById("proMaterialsCost");
+    const proLaborCost = document.getElementById("proLaborCost");
+    const proOverheadCost = document.getElementById("proOverheadCost");
+    const proContingencyCost = document.getElementById("proContingencyCost");
+    const proProjectionTotal = document.getElementById("proProjectionTotal");
+
+    const PRESET_LIBRARY = {
+      "starter-residential": [
+        { name: "THHN Copper Wire", category: "Cable", unit: "ft", size: "#12 AWG", cost: 0.42, defaultQty: 250, notes: "Residential branch circuits", active: true },
+        { name: "PVC Conduit", category: "Conduit", unit: "ft", size: "1/2 in", cost: 0.95, defaultQty: 140, notes: "Wall and attic routing", active: true },
+        { name: "GFCI Outlet", category: "Device", unit: "pcs", size: "15A", cost: 18.75, defaultQty: 8, notes: "Kitchen / wet area", active: true },
+        { name: "Single Pole Switch", category: "Device", unit: "pcs", size: "15A", cost: 3.9, defaultQty: 10, notes: "", active: true },
+        { name: "Breaker", category: "Panel", unit: "pcs", size: "20A Single Pole", cost: 12.5, defaultQty: 6, notes: "", active: true },
+        { name: "Junction Box", category: "Box", unit: "pcs", size: "4 in", cost: 2.6, defaultQty: 12, notes: "", active: true }
+      ],
+      "starter-commercial": [
+        { name: "THHN Copper Wire", category: "Cable", unit: "ft", size: "#10 AWG", cost: 0.69, defaultQty: 420, notes: "Commercial load circuits", active: true },
+        { name: "EMT Conduit", category: "Conduit", unit: "ft", size: "3/4 in", cost: 1.45, defaultQty: 260, notes: "Interior runs", active: true },
+        { name: "2-Pole Breaker", category: "Panel", unit: "pcs", size: "30A", cost: 24.8, defaultQty: 6, notes: "", active: true },
+        { name: "Commercial Receptacle", category: "Device", unit: "pcs", size: "20A", cost: 9.8, defaultQty: 20, notes: "", active: true },
+        { name: "MC Cable Connector", category: "Connector", unit: "pcs", size: "3/4 in", cost: 1.2, defaultQty: 40, notes: "", active: true },
+        { name: "Pull Box", category: "Box", unit: "pcs", size: "8x8", cost: 14.5, defaultQty: 6, notes: "", active: true }
+      ],
+      "starter-industrial": [
+        { name: "THHN Copper Wire", category: "Cable", unit: "ft", size: "#8 AWG", cost: 1.15, defaultQty: 520, notes: "High load branch circuits", active: true },
+        { name: "Rigid Conduit", category: "Conduit", unit: "ft", size: "1 in", cost: 3.8, defaultQty: 180, notes: "Industrial protection", active: true },
+        { name: "Industrial Breaker", category: "Panel", unit: "pcs", size: "40A", cost: 46.0, defaultQty: 8, notes: "", active: true },
+        { name: "Industrial Disconnect", category: "Switchgear", unit: "pcs", size: "60A", cost: 110.0, defaultQty: 3, notes: "", active: true },
+        { name: "Control Box", category: "Box", unit: "pcs", size: "NEMA", cost: 42.0, defaultQty: 6, notes: "", active: true },
+        { name: "Cable Tray Support", category: "Support", unit: "pcs", size: "Heavy duty", cost: 8.5, defaultQty: 35, notes: "", active: true }
+      ]
+    };
+
+    let editingId = "";
+    let materials = [];
+    let projectionState = null;
+    let currentView = "table";
+
+    try {
+      const savedView = String(localStorage.getItem(VIEW_STORAGE_KEY) || "").toLowerCase();
+      currentView = savedView === "cards" ? "cards" : "table";
+    } catch (_) {
+      currentView = "table";
+    }
+
+    if (PRO_MODE) {
+      document.body.classList.add("pro-mode");
+      if (topbarTitle) topbarTitle.textContent = "Materials / Inventory (Pro)";
+      if (topbarSubtitle) topbarSubtitle.textContent = "Build pro templates first, run millimetric projection, then continue to estimate generation.";
+      if (backToPanelLink) backToPanelLink.href = "panel-empleado.html";
+      if (createEstimateLink) createEstimateLink.href = "estimate-form.html?pro=1";
+      if (proHero) proHero.dataset.visible = "1";
+      if (proStudio) proStudio.dataset.visible = "1";
+      await logProAction("OPEN_PRO_ESTIMATOR", {
+        source: "materials.html",
+        route: window.location.pathname || "",
+        destination: "estimate-form.html?pro=1"
+      });
+    }
+
+    function parseJson(raw, fallback) {
+      try {
+        const value = JSON.parse(raw);
+        return value == null ? fallback : value;
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    function normalizeText(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function money(value) {
+      const num = Number(value || 0);
+      return `$${num.toFixed(2)}`;
+    }
+
+    function toNonNegative(value, fallback = 0) {
+      const num = Number(value);
+      return Number.isFinite(num) && num >= 0 ? num : fallback;
+    }
+
+    function numberFromInput(input, fallback = 0, min = 0) {
+      const value = toNonNegative(input?.value, fallback);
+      return value < min ? min : value;
+    }
+
+    function createId() {
+      return `MAT-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    }
+
+    function getMaterialTimestamp(item) {
+      const match = String(item?.id || "").match(/^MAT-(\d+)/);
+      if (!match) return 0;
+      return Number(match[1]) || 0;
+    }
+
+    function materialKey(item) {
+      return [
+        normalizeText(item?.name),
+        normalizeText(item?.size),
+        normalizeText(item?.unit)
+      ].join("::");
+    }
+
+    function readMaterials() {
+      const parsed = parseJson(localStorage.getItem(STORAGE_KEY), []);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((item) => normalizeMaterial(item)).filter(Boolean);
+    }
+
+    function saveMaterials(nextMaterials) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(nextMaterials));
+      } catch (_) {
+        alert("Unable to save materials in local storage.");
+      }
+    }
+
+    function normalizeMaterial(item) {
+      if (!item || typeof item !== "object") return null;
+      const id = String(item.id || "").trim();
+      const name = String(item.name || "").trim();
+      if (!id || !name) return null;
+      return {
+        id,
+        name,
+        category: String(item.category || "").trim(),
+        unit: String(item.unit || "").trim(),
+        size: String(item.size || "").trim(),
+        cost: toNonNegative(item.cost, 0),
+        defaultQty: toNonNegative(item.defaultQty, 1),
+        notes: String(item.notes || "").trim(),
+        active: item.active !== false
+      };
+    }
+
+    function setProStatus(message, tone = "neutral") {
+      if (!proStatusMessage) return;
+      proStatusMessage.textContent = message;
+      proStatusMessage.dataset.tone = tone;
+    }
+
+    function setViewMode(mode) {
+      currentView = mode === "cards" ? "cards" : "table";
+      if (materialsTableWrap) materialsTableWrap.hidden = currentView !== "table";
+      if (materialsCardsView) materialsCardsView.hidden = currentView !== "cards";
+      if (tableViewBtn) tableViewBtn.classList.toggle("active", currentView === "table");
+      if (cardsViewBtn) cardsViewBtn.classList.toggle("active", currentView === "cards");
+      try {
+        localStorage.setItem(VIEW_STORAGE_KEY, currentView);
+      } catch (_) {
+        // Ignore storage restrictions
+      }
+    }
+
+    function resetForm() {
+      editingId = "";
+      formTitle.textContent = "New material";
+      materialForm.reset();
+      matCost.value = "0";
+      matDefaultQty.value = "1";
+      matActive.value = "active";
+      matName.focus();
+    }
+
+    function fillForm(item) {
+      editingId = item.id;
+      formTitle.textContent = `Edit material - ${item.name}`;
+      matName.value = item.name;
+      matCategory.value = item.category;
+      matUnit.value = item.unit;
+      matSize.value = item.size;
+      matCost.value = item.cost;
+      matDefaultQty.value = item.defaultQty;
+      matActive.value = item.active ? "active" : "inactive";
+      matNotes.value = item.notes;
+      matName.focus();
+    }
+
+    function buildMaterialFromForm() {
+      const name = String(matName.value || "").trim();
+      if (!name) {
+        throw new Error("Material name is required.");
+      }
+
+      const cost = toNonNegative(matCost.value, -1);
+      if (cost < 0) {
+        throw new Error("Unit price must be zero or greater.");
+      }
+
+      return {
+        id: editingId || createId(),
+        name,
+        category: String(matCategory.value || "").trim(),
+        unit: String(matUnit.value || "").trim(),
+        size: String(matSize.value || "").trim(),
+        cost,
+        defaultQty: toNonNegative(matDefaultQty.value, 1),
+        notes: String(matNotes.value || "").trim(),
+        active: matActive.value !== "inactive"
+      };
+    }
+
+    function renderKpis() {
+      const count = materials.length;
+      const activeCount = materials.filter((item) => item.active).length;
+      const avg = count
+        ? materials.reduce((sum, item) => sum + Number(item.cost || 0), 0) / count
+        : 0;
+
+      kpiCount.textContent = String(count);
+      kpiAverage.textContent = money(avg);
+      kpiActive.textContent = String(activeCount);
+    }
+
+    function renderProHeroKpis() {
+      if (!PRO_MODE) return;
+
+      const activeCount = materials.filter((item) => item.active).length;
+      const pricedActive = materials.filter((item) => item.active && Number(item.cost || 0) > 0).length;
+      const categories = new Set(
+        materials.map((item) => normalizeText(item.category)).filter(Boolean)
+      );
+      const coverage = activeCount ? Math.round((pricedActive / activeCount) * 100) : 0;
+
+      if (proCoverageKpi) proCoverageKpi.textContent = `${coverage}%`;
+      if (proActiveKpi) proActiveKpi.textContent = String(activeCount);
+      if (proCategoryKpi) proCategoryKpi.textContent = String(categories.size);
+      if (proLastProjectionKpi) {
+        proLastProjectionKpi.textContent = projectionState ? money(projectionState.summary.total) : "$0.00";
+      }
+    }
+
+    function createStatusTag(isActive) {
+      if (isActive) return '<span class="mat-status">Active</span>';
+      return '<span class="mat-status mat-status-off">Inactive</span>';
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function renderCategoryFilterOptions() {
+      const categories = [...new Set(
+        materials
+          .map((item) => String(item.category || "").trim())
+          .filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b));
+
+      const selected = String(matCategoryFilter?.value || "");
+      if (!matCategoryFilter) return;
+
+      matCategoryFilter.innerHTML = "";
+      const allOption = document.createElement("option");
+      allOption.value = "";
+      allOption.textContent = "All categories";
+      matCategoryFilter.appendChild(allOption);
+
+      categories.forEach((category) => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        matCategoryFilter.appendChild(option);
+      });
+
+      if (categories.includes(selected)) {
+        matCategoryFilter.value = selected;
+      } else {
+        matCategoryFilter.value = "";
+      }
+    }
+
+    function getFilteredMaterials() {
+      const searchQuery = normalizeText(matSearchInput?.value);
+      const categoryQuery = normalizeText(matCategoryFilter?.value);
+      const status = String(matStatusFilter?.value || "all").toLowerCase();
+      const sortBy = String(matSortSelect?.value || "recent").toLowerCase();
+
+      let list = [...materials];
+
+      if (searchQuery) {
+        list = list.filter((item) => {
+          const haystack = [
+            item.name,
+            item.category,
+            item.unit,
+            item.size,
+            item.notes
+          ].join(" ").toLowerCase();
+          return haystack.includes(searchQuery);
+        });
+      }
+
+      if (categoryQuery) {
+        list = list.filter((item) => normalizeText(item.category) === categoryQuery);
+      }
+
+      if (status === "active") list = list.filter((item) => item.active);
+      if (status === "inactive") list = list.filter((item) => !item.active);
+
+      if (sortBy === "name-asc") {
+        list.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (sortBy === "name-desc") {
+        list.sort((a, b) => b.name.localeCompare(a.name));
+      } else if (sortBy === "price-desc") {
+        list.sort((a, b) => Number(b.cost || 0) - Number(a.cost || 0));
+      } else if (sortBy === "price-asc") {
+        list.sort((a, b) => Number(a.cost || 0) - Number(b.cost || 0));
+      } else if (sortBy === "category-asc") {
+        list.sort((a, b) => {
+          const catDiff = String(a.category || "").localeCompare(String(b.category || ""));
+          if (catDiff !== 0) return catDiff;
+          return a.name.localeCompare(b.name);
+        });
+      } else {
+        list.sort((a, b) => getMaterialTimestamp(b) - getMaterialTimestamp(a));
+      }
+
+      return list;
+    }
+
+    function renderCatalog() {
+      renderKpis();
+      const filteredMaterials = getFilteredMaterials();
+
+      if (matResultChip) {
+        matResultChip.textContent = `${filteredMaterials.length} shown / ${materials.length} total`;
+      }
+
+      if (!materials.length) {
+        materialsBody.innerHTML = "";
+        if (materialsCardsView) materialsCardsView.innerHTML = "";
+        materialsEmpty.style.display = "block";
+        materialsEmpty.textContent = "No materials yet. Add your first item from the form.";
+        return;
+      }
+
+      if (!filteredMaterials.length) {
+        materialsBody.innerHTML = "";
+        if (materialsCardsView) {
+          materialsCardsView.innerHTML = `
+            <article class="mat-item-card">
+              <p class="mat-item-name">No results for current filters</p>
+              <p class="mat-item-meta">Try a different search, status or category filter.</p>
+            </article>
+          `;
+        }
+        materialsEmpty.style.display = "block";
+        materialsEmpty.textContent = "No materials match current filters.";
+        return;
+      }
+
+      materialsEmpty.style.display = "none";
+
+      const rows = filteredMaterials.map((item) => {
+        const details = [item.unit, item.size].filter(Boolean).join(" / ") || "-";
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(item.name)}</strong>
+              ${item.notes ? `<div style="color:#cbd5e1; margin-top:3px;">${escapeHtml(item.notes)}</div>` : ""}
+            </td>
+            <td>${escapeHtml(item.category || "-")}</td>
+            <td>${escapeHtml(details)}</td>
+            <td>${money(item.cost)}</td>
+            <td>${Number(item.defaultQty || 0).toFixed(2)}</td>
+            <td>${createStatusTag(item.active)}</td>
+            <td>
+              <div class="mat-actions">
+                <button type="button" class="mat-btn" data-edit="${item.id}">Edit</button>
+                <button type="button" class="mat-btn mat-btn-danger" data-delete="${item.id}">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      const cards = filteredMaterials.map((item) => {
+        const details = [item.unit, item.size].filter(Boolean).join(" / ") || "-";
+        return `
+          <article class="mat-item-card">
+            <div class="mat-item-head">
+              <div>
+                <p class="mat-item-name">${escapeHtml(item.name)}</p>
+                <p class="mat-item-meta">${escapeHtml(item.category || "General")} | ${escapeHtml(details)}</p>
+              </div>
+              <div class="mat-item-price">${money(item.cost)}</div>
+            </div>
+            <p class="mat-item-meta">Default qty: ${Number(item.defaultQty || 0).toFixed(2)} | ${item.active ? "Active" : "Inactive"}</p>
+            ${item.notes ? `<p class="mat-item-meta">${escapeHtml(item.notes)}</p>` : ""}
+            <div class="mat-actions">
+              <button type="button" class="mat-btn" data-edit="${item.id}">Edit</button>
+              <button type="button" class="mat-btn mat-btn-danger" data-delete="${item.id}">Delete</button>
+            </div>
+          </article>
+        `;
+      });
+
+      materialsBody.innerHTML = rows.join("");
+      if (materialsCardsView) materialsCardsView.innerHTML = cards.join("");
+    }
+
+    function refresh() {
+      materials = readMaterials();
+      renderCategoryFilterOptions();
+      renderCatalog();
+      renderProHeroKpis();
+    }
+
+    function upsertMaterial(nextMaterial) {
+      const index = materials.findIndex((item) => item.id === nextMaterial.id);
+      if (index === -1) materials.unshift(nextMaterial);
+      else materials[index] = nextMaterial;
+      saveMaterials(materials);
+      refresh();
+      resetForm();
+    }
+
+    function deleteMaterial(id) {
+      const target = materials.find((item) => item.id === id);
+      if (!target) return;
+      const ok = window.confirm(`Delete "${target.name}" from catalog?`);
+      if (!ok) return;
+
+      materials = materials.filter((item) => item.id !== id);
+      saveMaterials(materials);
+      refresh();
+      if (editingId === id) resetForm();
+    }
+
+    function loadStarterItems() {
+      const starter = [
+        { id: createId(), name: "THHN Copper Wire", category: "Cable", unit: "ft", size: "#12 AWG", cost: 0.42, defaultQty: 120, notes: "Standard branch circuit", active: true },
+        { id: createId(), name: "PVC Conduit", category: "Conduit", unit: "ft", size: "1/2 in", cost: 0.95, defaultQty: 40, notes: "", active: true },
+        { id: createId(), name: "Breaker", category: "Panel", unit: "pcs", size: "20A Single Pole", cost: 12.5, defaultQty: 1, notes: "", active: true },
+        { id: createId(), name: "GFCI Outlet", category: "Device", unit: "pcs", size: "15A", cost: 18.75, defaultQty: 1, notes: "", active: true }
+      ];
+      saveMaterials(starter);
+      refresh();
+      resetForm();
+    }
+
+    function findMaterialCandidate(keywordList, categoryList = []) {
+      const activeCatalog = materials.filter((item) => item.active);
+      if (!activeCatalog.length) return null;
+
+      const normalizedKeywords = keywordList.map((keyword) => normalizeText(keyword)).filter(Boolean);
+      const normalizedCategories = categoryList.map((category) => normalizeText(category)).filter(Boolean);
+
+      for (const material of activeCatalog) {
+        const haystack = [material.name, material.category, material.size, material.notes].join(" ").toLowerCase();
+        if (normalizedKeywords.some((keyword) => haystack.includes(keyword))) return material;
+      }
+
+      for (const material of activeCatalog) {
+        const category = normalizeText(material.category);
+        if (normalizedCategories.some((candidate) => category.includes(candidate))) return material;
+      }
+
+      return null;
+    }
+
+    function buildProjectionRows(settings) {
+      const profileFactorMap = {
+        residential: 1,
+        commercial: 1.26,
+        industrial: 1.48,
+        mixed: 1.15
+      };
+      const factor = profileFactorMap[settings.profile] || 1;
+      const wasteFactor = 1 + (settings.wastePct / 100);
+
+      const baseRows = [
+        {
+          fallbackName: "THHN Copper Wire",
+          unit: "ft",
+          fallbackCost: 0.42,
+          qty: (settings.runLength * (settings.circuits + 1.2) + settings.panelDistance * 1.8) * factor * wasteFactor,
+          keywords: ["thhn", "wire", "copper"],
+          categories: ["cable", "wire"]
+        },
+        {
+          fallbackName: "PVC / EMT Conduit",
+          unit: "ft",
+          fallbackCost: 1.1,
+          qty: (settings.runLength * 0.86 + settings.panelDistance) * factor * wasteFactor,
+          keywords: ["conduit", "emt", "pvc"],
+          categories: ["conduit", "pipe"]
+        },
+        {
+          fallbackName: "Junction / Device Box",
+          unit: "pcs",
+          fallbackCost: 2.6,
+          qty: (settings.points * 1.08) * factor,
+          keywords: ["box", "junction", "device box", "pull box"],
+          categories: ["box"]
+        },
+        {
+          fallbackName: "Receptacles",
+          unit: "pcs",
+          fallbackCost: 4.5,
+          qty: (settings.points * 0.58) * factor,
+          keywords: ["outlet", "receptacle", "gfci"],
+          categories: ["device"]
+        },
+        {
+          fallbackName: "Switches",
+          unit: "pcs",
+          fallbackCost: 3.9,
+          qty: (settings.points * 0.42) * factor,
+          keywords: ["switch", "toggle", "dimmer"],
+          categories: ["device", "switchgear"]
+        },
+        {
+          fallbackName: "Breakers",
+          unit: "pcs",
+          fallbackCost: 14.0,
+          qty: Math.max(1, settings.circuits * 1.04),
+          keywords: ["breaker"],
+          categories: ["panel", "switchgear"]
+        },
+        {
+          fallbackName: "Panel accessories",
+          unit: "lot",
+          fallbackCost: 45.0,
+          qty: Math.max(1, Math.ceil(settings.circuits / 5)),
+          keywords: ["panel", "bus", "terminal", "disconnect"],
+          categories: ["panel", "switchgear", "connector"]
+        }
+      ];
+
+      return baseRows.map((row) => {
+        const matched = findMaterialCandidate(row.keywords, row.categories);
+        const qty = Number((Math.max(0.01, row.qty)).toFixed(2));
+        const unitCost = Number((matched ? matched.cost : row.fallbackCost).toFixed(2));
+        return {
+          materialId: matched?.id || "",
+          name: matched?.name || row.fallbackName,
+          unit: matched?.unit || row.unit,
+          qty,
+          unitCost,
+          total: Number((qty * unitCost).toFixed(2)),
+          source: matched ? "Catalog" : "Fallback"
+        };
+      });
+    }
+
+    function readProjectionSettings() {
+      return {
+        profile: String(proProfile?.value || "residential").toLowerCase(),
+        runLength: numberFromInput(proRunLength, 180, 1),
+        panelDistance: numberFromInput(proPanelDistance, 45, 0),
+        circuits: Math.max(1, Math.round(numberFromInput(proCircuits, 8, 1))),
+        points: Math.max(1, Math.round(numberFromInput(proPoints, 24, 1))),
+        wastePct: numberFromInput(proWastePct, 9, 0),
+        laborRate: numberFromInput(proLaborRate, 68, 0),
+        overheadPct: numberFromInput(proOverheadPct, 10, 0),
+        contingencyPct: numberFromInput(proContingencyPct, 6, 0)
+      };
+    }
+
+    function buildProjection() {
+      const settings = readProjectionSettings();
+      const rows = buildProjectionRows(settings);
+      const materialsCost = rows.reduce((sum, row) => sum + Number(row.total || 0), 0);
+      const profileFactor = settings.profile === "industrial" ? 1.4 : settings.profile === "commercial" ? 1.2 : settings.profile === "mixed" ? 1.12 : 1;
+      const laborHours = Number(((settings.points * 0.32 + settings.circuits * 1.4 + settings.runLength / 34 + settings.panelDistance / 28) * profileFactor).toFixed(2));
+      const laborCostValue = Number((laborHours * settings.laborRate).toFixed(2));
+      const overheadCostValue = Number(((materialsCost + laborCostValue) * (settings.overheadPct / 100)).toFixed(2));
+      const contingencyCostValue = Number(((materialsCost + laborCostValue + overheadCostValue) * (settings.contingencyPct / 100)).toFixed(2));
+      const total = Number((materialsCost + laborCostValue + overheadCostValue + contingencyCostValue).toFixed(2));
+      const fallbackCount = rows.filter((row) => row.source === "Fallback").length;
+
+      return {
+        settings,
+        rows,
+        summary: {
+          materialsCost,
+          laborHours,
+          laborCost: laborCostValue,
+          overheadCost: overheadCostValue,
+          contingencyCost: contingencyCostValue,
+          total,
+          fallbackCount
+        }
+      };
+    }
+
+    function renderProjection() {
+      if (!proProjectionBody || !projectionState) {
+        if (proProjectionBody) {
+          proProjectionBody.innerHTML = `<tr><td colspan="5" class="pro-muted">Generate a projection to see a millimetric BoM.</td></tr>`;
+        }
+        if (proMaterialsCost) proMaterialsCost.textContent = "$0.00";
+        if (proLaborCost) proLaborCost.textContent = "$0.00";
+        if (proOverheadCost) proOverheadCost.textContent = "$0.00";
+        if (proContingencyCost) proContingencyCost.textContent = "$0.00";
+        if (proProjectionTotal) proProjectionTotal.textContent = "$0.00";
+        renderProHeroKpis();
+        return;
+      }
+
+      const rows = projectionState.rows.map((row) => `
+        <tr>
+          <td>${escapeHtml(row.name)}${row.unit ? ` <small style="color:#94a3b8;">(${escapeHtml(row.unit)})</small>` : ""}</td>
+          <td>${escapeHtml(row.source)}</td>
+          <td>${Number(row.qty || 0).toFixed(2)}</td>
+          <td>${money(row.unitCost)}</td>
+          <td>${money(row.total)}</td>
+        </tr>
+      `);
+
+      proProjectionBody.innerHTML = rows.join("");
+      proMaterialsCost.textContent = money(projectionState.summary.materialsCost);
+      proLaborCost.textContent = `${money(projectionState.summary.laborCost)} (${projectionState.summary.laborHours.toFixed(2)} h)`;
+      proOverheadCost.textContent = money(projectionState.summary.overheadCost);
+      proContingencyCost.textContent = money(projectionState.summary.contingencyCost);
+      proProjectionTotal.textContent = money(projectionState.summary.total);
+
+      const fallbackCount = projectionState.summary.fallbackCount;
+      if (fallbackCount > 0) {
+        setProStatus(`Projection ready. ${fallbackCount} line(s) used fallback pricing because no matching active material was found.`, "warn");
+      } else {
+        setProStatus("Projection ready. All lines mapped directly from your active catalog.", "ok");
+      }
+      renderProHeroKpis();
+    }
+
+    function ensureProjection() {
+      if (!projectionState) {
+        projectionState = buildProjection();
+        renderProjection();
+      }
+      return projectionState;
+    }
+
+    async function applyPresetTemplate() {
+      const presetKey = String(proTemplatePreset?.value || "");
+      const preset = PRESET_LIBRARY[presetKey];
+      if (!Array.isArray(preset) || !preset.length) {
+        setProStatus("Preset template not found.", "error");
+        return;
+      }
+
+      const catalog = readMaterials();
+      const keyMap = new Map(catalog.map((item) => [materialKey(item), item.id]));
+      let addedCount = 0;
+
+      preset.forEach((item) => {
+        const next = normalizeMaterial({
+          ...item,
+          id: createId()
+        });
+        if (!next) return;
+        const key = materialKey(next);
+        if (keyMap.has(key)) return;
+        catalog.unshift(next);
+        keyMap.set(key, next.id);
+        addedCount += 1;
+      });
+
+      saveMaterials(catalog);
+      refresh();
+
+      if (addedCount > 0) {
+        setProStatus(`${addedCount} materials from "${presetKey}" were added to your catalog.`, "ok");
+      } else {
+        setProStatus(`All "${presetKey}" items already exist in your catalog.`, "warn");
+      }
+
+      if (PRO_MODE) {
+        await logProAction("SAVE_TEMPLATE", {
+          source: "materials.html",
+          templateId: presetKey,
+          templateName: presetKey,
+          addedCount
+        });
+      }
+    }
+
+    async function sendProjectionToEstimate() {
+      const projection = ensureProjection();
+      if (!projection) {
+        setProStatus("Projection is empty. Generate it first.", "error");
+        return;
+      }
+
+      const draftItems = projection.rows.map((row) => ({
+        desc: [row.name, row.unit].filter(Boolean).join(" / "),
+        type: "material",
+        qty: Number(row.qty.toFixed(2)),
+        price: Number(row.unitCost.toFixed(2))
+      }));
+
+      if (projection.summary.laborHours > 0) {
+        draftItems.push({
+          desc: `Labor (${projection.summary.laborHours.toFixed(2)} h @ ${money(projection.settings.laborRate)}/h)`,
+          type: "service",
+          qty: Number(projection.summary.laborHours.toFixed(2)),
+          price: Number(projection.settings.laborRate.toFixed(2))
+        });
+      }
+
+      if (projection.summary.overheadCost > 0) {
+        draftItems.push({
+          desc: `Project overhead (${projection.settings.overheadPct.toFixed(1)}%)`,
+          type: "service",
+          qty: 1,
+          price: Number(projection.summary.overheadCost.toFixed(2))
+        });
+      }
+
+      if (projection.summary.contingencyCost > 0) {
+        draftItems.push({
+          desc: `Contingency reserve (${projection.settings.contingencyPct.toFixed(1)}%)`,
+          type: "service",
+          qty: 1,
+          price: Number(projection.summary.contingencyCost.toFixed(2))
+        });
+      }
+
+      const draft = {
+        client: "",
+        phone: "",
+        email: "",
+        billingAddress: "",
+        serviceAddress: "",
+        tax: 0,
+        items: draftItems
+      };
+
+      localStorage.setItem(ESTIMATE_DRAFT_KEY, JSON.stringify(draft));
+
+      if (PRO_MODE) {
+        await logProAction("GENERATE_ESTIMATE", {
+          source: "materials.html",
+          route: window.location.pathname || "",
+          itemsCount: draftItems.length,
+          total: projection.summary.total,
+          profile: projection.settings.profile
+        });
+      }
+
+      window.location.href = "estimate-form.html?pro=1";
+    }
+
+    async function exportProjectionCsv() {
+      const projection = ensureProjection();
+      if (!projection) {
+        setProStatus("Projection is empty. Generate it first.", "error");
+        return;
+      }
+
+      const csvRows = [
+        ["Item", "Source", "Unit", "Qty", "Unit Cost", "Line Total"],
+        ...projection.rows.map((row) => [
+          row.name,
+          row.source,
+          row.unit || "",
+          row.qty.toFixed(2),
+          row.unitCost.toFixed(2),
+          row.total.toFixed(2)
+        ]),
+        [],
+        ["Materials Cost", "", "", "", "", projection.summary.materialsCost.toFixed(2)],
+        ["Labor Cost", "", "", "", "", projection.summary.laborCost.toFixed(2)],
+        ["Overhead Cost", "", "", "", "", projection.summary.overheadCost.toFixed(2)],
+        ["Contingency Cost", "", "", "", "", projection.summary.contingencyCost.toFixed(2)],
+        ["Projected Total", "", "", "", "", projection.summary.total.toFixed(2)]
+      ];
+
+      const csvContent = csvRows
+        .map((row) => row.map((cell) => `"${String(cell ?? "").replace(/"/g, "\"\"")}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `pro-projection-${Date.now()}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      if (PRO_MODE) {
+        await logProAction("EXPORT", {
+          source: "materials.html",
+          format: "csv",
+          rows: projection.rows.length,
+          total: projection.summary.total
+        });
+      }
+
+      setProStatus("Projection exported to CSV.", "ok");
+    }
+
+    function clearProjection() {
+      projectionState = null;
+      renderProjection();
+      setProStatus("Projection cleared. Update parameters and run it again.", "neutral");
+    }
+
+    function handleMaterialAction(event) {
+      const target = event.target?.closest?.("button[data-edit], button[data-delete]");
+      if (!target) return;
+
+      const editId = target.dataset.edit;
+      if (editId) {
+        const item = materials.find((entry) => entry.id === editId);
+        if (item) fillForm(item);
+        return;
+      }
+
+      const deleteId = target.dataset.delete;
+      if (deleteId) deleteMaterial(deleteId);
+    }
+
+    materialForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        const material = buildMaterialFromForm();
+        upsertMaterial(material);
+        if (PRO_MODE) {
+          await logProAction("SAVE_TEMPLATE", {
+            source: "materials.html",
+            templateId: material.id,
+            templateName: material.name,
+            category: material.category || "",
+            active: material.active
+          });
+        }
+      } catch (error) {
+        alert(error.message || "Unable to save material.");
+      }
+    });
+
+    clearMaterialBtn.addEventListener("click", resetForm);
+
+    seedMaterialsBtn.addEventListener("click", () => {
+      const ok = window.confirm("Replace current catalog with starter items?");
+      if (!ok) return;
+      loadStarterItems();
+    });
+
+    materialsBody.addEventListener("click", handleMaterialAction);
+    if (materialsCardsView) materialsCardsView.addEventListener("click", handleMaterialAction);
+
+    [matSearchInput, matCategoryFilter, matStatusFilter, matSortSelect].forEach((control) => {
+      if (!control) return;
+      control.addEventListener("input", renderCatalog);
+      control.addEventListener("change", renderCatalog);
+    });
+
+    if (tableViewBtn) tableViewBtn.addEventListener("click", () => setViewMode("table"));
+    if (cardsViewBtn) cardsViewBtn.addEventListener("click", () => setViewMode("cards"));
+
+    if (proGenerateBtn) {
+      proGenerateBtn.addEventListener("click", () => {
+        projectionState = buildProjection();
+        renderProjection();
+      });
+    }
+
+    if (proApplyPresetBtn) {
+      proApplyPresetBtn.addEventListener("click", () => {
+        applyPresetTemplate().catch(() => {
+          setProStatus("Unable to apply preset template right now.", "error");
+        });
+      });
+    }
+
+    if (proSendDraftBtn) {
+      proSendDraftBtn.addEventListener("click", () => {
+        sendProjectionToEstimate().catch(() => {
+          setProStatus("Unable to send projection to Create Estimate.", "error");
+        });
+      });
+    }
+
+    if (proExportCsvBtn) {
+      proExportCsvBtn.addEventListener("click", () => {
+        exportProjectionCsv().catch(() => {
+          setProStatus("Unable to export projection.", "error");
+        });
+      });
+    }
+
+    if (proClearBtn) {
+      proClearBtn.addEventListener("click", clearProjection);
+    }
+
+    setViewMode(currentView);
+    refresh();
+    resetForm();
+    renderProjection();
+
+    if (PRO_MODE) {
+      setProStatus("Pro workspace active. Configure parameters, generate projection, then send to Create Estimate.", "neutral");
+    }
+  </script>
+</body>
+
+</html>

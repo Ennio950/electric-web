@@ -1,0 +1,61 @@
+services:
+  ollama-cpu:
+    image: ollama/ollama:latest
+    container_name: autodev-ollama-cpu
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_MODELS=/models-host
+      - CUDA_VISIBLE_DEVICES=-1
+      - GGML_VK_VISIBLE_DEVICES=-1
+      - OLLAMA_NO_CLOUD=1
+      - OLLAMA_KEEP_ALIVE=15m
+      - OLLAMA_CONTEXT_LENGTH=4096
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+    volumes:
+      - ollama_cpu_data:/root/.ollama
+      - ${USERPROFILE}/.ollama/models:/models-host:ro
+
+  n8n:
+    build:
+      context: ../../
+      dockerfile: autodev-lab/n8n/Dockerfile.n8n-tools
+    image: autodev-n8n-tools:latest
+    container_name: autodev-n8n
+    restart: unless-stopped
+    depends_on:
+      - ollama-cpu
+    ports:
+      - "5678:5678"
+    environment:
+      - TZ=America/Guatemala
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_ENABLE_EXECUTE_COMMAND=true
+      - NODES_EXCLUDE=[]
+      - EXPO_TOKEN=${EXPO_TOKEN:-}
+      - N8N_MOBILE_AUTO_SUBMIT=${N8N_MOBILE_AUTO_SUBMIT:-0}
+      - OLLAMA_HOST=http://ollama-cpu:11434
+      - OLLAMA_MODEL=qwen2.5-coder:7b
+      - OLLAMA_SLOW_MODEL=deepseek-coder-v2:16b
+      - OLLAMA_REQUEST_KEEP_ALIVE=15m
+      - OPENCLAW_HOME=/opt/host-openclaw
+    working_dir: /workspace/electric-web
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ../../:/workspace/electric-web
+      - ${APPDATA}/npm/node_modules/openclaw:/opt/host-openclaw:ro
+      - ${USERPROFILE}/.codex:/home/node/.codex
+      - ${USERPROFILE}/.claude:/home/node/.claude
+      - ${USERPROFILE}/.claude.json:/home/node/.claude.json:ro
+      - ${USERPROFILE}/.openclaw:/home/node/.openclaw
+      - ${USERPROFILE}/.gitconfig:/home/node/.gitconfig:ro
+      - ${USERPROFILE}/.ssh:/home/node/.ssh:ro
+
+volumes:
+  n8n_data:
+  ollama_cpu_data:

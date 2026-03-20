@@ -1,0 +1,29 @@
+{
+  "id": "task-026",
+  "titulo": "Normalizar helper de errores en straight-wire-backend/src/controllers/clientJobs.controller.js",
+  "descripcion": "Extraer manejo de errores repetido a una utilidad backend pequeña y reutilizable.",
+  "modulo": "backend",
+  "estado": "completado",
+  "reintentos": 0,
+  "modo": "SAFE_AUTODEV_EXECUTABLE_BACKLOG_MOBILE_BACKEND",
+  "areaObjetivo": "backend",
+  "plataformaObjetivo": "node-express",
+  "aplicacionObjetivo": "straight-wire-backend",
+  "creadoEn": "2026-03-15T02:39:24.452Z",
+  "actualizadoEn": "2026-03-15T02:40:46.950Z",
+  "resumenResultado": "AutoDev ejecuto task-026 con 1 fix(es) seguro(s).",
+  "categoriaFix": "backend-controller-error-utility",
+  "clasificacion": "seguro_automatico",
+  "archivosObjetivo": [
+    "straight-wire-backend/src/controllers/clientJobs.controller.js",
+    "straight-wire-backend/src/utils/controllerErrors.js"
+  ],
+  "requiereRevision": false,
+  "taskKind": "generated",
+  "taskKey": "backend-error:straight-wire-backend/src/controllers/clientJobs.controller.js",
+  "fixPayload": {
+    "kind": "backend-controller-error-utility",
+    "targetFile": "straight-wire-backend/src/controllers/clientJobs.controller.js"
+  },
+  "taskPath": "autodev-lab/tasks/generated/task-026.json"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "task-023",
+  "titulo": "Separar logica de pantalla grande app/(boss)/index.tsx",
+  "descripcion": "Mover logica simple de pantalla a helper o servicio manteniendo la arquitectura Expo Router.",
+  "modulo": "mobile",
+  "estado": "requiere_revision",
+  "reintentos": 0,
+  "modo": "SAFE_AUTODEV_EXECUTABLE_BACKLOG_MOBILE_BACKEND",
+  "areaObjetivo": "mobile",
+  "plataformaObjetivo": "react-native-expo",
+  "aplicacionObjetivo": "apps/mobile",
+  "creadoEn": "2026-03-15T02:39:24.452Z",
+  "actualizadoEn": "2026-03-15T02:40:46.939Z",
+  "resumenResultado": "Tarea generada y pendiente de orquestacion.",
+  "categoriaFix": "screen-helper-separation",
+  "clasificacion": "manual",
+  "archivosObjetivo": [
+    "apps/mobile/app/(boss)/index.tsx"
+  ],
+  "requiereRevision": true,
+  "taskKind": "generated",
+  "taskKey": "mobile-helper:app/(boss)/index.tsx",
+  "fixPayload": {
+    "kind": "mobile-screen-helper-review",
+    "targetFile": "app/(boss)/index.tsx"
+  },
+  "taskPath": "autodev-lab/tasks/generated/task-023.json"
+}
