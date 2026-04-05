@@ -622,3 +622,50 @@ export function linkBuilderEstimateToRequest(token: string, estimateId: string, 
 export function builderEstimatePdfPath(estimateId: string) {
   return `/api/builder/estimates/${estimateId}/pdf`;
 }
+
+// ============================================================
+// Catalog Materials
+// ============================================================
+
+export type CatalogMaterialPayload = {
+  id: string;
+  name: string;
+  category: string;
+  baseUnit: string;
+  unitPrice: number;
+  currency: string;
+  conversions: Array<{ from: string; to: string; factor: number }>;
+  densityKgPerM3?: number;
+  notes?: string;
+};
+
+/** List all company catalog materials. */
+export function fetchCatalogMaterials(token: string) {
+  return requestEnvelopeData<CatalogMaterialPayload[]>('/api/builder/materials', token);
+}
+
+/** Create or update a single material. */
+export function upsertCatalogMaterial(token: string, material: CatalogMaterialPayload) {
+  return requestEnvelopeData<CatalogMaterialPayload>(
+    `/api/builder/materials/${encodeURIComponent(material.id)}`,
+    token,
+    { method: 'PUT', body: material as unknown as JsonValue },
+  );
+}
+
+/** Delete a material by id. */
+export function deleteCatalogMaterial(token: string, materialId: string) {
+  return requestEnvelopeData<{ ok: boolean; id: string }>(
+    `/api/builder/materials/${encodeURIComponent(materialId)}`,
+    token,
+    { method: 'DELETE' },
+  );
+}
+
+/** Push many materials at once (initial sync from local to server). */
+export function batchUpsertCatalogMaterials(token: string, materials: CatalogMaterialPayload[]) {
+  return requestEnvelopeData<CatalogMaterialPayload[]>('/api/builder/materials/batch', token, {
+    method: 'POST',
+    body: { materials } as unknown as JsonValue,
+  });
+}
