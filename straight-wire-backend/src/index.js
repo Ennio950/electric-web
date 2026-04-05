@@ -231,6 +231,7 @@ const mobileRoutes = asRouter(require('./routes/mobile.routes'), 'mobile.routes.
 const marketplaceRoutes = asRouter(require('./routes/marketplace.routes'), 'marketplace.routes.js');
 const builderRoutes = asRouter(require('./routes/builder.routes'), 'builder.routes.js');
 const materialsRoutes = asRouter(require('./routes/materials.routes'), 'materials.routes.js');
+const recipesRoutes = asRouter(require('./routes/recipes.routes'), 'recipes.routes.js');
 const uploadsRoutes = asRouter(require('./routes/uploads.routes'), 'uploads.routes.js');
 const whatsappWebhookRoutes = asRouter(require('./routes/whatsappWebhook.routes'), 'whatsappWebhook.routes.js');
 
@@ -253,6 +254,7 @@ app.use('/api/uploads', uploadsRoutes);
 app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/builder', builderRoutes);
 app.use('/api/builder/materials', materialsRoutes);
+app.use('/api/builder/recipes', recipesRoutes);
 
 // Employee profile routes (public for clients to view)
 const employeeProfileRoutes = asRouter(require('./routes/employee-profile.routes'), 'employee-profile.routes.js');

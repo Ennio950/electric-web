@@ -669,3 +669,48 @@ export function batchUpsertCatalogMaterials(token: string, materials: CatalogMat
     body: { materials } as unknown as JsonValue,
   });
 }
+
+// ============================================================
+// Catalog Recipes
+// ============================================================
+
+export type CatalogRecipePayload = {
+  id: string;
+  name: string;
+  type: string;
+  baseUnit: string;
+  params: Array<Record<string, unknown>>;
+  outputs: Array<Record<string, unknown>>;
+  description?: string;
+};
+
+/** List all company catalog recipes. */
+export function fetchCatalogRecipes(token: string) {
+  return requestEnvelopeData<CatalogRecipePayload[]>('/api/builder/recipes', token);
+}
+
+/** Create or update a single recipe. */
+export function upsertCatalogRecipe(token: string, recipe: CatalogRecipePayload) {
+  return requestEnvelopeData<CatalogRecipePayload>(
+    `/api/builder/recipes/${encodeURIComponent(recipe.id)}`,
+    token,
+    { method: 'PUT', body: recipe as unknown as JsonValue },
+  );
+}
+
+/** Delete a recipe by id. */
+export function deleteCatalogRecipe(token: string, recipeId: string) {
+  return requestEnvelopeData<{ ok: boolean; id: string }>(
+    `/api/builder/recipes/${encodeURIComponent(recipeId)}`,
+    token,
+    { method: 'DELETE' },
+  );
+}
+
+/** Push many recipes at once (initial sync from local to server). */
+export function batchUpsertCatalogRecipes(token: string, recipes: CatalogRecipePayload[]) {
+  return requestEnvelopeData<CatalogRecipePayload[]>('/api/builder/recipes/batch', token, {
+    method: 'POST',
+    body: { recipes } as unknown as JsonValue,
+  });
+}
