@@ -30,6 +30,8 @@ automation/locks.json
 automation/handoffs.json
 automation/checkpoints.json
 automation/change-events.json
+automation/control-room-state.json
+automation/agents-sdk-state.json
 reports/progress-log.md
 reports/conflict-report.md
 autodev-lab/logs/
@@ -39,3 +41,4 @@ autodev-lab/reports/n8n-native-team/continuous-*.json
 autodev-lab/reports/n8n-native-team/latest-run.json
 __tmp_mobile_seed/
 *.autodev.bak
+.codex-logs/
