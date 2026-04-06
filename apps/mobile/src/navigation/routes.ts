@@ -13,6 +13,8 @@ type StaticAppRoute =
   | '/(boss)/queue'
   | '/(boss)/settings'
   | '/(builder)'
+  | '/(builder)/estimate-history'
+  | '/(builder)/invoice/new'
   | '/(builder)/materials'
   | '/(builder)/recipes'
   | '/(builder)/estimate-preview'
@@ -31,6 +33,7 @@ type DynamicAppRoute =
   | { pathname: '/(boss)/queue/[id]'; params: { id: string; sourceType?: ReviewQueueSourceType } }
   | { pathname: '/(builder)/jobs/[id]'; params: { id: string } }
   | { pathname: '/(builder)/estimate-preview/[id]'; params: { id: string } }
+  | { pathname: '/(builder)/estimate-detail/[id]'; params: { id: string } }
   | { pathname: '/(client)/emergency/[id]'; params: { id: string } }
   | { pathname: '/(client)/requests/[id]'; params: { id: string } }
   | { pathname: '/(employee)/emergency/[id]'; params: { id: string } }
@@ -56,6 +59,8 @@ export const appRoutes = {
   bossQueue: '/(boss)/queue' as const,
   bossSettings: '/(boss)/settings' as const,
   builderHome: '/(builder)' as const,
+  builderEstimateHistory: '/(builder)/estimate-history' as const,
+  builderInvoiceNew: '/(builder)/invoice/new' as const,
   builderMaterials: '/(builder)/materials' as const,
   builderRecipes: '/(builder)/recipes' as const,
   clientHome: '/(client)' as const,
@@ -86,6 +91,9 @@ export const appRoutes = {
   },
   builderEstimatePreview(jobId: string | number): AppRouteHref {
     return { pathname: '/(builder)/estimate-preview/[id]', params: { id: stringifyId(jobId) } };
+  },
+  builderEstimateDetail(estimateId: string | number): AppRouteHref {
+    return { pathname: '/(builder)/estimate-detail/[id]', params: { id: stringifyId(estimateId) } };
   },
   clientEmergencyDetail(id: string | number): AppRouteHref {
     return { pathname: '/(client)/emergency/[id]', params: { id: stringifyId(id) } };

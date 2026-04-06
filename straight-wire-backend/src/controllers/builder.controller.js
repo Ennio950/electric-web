@@ -214,4 +214,46 @@ async function linkEstimateToRequest(req, res) {
     }
 }
 
-module.exports = { createEstimate, getEstimatePdf, linkEstimateToRequest };
+/**
+ * GET /api/builder/estimates
+ * Returns a summary list of saved builder estimates.
+ * Employees see only their own; boss sees all (latest 100).
+ */
+async function listEstimates(req, res) {
+    try {
+        let query;
+        if (req.user.role === 'boss') {
+            query = db.collection(ESTIMATES_COLLECTION)
+                .orderBy('createdAt', 'desc')
+                .limit(100);
+        } else {
+            query = db.collection(ESTIMATES_COLLECTION)
+                .where('createdByUid', '==', req.user.uid)
+                .orderBy('createdAt', 'desc')
+                .limit(50);
+        }
+
+        const snap = await query.get();
+        const estimates = snap.docs.map((doc) => {
+            const d = doc.data();
+            return {
+                id: doc.id,
+                quoteNumber: d.quoteNumber || null,
+                description: d.description || null,
+                requestId: d.requestId || null,
+                createdAt: d.createdAt || null,
+                createdByEmail: d.createdByEmail || null,
+                grandTotal: d.result?.totals?.grandTotal ?? 0,
+                jobName: d.jobSnapshot?.name || null,
+                currency: d.jobSnapshot?.currency || 'GTQ',
+            };
+        });
+
+        return res.status(200).json({ ok: true, data: estimates });
+    } catch (err) {
+        logger.error('listEstimates error:', err);
+        return res.status(500).json({ ok: false, error: 'internal_error', message: err.message });
+    }
+}
+
+module.exports = { createEstimate, getEstimatePdf, linkEstimateToRequest, listEstimates };

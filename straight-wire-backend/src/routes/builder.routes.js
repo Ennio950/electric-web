@@ -9,6 +9,9 @@ const controller = require('../controllers/builder.controller');
 
 router.use(verifyFirebaseToken);
 
+// List saved estimates for the current user (or all, for boss)
+router.get('/estimates', requireRole(['employee', 'boss']), controller.listEstimates);
+
 // Create and persist a builder estimate, allocating a quote number
 router.post('/estimates', requireRole(['employee', 'boss']), controller.createEstimate);
 

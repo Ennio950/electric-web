@@ -22,6 +22,8 @@ export default function BossQueueScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [scopeFilter, setScopeFilter] = useState<'all' | 'request' | 'emergency'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'in_progress' | 'payment' | 'done'>('all');
+  const [priorityFilter, setPriorityFilter] = useState<'all' | 'urgent' | 'normal'>('all');
+  const [dispatchFilter, setDispatchFilter] = useState<'all' | 'emergency' | 'scheduled'>('all');
 
   const requestsQuery = useQuery({
     queryKey: ['boss-requests'],
@@ -85,6 +87,8 @@ export default function BossQueueScreen() {
   const filteredEmergencies = (emergenciesQuery.data ?? []).filter((call) => {
     if (scopeFilter === 'request') return false;
     if (allowedEmergencyStatuses && !allowedEmergencyStatuses.includes(call.status)) return false;
+    if (priorityFilter !== 'all' && call.priority !== priorityFilter) return false;
+    if (dispatchFilter !== 'all' && call.dispatchMode !== dispatchFilter) return false;
     if (!normalizedQuery) return true;
 
     const haystack = [
@@ -143,6 +147,28 @@ export default function BossQueueScreen() {
             { label: 'Completados', value: 'done' },
           ]}
         />
+        {scopeFilter !== 'request' ? (
+          <>
+            <FilterChips
+              value={priorityFilter}
+              onChange={setPriorityFilter}
+              options={[
+                { label: 'Urgencia: Todos', value: 'all' },
+                { label: 'Urgente', value: 'urgent' },
+                { label: 'Normal', value: 'normal' },
+              ]}
+            />
+            <FilterChips
+              value={dispatchFilter}
+              onChange={setDispatchFilter}
+              options={[
+                { label: 'Modo: Todos', value: 'all' },
+                { label: 'Emergencia', value: 'emergency' },
+                { label: 'Programada', value: 'scheduled' },
+              ]}
+            />
+          </>
+        ) : null}
       </SectionCard>
 
       <SectionCard title="Solicitudes" subtitle="Cola general de requests.">

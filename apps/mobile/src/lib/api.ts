@@ -714,3 +714,78 @@ export function batchUpsertCatalogRecipes(token: string, recipes: CatalogRecipeP
     body: { recipes } as unknown as JsonValue,
   });
 }
+
+// ============================================================
+// Builder Estimate History
+// ============================================================
+
+export type BuilderEstimateSummary = {
+  id: string;
+  quoteNumber: string | null;
+  description: string | null;
+  requestId: string | null;
+  createdAt: string | null;
+  createdByEmail: string | null;
+  grandTotal: number;
+  jobName: string | null;
+  currency: string;
+};
+
+/** List saved estimates for the current user (employees) or all (boss). */
+export function fetchBuilderEstimates(token: string) {
+  return requestEnvelopeData<BuilderEstimateSummary[]>('/api/builder/estimates', token);
+}
+
+// ============================================================
+// Invoices
+// ============================================================
+
+export type InvoiceItem = {
+  desc: string;
+  type: 'Service' | 'Material' | string;
+  qty: number;
+  price: number;
+  amount: number;
+};
+
+export type InvoicePayload = {
+  clientName: string;
+  clientAddress?: string;
+  items: InvoiceItem[];
+  taxPct?: number;
+  currency?: string;
+  dueDate?: string;
+  notes?: string;
+};
+
+export type InvoiceSummary = {
+  id: string;
+  invoiceNumber: string;
+  clientName: string | null;
+  clientAddress: string | null;
+  dueDate: string | null;
+  notes: string | null;
+  total: number;
+  currency: string;
+  createdAt: string | null;
+  createdByEmail: string | null;
+};
+
+/** List saved invoices. */
+export function fetchInvoices(token: string) {
+  return requestEnvelopeData<InvoiceSummary[]>('/api/builder/invoices', token);
+}
+
+/** Create a new invoice. */
+export function createInvoice(token: string, payload: InvoicePayload) {
+  return requestEnvelopeData<{ invoiceId: string; invoiceNumber: string }>(
+    '/api/builder/invoices',
+    token,
+    { method: 'POST', body: payload as unknown as JsonValue },
+  );
+}
+
+/** Returns the full API path for downloading an invoice PDF. */
+export function invoicePdfPath(invoiceId: string) {
+  return `/api/builder/invoices/${invoiceId}/pdf`;
+}
