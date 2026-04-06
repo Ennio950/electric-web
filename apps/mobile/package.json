@@ -40,6 +40,7 @@
     "react-native-screens": "~4.23.0",
     "react-native-web": "~0.21.0",
     "@sentry/react-native": "^6.5.0",
+    "expo-updates": "~0.28.12",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
