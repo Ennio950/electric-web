@@ -11,6 +11,7 @@ type StaticAppRoute =
   | '/(boss)/admin'
   | '/(boss)/payments'
   | '/(boss)/queue'
+  | '/(boss)/schedule'
   | '/(boss)/settings'
   | '/(builder)'
   | '/(builder)/estimate-history'
@@ -26,7 +27,8 @@ type StaticAppRoute =
   | '/(employee)'
   | '/(employee)/emergency/new'
   | '/(employee)/profile'
-  | '/(employee)/requests';
+  | '/(employee)/requests'
+  | '/(employee)/schedule';
 
 type DynamicAppRoute =
   | { pathname: '/(boss)/payments/[id]'; params: { id: string; sourceType?: ReviewQueueSourceType } }
@@ -57,6 +59,7 @@ export const appRoutes = {
   bossAdmin: '/(boss)/admin' as const,
   bossPayments: '/(boss)/payments' as const,
   bossQueue: '/(boss)/queue' as const,
+  bossSchedule: '/(boss)/schedule' as const,
   bossSettings: '/(boss)/settings' as const,
   builderHome: '/(builder)' as const,
   builderEstimateHistory: '/(builder)/estimate-history' as const,
@@ -72,6 +75,7 @@ export const appRoutes = {
   employeeEmergencyNew: '/(employee)/emergency/new' as const,
   employeeProfile: '/(employee)/profile' as const,
   employeeRequests: '/(employee)/requests' as const,
+  employeeSchedule: '/(employee)/schedule' as const,
   bossPaymentDetail(id: string | number, sourceType?: ReviewQueueSourceType): AppRouteHref {
     const params: { id: string; sourceType?: ReviewQueueSourceType } = { id: stringifyId(id) };
     if (sourceType) {

@@ -110,6 +110,12 @@ export default function EmployeeHomeScreen() {
             subtitle="Ver pendientes, aceptadas y compartir ubicación."
             onPress={() => pushAppRoute(appRoutes.employeeEmergencyNew)}
           />
+          <PressableCard
+            eyebrow="Agenda"
+            title="Ver mi agenda"
+            subtitle="Servicios programados asignados a tu cuenta."
+            onPress={() => pushAppRoute(appRoutes.employeeSchedule)}
+          />
           {bootstrap.featureFlags.builderMobile ? (
             <PressableCard
               eyebrow="Builder"
