@@ -789,3 +789,20 @@ export function createInvoice(token: string, payload: InvoicePayload) {
 export function invoicePdfPath(invoiceId: string) {
   return `/api/builder/invoices/${invoiceId}/pdf`;
 }
+
+/** Delete an emergency call (boss or employee only). */
+export function deleteEmergencyCall(token: string, callId: string) {
+  return requestEnvelopeData<{ ok: boolean }>(
+    `/api/marketplace/emergency-calls/${callId}`,
+    token,
+    { method: 'DELETE' },
+  );
+}
+
+/** Get the current active job for the authenticated employee. Returns null when there is none. */
+export function fetchEmployeeActiveJob(token: string) {
+  return requestEnvelopeData<MarketplaceRequest | null>(
+    '/api/marketplace/employee/active-job',
+    token,
+  );
+}
