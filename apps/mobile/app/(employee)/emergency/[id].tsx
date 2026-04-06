@@ -231,15 +231,17 @@ export default function EmployeeEmergencyDetailScreen() {
             { label: 'Monto', value: formatCurrency(call.finalAmount ?? call.quotedAmount, companyConfig.currency, companyConfig.locale) },
           ]}
         />
-        {call.location ? (
+        {(call.clientCoords || call.location) ? (
           <AppButton
             tone="secondary"
             onPress={() => {
-              const q = encodeURIComponent(call.location ?? '');
-              void Linking.openURL(`https://maps.google.com/?q=${q}`);
+              const url = call.clientCoords
+                ? `https://maps.google.com/?q=${call.clientCoords.lat},${call.clientCoords.lng}`
+                : `https://maps.google.com/?q=${encodeURIComponent(call.location ?? '')}`;
+              void Linking.openURL(url);
             }}
           >
-            Ver ubicacion en mapa
+            {call.clientCoords ? 'Navegar a GPS del cliente' : 'Ver ubicacion en mapa'}
           </AppButton>
         ) : null}
       </SectionCard>

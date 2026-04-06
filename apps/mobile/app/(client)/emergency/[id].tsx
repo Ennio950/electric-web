@@ -176,15 +176,19 @@ export default function ClientEmergencyDetailScreen() {
         >
           Compartir mi ubicacion
         </AppButton>
-        {call.location ? (
+        {(call.employeeCoords || call.clientCoords || call.location) ? (
           <AppButton
             tone="secondary"
             onPress={() => {
-              const q = encodeURIComponent(call.location ?? '');
-              void Linking.openURL(`https://maps.google.com/?q=${q}`);
+              // Prefer employee GPS (where the tech is), fallback to client GPS, then text address
+              const coords = call.employeeCoords ?? call.clientCoords;
+              const url = coords
+                ? `https://maps.google.com/?q=${coords.lat},${coords.lng}`
+                : `https://maps.google.com/?q=${encodeURIComponent(call.location ?? '')}`;
+              void Linking.openURL(url);
             }}
           >
-            Ver ubicacion en mapa
+            {call.employeeCoords ? 'Ver ubicacion GPS del tecnico' : 'Ver ubicacion en mapa'}
           </AppButton>
         ) : null}
         {call.finalPhotoUrl ? (

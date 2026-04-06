@@ -128,15 +128,17 @@ export default function BossQueueDetailScreen() {
         </SectionCard>
 
         <SectionCard title="Acciones">
-          {call.location ? (
+          {(call.clientCoords || call.location) ? (
             <AppButton
               tone="secondary"
               onPress={() => {
-                const q = encodeURIComponent(call.location ?? '');
-                void Linking.openURL(`https://maps.google.com/?q=${q}`);
+                const url = call.clientCoords
+                  ? `https://maps.google.com/?q=${call.clientCoords.lat},${call.clientCoords.lng}`
+                  : `https://maps.google.com/?q=${encodeURIComponent(call.location ?? '')}`;
+                void Linking.openURL(url);
               }}
             >
-              Ver ubicacion en mapa
+              {call.clientCoords ? 'Ver GPS de la emergencia' : 'Ver ubicacion en mapa'}
             </AppButton>
           ) : null}
           {call.paymentProofUrl ? (
