@@ -1,0 +1,50 @@
+{
+  "name": "@electric/mobile",
+  "private": true,
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@electric/builder-domain": "file:../../packages/builder-domain",
+    "@electric/estimator-core": "file:../../packages/estimator-core",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-navigation/native": "^7.1.28",
+    "@tanstack/react-query": "^5.90.21",
+    "expo": "~55.0.5",
+    "expo-camera": "~55.0.10",
+    "expo-constants": "~55.0.9",
+    "expo-dev-client": "~55.0.18",
+    "expo-document-picker": "~55.0.9",
+    "expo-file-system": "~55.0.11",
+    "expo-image-manipulator": "~55.0.11",
+    "expo-image-picker": "~55.0.13",
+    "expo-linking": "~55.0.8",
+    "expo-location": "~55.1.4",
+    "expo-notifications": "~55.0.13",
+    "expo-router": "~55.0.7",
+    "expo-secure-store": "~55.0.9",
+    "expo-sharing": "~55.0.14",
+    "expo-splash-screen": "~55.0.12",
+    "expo-status-bar": "~55.0.4",
+    "firebase": "^12.10.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-native": "0.83.2",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-screens": "~4.23.0",
+    "react-native-web": "~0.21.0",
+    "@sentry/react-native": "^6.5.0",
+    "expo-updates": "~0.28.12",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~5.9.2"
+  }
+}
