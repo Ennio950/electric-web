@@ -47,8 +47,15 @@ function assertRequiredReleaseEnv(releaseStage: ReleaseStage) {
     return;
   }
 
-  throw new Error(
-    `[app.config] EXPO_PUBLIC_API_BASE_URL es obligatoria para builds ${releaseStage}. Configurala en las variables de entorno de EAS antes de generar artefactos nativos.`,
+  // Only throw on actual EAS cloud builds — locally just warn so CLI doesn't block
+  if (process.env.EAS_BUILD === 'true') {
+    throw new Error(
+      `[app.config] EXPO_PUBLIC_API_BASE_URL es obligatoria para builds ${releaseStage}.`,
+    );
+  }
+
+  console.warn(
+    `[app.config] EXPO_PUBLIC_API_BASE_URL no configurada para build ${releaseStage}. Configúrala en EAS antes de hacer build.`,
   );
 }
 

@@ -1,5 +1,7 @@
 import { Slot } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { AppProviders } from '@/src/providers/AppProviders';
@@ -18,15 +20,21 @@ if (Platform.OS !== 'web') {
         shouldShowAlert: true,
         shouldPlaySound: true,
         shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
       }),
     });
   }).catch(() => undefined);
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => undefined);
+  }, []);
+
   return (
     <AppProviders>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Slot />
     </AppProviders>
   );

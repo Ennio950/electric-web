@@ -23,8 +23,6 @@ import { useSessionStore } from '@/src/stores/sessionStore';
 const CHAT_ENABLED_STATUSES = new Set([
   'accepted',
   'awaiting_client_close',
-  'awaiting_payment_proof',
-  'payment_pending_review',
 ]);
 
 export default function ClientEmergencyDetailScreen() {
@@ -39,6 +37,8 @@ export default function ClientEmergencyDetailScreen() {
   const detailQuery = useQuery({
     queryKey: ['client-emergency-detail', callId],
     enabled: Boolean(callId),
+    refetchInterval: callId ? 15_000 : false,
+    refetchIntervalInBackground: false,
     queryFn: () => withCurrentToken((token) => fetchEmergencyDetail(token, callId)),
   });
 
@@ -106,7 +106,9 @@ export default function ClientEmergencyDetailScreen() {
 
   const locationMutation = useMutation({
     mutationFn: async () => {
-      const coords = await getCurrentForegroundCoords();
+      const coords = await getCurrentForegroundCoords({
+        fallbackAddress: detailQuery.data?.location ?? '',
+      });
       return withCurrentToken((token) => updateEmergencyLocation(token, callId, coords));
     },
     onSuccess: invalidateAll,
@@ -114,7 +116,10 @@ export default function ClientEmergencyDetailScreen() {
 
   const status = String(detailQuery.data?.status || '').trim().toLowerCase();
   const canClose = status === 'awaiting_client_close';
-  const showChat = CHAT_ENABLED_STATUSES.has(status);
+  const hasAssignedTechnician = Boolean(
+    detailQuery.data?.assignedEmployeeId || detailQuery.data?.assignedEmployeeName || detailQuery.data?.assignedEmployeeEmail,
+  );
+  const showChat = CHAT_ENABLED_STATUSES.has(status) && hasAssignedTechnician;
 
   const actionError = useMemo(() => {
     const candidates = [closeMutation.error, uploadFinalPhotoMutation.error, locationMutation.error];

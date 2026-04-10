@@ -1,0 +1,181 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Keep this file byte-for-byte in sync with the other firestore.rules copy in the repo.
+    // The legacy web app reads Firestore directly while the backend workspace deploys
+    // its own rules file, so both entrypoints must share the same access policy.
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function roleFromClaims() {
+      return isAuthenticated() ? request.auth.token.role : null;
+    }
+
+    function roleFromUserDoc() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        : null;
+    }
+
+    function effectiveRole() {
+      return roleFromClaims() != null ? roleFromClaims() : roleFromUserDoc();
+    }
+
+    function isBoss() {
+      return isAuthenticated() && (
+        effectiveRole() == 'boss' ||
+        request.auth.token.email == 'boss@straightwireelectric.com'
+      );
+    }
+
+    function isEmployee() {
+      return isAuthenticated() && effectiveRole() in ['employee', 'boss'];
+    }
+
+    function requestClientUid(data) {
+      return 'clientUid' in data
+        ? data.clientUid
+        : ('clientId' in data
+          ? data.clientId
+          : ('createdBy' in data ? data.createdBy : null));
+    }
+
+    function requestAssignedUid(data) {
+      return 'assignedToUid' in data
+        ? data.assignedToUid
+        : ('assignedEmployeeId' in data
+          ? data.assignedEmployeeId
+          : ('assignedTo' in data ? data.assignedTo : null));
+    }
+
+    function requestStatus(data) {
+      return 'status' in data ? data.status : null;
+    }
+
+    function canReadRequest(data) {
+      return isBoss() ||
+        (isAuthenticated() && requestClientUid(data) == request.auth.uid) ||
+        (isEmployee() && requestAssignedUid(data) == request.auth.uid) ||
+        (isAuthenticated() && requestStatus(data) in ['EN_ESPERA', 'open']);
+    }
+
+    function validProAction() {
+      return request.resource.data.action in [
+        'OPEN_PRO_ESTIMATOR',
+        'SAVE_TEMPLATE',
+        'GENERATE_ESTIMATE',
+        'EXPORT'
+      ];
+    }
+
+    function validActorEmail() {
+      return !('actorEmail' in request.resource.data) ||
+        (
+          request.auth.token.email != null
+            ? request.resource.data.actorEmail == request.auth.token.email
+            : request.resource.data.actorEmail == ''
+        );
+    }
+
+    function validAuditLogCreate() {
+      return request.resource.data.keys().hasAll([
+          'type',
+          'action',
+          'actorUid',
+          'createdAt',
+          'role'
+        ]) &&
+        request.resource.data.keys().hasOnly([
+          'type',
+          'action',
+          'actorUid',
+          'actorEmail',
+          'role',
+          'createdAt',
+          'metadata'
+        ]) &&
+        request.resource.data.type == 'PRO_ACTION' &&
+        validProAction() &&
+        request.resource.data.actorUid == request.auth.uid &&
+        request.resource.data.role == 'employee' &&
+        request.resource.data.createdAt == request.time &&
+        validActorEmail() &&
+        (!('metadata' in request.resource.data) || request.resource.data.metadata is map);
+    }
+
+    match /requests/{requestId} {
+      allow read: if canReadRequest(resource.data);
+      allow update: if isBoss();
+      allow create, delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isBoss() ||
+          (
+            exists(/databases/$(database)/documents/requests/$(requestId)) &&
+            canReadRequest(get(/databases/$(database)/documents/requests/$(requestId)).data)
+          );
+        allow write: if false;
+      }
+    }
+
+    match /clientRequests/{requestId} {
+      allow read: if canReadRequest(resource.data);
+      allow create, update, delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isBoss() ||
+          (
+            exists(/databases/$(database)/documents/clientRequests/$(requestId)) &&
+            canReadRequest(get(/databases/$(database)/documents/clientRequests/$(requestId)).data)
+          );
+        allow write: if false;
+      }
+
+      match /cooldowns/{uid} {
+        allow read, write: if false;
+      }
+    }
+
+    match /employeeLocks/{uid} {
+      allow read: if isBoss() || (isEmployee() && request.auth.uid == uid);
+      allow write: if false;
+    }
+
+    match /clientCounters/{uid} {
+      allow read: if isBoss() || (isAuthenticated() && request.auth.uid == uid);
+      allow write: if false;
+    }
+
+    match /clientLocks/{uid} {
+      allow read, write: if false;
+    }
+
+    match /employees/{uid} {
+      allow read: if isBoss() || (isAuthenticated() && request.auth.uid == uid);
+      allow write: if false;
+
+      match /history/{entryId} {
+        allow read: if isBoss() || (isAuthenticated() && request.auth.uid == uid);
+        allow write: if false;
+      }
+    }
+
+    match /users/{uid} {
+      allow read: if isBoss() || (isAuthenticated() && request.auth.uid == uid);
+      allow write: if false;
+    }
+
+    match /auditLogs/{logId} {
+      allow create: if isEmployee() && validAuditLogCreate();
+      allow read: if isBoss();
+      allow update, delete: if false;
+    }
+
+    match /chatRateLimits/{docId} {
+      allow read, write: if false;
+    }
+  }
+}

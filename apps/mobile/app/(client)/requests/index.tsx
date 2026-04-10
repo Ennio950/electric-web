@@ -1,0 +1,186 @@
+import { useMemo, useState } from 'react';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { AppButton } from '@/src/components/AppButton';
+import { FilterChips } from '@/src/components/FilterChips';
+import { LoadingScreen } from '@/src/components/LoadingScreen';
+import { PressableCard } from '@/src/components/PressableCard';
+import { SearchField } from '@/src/components/SearchField';
+import { SectionCard } from '@/src/components/SectionCard';
+import { useClientRequestsQuery } from '@/src/hooks/useMobileDataQueries';
+import { formatCurrency, formatDateTime, formatRequestStatus } from '@/src/lib/formatters';
+import { appRoutes, pushAppRoute } from '@/src/navigation/routes';
+import { useSessionStore } from '@/src/stores/sessionStore';
+import type { MarketplaceRequest } from '@/src/types/api';
+
+const WAITING_STATUSES = new Set([
+  'NEGOCIANDO',
+  'ESPERANDO_CIERRE_CLIENTE',
+  'ESPERANDO_COMPROBANTE_PAGO',
+]);
+
+const ACTIVE_STATUSES = new Set([
+  'EN_ESPERA',
+  'ASIGNADO',
+  'NEGOCIANDO',
+  'EN_PROCESO',
+  'ESPERANDO_CIERRE_CLIENTE',
+  'ESPERANDO_COMPROBANTE_PAGO',
+  'PAGO_PENDIENTE_REVISION',
+]);
+
+export default function ClientRequestsScreen() {
+  const bootstrap = useSessionStore((state) => state.bootstrap);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [scopeFilter, setScopeFilter] = useState<'all' | 'active' | 'waiting' | 'closed'>('all');
+
+  const requestsQuery = useClientRequestsQuery();
+
+  if (!bootstrap) {
+    return <LoadingScreen label="Cargando requests..." />;
+  }
+
+  const requests = useMemo(() => {
+    const data = requestsQuery.data ?? [];
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    return data.filter((request) => {
+      const status = String(request.status || '').trim().toUpperCase();
+
+      if (scopeFilter === 'active' && !ACTIVE_STATUSES.has(status)) {
+        return false;
+      }
+
+      if (scopeFilter === 'waiting' && !WAITING_STATUSES.has(status)) {
+        return false;
+      }
+
+      if (scopeFilter === 'closed' && ACTIVE_STATUSES.has(status)) {
+        return false;
+      }
+
+      if (!normalizedQuery) {
+        return true;
+      }
+
+      const haystack = [
+        request.address,
+        request.description,
+        request.category,
+        request.employeeName,
+        request.employeeEmail,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(normalizedQuery);
+    });
+  }, [requestsQuery.data, scopeFilter, searchQuery]);
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      refreshControl={<RefreshControl refreshing={requestsQuery.isRefetching} onRefresh={() => void requestsQuery.refetch()} />}
+    >
+      <SectionCard
+        title="Mis solicitudes"
+        subtitle="Cliente ya puede crear, seguir y cerrar sus propios requests desde nativo."
+      >
+        <SearchField
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Buscar por direccion, descripcion o tecnico"
+        />
+        <FilterChips
+          value={scopeFilter}
+          onChange={setScopeFilter}
+          options={[
+            { label: 'Todo', value: 'all' },
+            { label: 'Activas', value: 'active' },
+            { label: 'Accion mia', value: 'waiting' },
+            { label: 'Cerradas', value: 'closed' },
+          ]}
+        />
+        <AppButton onPress={() => pushAppRoute(appRoutes.clientRequestsNew)}>Nueva solicitud</AppButton>
+      </SectionCard>
+
+      <SectionCard title="Historial">
+        {requestsQuery.isLoading ? <Text style={styles.muted}>Cargando tus solicitudes...</Text> : null}
+        {requestsQuery.error ? (
+          <Text style={styles.error}>
+            {requestsQuery.error instanceof Error ? requestsQuery.error.message : 'No se pudo cargar tu historial.'}
+          </Text>
+        ) : null}
+        {requests.length ? (
+          <View style={styles.stack}>
+            {requests.map((request) => (
+              <ClientRequestCard
+                key={request.id}
+                request={request}
+                locale={bootstrap.companyConfig.locale}
+                timezone={bootstrap.companyConfig.timezone}
+                currency={bootstrap.companyConfig.currency}
+                onPress={() => pushAppRoute(appRoutes.clientRequestDetail(request.id))}
+              />
+            ))}
+          </View>
+        ) : null}
+        {!requestsQuery.isLoading && !requestsQuery.error && !requests.length ? (
+          <Text style={styles.muted}>No hay solicitudes para este filtro.</Text>
+        ) : null}
+      </SectionCard>
+    </ScrollView>
+  );
+}
+
+function ClientRequestCard(props: {
+  request: MarketplaceRequest;
+  locale: string;
+  timezone: string;
+  currency: string;
+  onPress: () => void;
+}) {
+  const { request, locale, timezone, currency, onPress } = props;
+
+  return (
+    <PressableCard
+      eyebrow={formatRequestStatus(request.status)}
+      title={request.address || 'Solicitud sin direccion'}
+      subtitle={request.description || 'Sin descripcion'}
+      meta={formatDateTime(request.updatedAt || request.createdAt, locale, timezone)}
+      onPress={onPress}
+    >
+      <Text style={styles.metaLine}>
+        {request.category || 'General'} · {formatCurrency(request.finalAmount, currency, locale)}
+      </Text>
+    </PressableCard>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F4F7FB',
+  },
+  content: {
+    padding: 20,
+    gap: 16,
+  },
+  stack: {
+    gap: 12,
+  },
+  muted: {
+    fontSize: 14,
+    color: '#6B778C',
+  },
+  error: {
+    fontSize: 14,
+    color: '#B42318',
+  },
+  metaLine: {
+    fontSize: 13,
+    color: '#4A5970',
+  },
+});

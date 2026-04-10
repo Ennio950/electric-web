@@ -115,7 +115,8 @@ export default function NewInvoiceScreen() {
 
       const apiPath = invoicePdfPath(savedInvoiceId);
       const url = buildApiUrl(apiPath);
-      const localUri = `${FileSystem.cacheDirectory}invoice_${savedInvoiceNumber ?? savedInvoiceId}.pdf`;
+      const filename = `invoice_${savedInvoiceNumber ?? savedInvoiceId}.pdf`;
+      const localUri = (((FileSystem as any).cacheDirectory) || '') + filename;
 
       const { status } = await FileSystem.downloadAsync(url, localUri, {
         headers: { Authorization: `Bearer ${token}` },

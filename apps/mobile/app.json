@@ -14,16 +14,20 @@
     },
     "ios": {
       "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.straightwireelectric.staff",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Electric Staff usa tu ubicacion para registrar llegada e inicio de trabajo.",
         "NSCameraUsageDescription": "Electric Staff necesita acceso a la camara para selfies y evidencia.",
         "NSPhotoLibraryUsageDescription": "Electric Staff necesita acceso a fotos para subir pruebas y evidencia.",
         "NSMicrophoneUsageDescription": "Electric Staff necesita acceso al microfono para grabaciones de evidencia.",
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -45,6 +49,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "@react-native-google-signin/google-signin",
       "expo-router",
       "expo-secure-store",
       "expo-dev-client",
@@ -73,6 +78,7 @@
           "cameraPermission": "Electric Staff necesita acceso a la camara para selfies y evidencia."
         }
       ],
+      "expo-web-browser",
       "expo-sharing",
       "expo-updates",
       [
@@ -84,11 +90,19 @@
         }
       ]
     ],
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "mobile": {
+        "releaseStage": "development"
+      },
+      "eas": {
+        "projectId": "74e68cb7-aa19-4686-8a18-84cf962fff4e"
+      },
+      "router": {}
+    },
+    "owner": "fetris1"
   }
 }

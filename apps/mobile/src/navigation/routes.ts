@@ -4,6 +4,9 @@ import type { MobileUserRole, ReviewQueueSourceType } from '@/src/types/api';
 
 type StaticAppRoute =
   | '/(auth)/apply-employee'
+  | '/(auth)/login-admin'
+  | '/(auth)/login-client'
+  | '/(auth)/login-employee'
   | '/(auth)/login'
   | '/(auth)/magic-client'
   | '/(auth)/signup-client'
@@ -52,6 +55,9 @@ function stringifyId(id: string | number) {
 
 export const appRoutes = {
   authApplyEmployee: '/(auth)/apply-employee' as const,
+  authAdminLogin: '/(auth)/login-admin' as const,
+  authClientLogin: '/(auth)/login-client' as const,
+  authEmployeeLogin: '/(auth)/login-employee' as const,
   authLogin: '/(auth)/login' as const,
   authMagicClient: '/(auth)/magic-client' as const,
   authSignupClient: '/(auth)/signup-client' as const,
