@@ -15,6 +15,7 @@ import { useCurrentBuilderJob, useBuilderStore } from '@/src/stores/builderStore
 import { useSessionStore } from '@/src/stores/sessionStore';
 import { formatCurrency } from '@/src/lib/formatters';
 import { appRoutes, pushAppRoute } from '@/src/navigation/routes';
+import { colors, radii, spacing } from '@/src/theme';
 
 export default function BuilderDashboardScreen() {
   const bootstrap = useSessionStore((state) => state.bootstrap);
@@ -226,51 +227,51 @@ export default function BuilderDashboardScreen() {
 
 const styles = StyleSheet.create({
   sections: {
-    gap: 16
+    gap: spacing.lg,
   },
   grid: {
-    gap: 12
+    gap: spacing.md,
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: 12
+    gap: spacing.md,
   },
   horizontalList: {
     flexDirection: 'row',
-    gap: 12
+    gap: spacing.md,
   },
   jobCardWrap: {
-    width: 240
+    width: 240,
   },
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   totalLabel: {
     fontSize: 14,
-    color: '#4A5970'
+    color: colors.textSecondary,
   },
   totalValue: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#10233F'
+    color: colors.navy,
   },
   totalMeta: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#10233F'
+    color: colors.navy,
   },
   importInput: {
     minHeight: 120,
-    borderRadius: 16,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: '#C7D5EA',
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.borderMedium,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 14,
-    color: '#10233F',
-    textAlignVertical: 'top'
-  }
+    color: colors.navy,
+    textAlignVertical: 'top',
+  },
 });

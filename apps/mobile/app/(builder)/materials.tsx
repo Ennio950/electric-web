@@ -6,6 +6,7 @@ import { AppButton } from '@/src/components/AppButton';
 import { SectionCard } from '@/src/components/SectionCard';
 import { useBuilderStore } from '@/src/stores/builderStore';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 
 export default function BuilderMaterialsScreen() {
   const bootstrap = useSessionStore((state) => state.bootstrap);
@@ -135,11 +136,11 @@ function Field(props: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB'
+    backgroundColor: colors.pageBg
   },
   content: {
-    padding: 20,
-    gap: 16
+    padding: spacing.xl,
+    gap: spacing.lg
   },
   field: {
     gap: 8
@@ -149,17 +150,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
-    color: '#6B778C'
+    color: colors.textMuted
   },
   input: {
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#C7D5EA',
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.borderMedium,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     fontSize: 15,
-    color: '#10233F'
+    color: colors.navy
   },
   textarea: {
     minHeight: 120,
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    gap: 12
+    gap: spacing.md
   },
   flexField: {
     flex: 1
@@ -176,10 +177,10 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 12
+    gap: spacing.md
   },
   error: {
     fontSize: 13,
-    color: '#B42318'
+    color: colors.error
   }
 });

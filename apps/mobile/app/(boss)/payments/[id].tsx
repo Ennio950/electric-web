@@ -25,6 +25,7 @@ import {
   formatRequestStatus,
 } from '@/src/lib/formatters';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 import type { MarketplaceEmergencyCall, MarketplaceRequest } from '@/src/types/api';
 
 export default function BossPaymentDetailScreen() {
@@ -240,7 +241,7 @@ function DecisionCard(props: {
         multiline
         numberOfLines={4}
         placeholder="Motivo de rechazo (opcional)"
-        placeholderTextColor="#8A94A6"
+        placeholderTextColor={colors.textPlaceholder}
         style={styles.input}
         value={rejectionReason}
         onChangeText={setRejectionReason}
@@ -330,41 +331,41 @@ async function invalidatePaymentQueries(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   eyebrow: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#0B5FFF',
+    color: colors.primary,
     textTransform: 'uppercase',
   },
   status: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#10233F',
+    color: colors.navy,
   },
   input: {
     minHeight: 96,
     borderWidth: 1,
-    borderColor: '#D8E2F0',
-    borderRadius: 16,
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
     lineHeight: 22,
-    color: '#10233F',
+    color: colors.navy,
     textAlignVertical: 'top',
   },
   actions: {
-    gap: 12,
+    gap: spacing.md,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
 });

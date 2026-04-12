@@ -22,6 +22,7 @@ import { formatCurrency, formatDateTime, formatRequestStatus } from '@/src/lib/f
 import { compressImageForUpload, uploadImageAsset } from '@/src/lib/imageUpload';
 import { captureImageFromCamera, pickImageFromLibrary } from '@/src/lib/media';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 
 const CHAT_ENABLED_STATUSES = new Set([
   'ASIGNADO',
@@ -300,7 +301,7 @@ export default function ClientRequestDetailScreen() {
           <TextInput
             keyboardType="decimal-pad"
             placeholder="Monto final"
-            placeholderTextColor="#8A94A6"
+            placeholderTextColor={colors.textPlaceholder}
             style={styles.input}
             value={finalAmount}
             onChangeText={setFinalAmount}
@@ -308,7 +309,7 @@ export default function ClientRequestDetailScreen() {
           <TextInput
             keyboardType="number-pad"
             placeholder="Calificacion 1-5"
-            placeholderTextColor="#8A94A6"
+            placeholderTextColor={colors.textPlaceholder}
             style={styles.input}
             value={clientRating}
             onChangeText={setClientRating}
@@ -335,7 +336,7 @@ export default function ClientRequestDetailScreen() {
             autoCapitalize="none"
             autoCorrect={false}
             placeholder="https://... (foto final)"
-            placeholderTextColor="#8A94A6"
+            placeholderTextColor={colors.textPlaceholder}
             style={styles.input}
             value={finalPhotoUrl}
             onChangeText={setFinalPhotoUrl}
@@ -378,7 +379,7 @@ export default function ClientRequestDetailScreen() {
             autoCapitalize="none"
             autoCorrect={false}
             placeholder="https://... (fallback manual)"
-            placeholderTextColor="#8A94A6"
+            placeholderTextColor={colors.textPlaceholder}
             style={styles.input}
             value={paymentProofUrl}
             onChangeText={setPaymentProofUrl}
@@ -426,32 +427,32 @@ export default function ClientRequestDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   status: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0B5FFF',
+    color: colors.primary,
   },
   actions: {
-    gap: 12,
+    gap: spacing.md,
   },
   input: {
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#D6DDE8',
-    backgroundColor: '#F9FBFD',
+    borderColor: colors.borderLight,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     paddingVertical: 13,
     fontSize: 16,
-    color: '#10233F',
+    color: colors.navy,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
 });

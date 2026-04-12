@@ -3,6 +3,7 @@ import { Redirect, Stack } from 'expo-router';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { appRoutes, getRoleHomeRoute, toExpoHref } from '@/src/navigation/routes';
 import { useSessionStore, useSessionSnapshot } from '@/src/stores/sessionStore';
+import { colors } from '@/src/theme';
 
 export default function BuilderLayout() {
   const session = useSessionSnapshot();
@@ -24,14 +25,14 @@ export default function BuilderLayout() {
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#10233F'
+          backgroundColor: colors.navy
         },
-        headerTintColor: '#FFFFFF',
+        headerTintColor: colors.cardBg,
         headerTitleStyle: {
           fontWeight: '700'
         },
         contentStyle: {
-          backgroundColor: '#F4F7FB'
+          backgroundColor: colors.pageBg
         }
       }}
     >

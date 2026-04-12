@@ -12,6 +12,7 @@ import { loadClientEmergencyCalls } from '@/src/services/apiService';
 import { formatCurrency, formatDateTime, formatEmergencyStatus } from '@/src/lib/formatters';
 import { appRoutes, pushAppRoute } from '@/src/navigation/routes';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 import type { MarketplaceEmergencyCall } from '@/src/types/api';
 
 const ACTIVE_STATUSES = new Set([
@@ -166,25 +167,25 @@ function EmergencyCard(props: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   stack: {
-    gap: 12,
+    gap: spacing.md,
   },
   muted: {
     fontSize: 14,
-    color: '#6B778C',
+    color: colors.textMuted,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
   metaLine: {
     fontSize: 13,
-    color: '#4A5970',
+    color: colors.textSecondary,
   },
 });

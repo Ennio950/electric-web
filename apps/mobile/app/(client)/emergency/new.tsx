@@ -9,6 +9,7 @@ import { SectionCard } from '@/src/components/SectionCard';
 import { createClientEmergencyCall, withCurrentToken } from '@/src/lib/api';
 import { appRoutes, replaceAppRoute } from '@/src/navigation/routes';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 
 const PRIORITY_OPTIONS = [
   { label: 'Urgente', value: 'urgent' },
@@ -85,7 +86,7 @@ export default function ClientEmergencyNewScreen() {
         <Text style={styles.label}>Nombre de contacto</Text>
         <TextInput
           placeholder="Tu nombre"
-          placeholderTextColor="#8A94A6"
+          placeholderTextColor={colors.textPlaceholder}
           style={styles.input}
           value={clientName}
           onChangeText={setClientName}
@@ -95,7 +96,7 @@ export default function ClientEmergencyNewScreen() {
         <TextInput
           keyboardType="phone-pad"
           placeholder="Telefono de contacto"
-          placeholderTextColor="#8A94A6"
+          placeholderTextColor={colors.textPlaceholder}
           style={styles.input}
           value={phone}
           onChangeText={setPhone}
@@ -104,7 +105,7 @@ export default function ClientEmergencyNewScreen() {
         <Text style={styles.label}>Ubicacion</Text>
         <TextInput
           placeholder="Direccion o punto de referencia"
-          placeholderTextColor="#8A94A6"
+          placeholderTextColor={colors.textPlaceholder}
           style={styles.input}
           value={location}
           onChangeText={setLocation}
@@ -115,7 +116,7 @@ export default function ClientEmergencyNewScreen() {
           multiline
           numberOfLines={5}
           placeholder="Explica el problema"
-          placeholderTextColor="#8A94A6"
+          placeholderTextColor={colors.textPlaceholder}
           style={[styles.input, styles.textArea]}
           value={issue}
           onChangeText={setIssue}
@@ -127,7 +128,7 @@ export default function ClientEmergencyNewScreen() {
               <Text style={styles.label}>Fecha</Text>
               <TextInput
                 placeholder="2026-03-11"
-                placeholderTextColor="#8A94A6"
+                placeholderTextColor={colors.textPlaceholder}
                 style={styles.input}
                 value={scheduledDate}
                 onChangeText={setScheduledDate}
@@ -137,7 +138,7 @@ export default function ClientEmergencyNewScreen() {
               <Text style={styles.label}>Hora</Text>
               <TextInput
                 placeholder="14:30"
-                placeholderTextColor="#8A94A6"
+                placeholderTextColor={colors.textPlaceholder}
                 style={styles.input}
                 value={scheduledTime}
                 onChangeText={setScheduledTime}
@@ -159,25 +160,25 @@ export default function ClientEmergencyNewScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
+    padding: spacing.xl,
   },
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#23324A',
+    color: colors.navyLabel,
   },
   input: {
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#D6DDE8',
-    backgroundColor: '#F9FBFD',
+    borderColor: colors.borderLight,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     paddingVertical: 13,
     fontSize: 16,
-    color: '#10233F',
+    color: colors.navy,
   },
   textArea: {
     minHeight: 120,
@@ -185,13 +186,13 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   flexField: {
     flex: 1,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
 });

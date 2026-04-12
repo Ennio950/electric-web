@@ -25,6 +25,7 @@ import {
   formatRequestStatus,
 } from '@/src/lib/formatters';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 import type { EmployeeDirectoryItem } from '@/src/types/api';
 
 export default function BossQueueDetailScreen() {
@@ -327,38 +328,38 @@ async function invalidateQueueQueries(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   eyebrow: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#0B5FFF',
+    color: colors.primary,
     textTransform: 'uppercase',
   },
   status: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#10233F',
+    color: colors.navy,
   },
   link: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0B5FFF',
+    color: colors.primary,
   },
   muted: {
     fontSize: 14,
-    color: '#6B778C',
+    color: colors.textMuted,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
   assignmentStack: {
-    gap: 12,
+    gap: spacing.md,
   },
   assignmentRow: {
     gap: 10,

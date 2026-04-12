@@ -9,6 +9,7 @@ import { ChatThread } from '@/src/components/ChatThread';
 import { KeyValueList } from '@/src/components/KeyValueList';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { SectionCard } from '@/src/components/SectionCard';
+import { colors, radii, spacing } from '@/src/theme';
 import { compressImageForUpload, uploadImageAsset } from '@/src/lib/imageUpload';
 import {
   acceptEmergencyCall,
@@ -270,7 +271,7 @@ export default function EmployeeEmergencyDetailScreen() {
         <TextInput
           keyboardType="decimal-pad"
           placeholder={`Monto en ${companyConfig.currency}`}
-          placeholderTextColor="#8A94A6"
+          placeholderTextColor={colors.textPlaceholder}
           style={styles.input}
           value={quotedAmount}
           onChangeText={setQuotedAmount}
@@ -311,7 +312,7 @@ export default function EmployeeEmergencyDetailScreen() {
           autoCapitalize="none"
           autoCorrect={false}
           placeholder="https://..."
-          placeholderTextColor="#8A94A6"
+          placeholderTextColor={colors.textPlaceholder}
           style={styles.input}
           value={proofUrl}
           onChangeText={setProofUrl}
@@ -377,10 +378,16 @@ export default function EmployeeEmergencyDetailScreen() {
           <View style={styles.attachmentDrafts}>
             {pendingChatAttachments.map((attachment, index) => (
               <View key={`${attachment}-${index}`} style={styles.attachmentDraft}>
-                <Pressable onPress={() => void Linking.openURL(attachment)}>
+                <Pressable
+                  accessibilityRole="link"
+                  accessibilityLabel={`Abrir adjunto ${index + 1}`}
+                  onPress={() => void Linking.openURL(attachment)}
+                >
                   <Text style={styles.attachmentDraftLabel}>Adjunto {index + 1}</Text>
                 </Pressable>
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Quitar adjunto ${index + 1}`}
                   onPress={() =>
                     setPendingChatAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))
                   }
@@ -410,55 +417,55 @@ export default function EmployeeEmergencyDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   status: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0B5FFF',
+    color: colors.primary,
   },
   actions: {
-    gap: 12,
+    gap: spacing.md,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
   input: {
     minHeight: 52,
     borderWidth: 1,
-    borderColor: '#D8E2F0',
-    borderRadius: 16,
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#10233F',
+    color: colors.navy,
   },
   attachmentDrafts: {
-    gap: 10,
+    gap: spacing.sm,
   },
   attachmentDraft: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 14,
-    backgroundColor: '#F8FAFD',
+    borderRadius: radii.md,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
   attachmentDraftLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0B5FFF',
+    color: colors.primary,
   },
   attachmentDraftRemove: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#B42318',
+    color: colors.error,
   },
 });
