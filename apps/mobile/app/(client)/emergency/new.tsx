@@ -72,7 +72,7 @@ export default function ClientEmergencyNewScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <SectionCard
         title="Nueva emergencia"
         subtitle="Abre un servicio urgente o agenda uno programado desde el mismo flujo."
