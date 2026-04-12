@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { Text, View } from 'react-native';
 
 import { DashboardScreen } from '@/src/components/DashboardScreen';
@@ -10,6 +11,7 @@ import { fetchClientRequests, fetchEmergencyCalls, withCurrentToken } from '@/sr
 import { formatDateTime, formatEmergencyStatus, formatRequestStatus } from '@/src/lib/formatters';
 import { appRoutes, pushAppRoute } from '@/src/navigation/routes';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors } from '@/src/theme';
 
 export default function ClientHomeScreen() {
   const bootstrap = useSessionStore((state) => state.bootstrap);
@@ -25,6 +27,12 @@ export default function ClientHomeScreen() {
     queryFn: () => withCurrentToken((token) => fetchEmergencyCalls(token, { mode: 'all' })),
   });
 
+  const handleRefresh = useCallback(() => {
+    void homeQuery.refetch();
+    void requestsQuery.refetch();
+    void emergencyQuery.refetch();
+  }, [homeQuery, requestsQuery, emergencyQuery]);
+
   if (!bootstrap) {
     return null;
   }
@@ -39,6 +47,7 @@ export default function ClientHomeScreen() {
       };
 
   const recentRequests = (requestsQuery.data ?? []).slice(0, 3);
+  const recentEmergencies = (emergencyQuery.data ?? []).slice(0, 3);
 
   return (
     <DashboardScreen
@@ -53,6 +62,7 @@ export default function ClientHomeScreen() {
         { label: 'Completadas', value: summary.completedRequests },
       ]}
       isLoading={homeQuery.isLoading || requestsQuery.isLoading || emergencyQuery.isLoading}
+      onRefresh={handleRefresh}
       errorMessage={
         homeQuery.error instanceof Error
           ? homeQuery.error.message
@@ -109,14 +119,14 @@ export default function ClientHomeScreen() {
                 meta={formatDateTime(request.createdAt, bootstrap.companyConfig.locale, bootstrap.companyConfig.timezone)}
                 onPress={() => pushAppRoute(appRoutes.clientRequestDetail(request.id))}
               />
-            )) : <Text style={{ fontSize: 14, color: '#6B778C' }}>Todavia no tienes solicitudes.</Text>}
+            )) : <Text style={{ fontSize: 14, color: colors.textMuted }}>Todavia no tienes solicitudes.</Text>}
           </SectionCard>
 
           <SectionCard
             title="Emergencias"
             subtitle="Tus ultimas llamadas de emergencia o trabajos programados."
           >
-            {(emergencyQuery.data ?? []).slice(0, 3).length ? (emergencyQuery.data ?? []).slice(0, 3).map((call) => (
+            {recentEmergencies.length ? recentEmergencies.map((call) => (
               <PressableCard
                 key={call.id}
                 eyebrow={formatEmergencyStatus(call.status)}
@@ -125,7 +135,7 @@ export default function ClientHomeScreen() {
                 meta={formatDateTime(call.updatedAt || call.createdAt, bootstrap.companyConfig.locale, bootstrap.companyConfig.timezone)}
                 onPress={() => pushAppRoute(appRoutes.clientEmergencyDetail(call.id))}
               />
-            )) : <Text style={{ fontSize: 14, color: '#6B778C' }}>Todavia no tienes emergencias.</Text>}
+            )) : <Text style={{ fontSize: 14, color: colors.textMuted }}>Todavia no tienes emergencias.</Text>}
           </SectionCard>
 
           <SignOutButton />

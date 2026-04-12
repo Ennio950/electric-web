@@ -15,7 +15,12 @@ export function PressableCard(props: PressableCardProps) {
   const { eyebrow, title, subtitle, meta, onPress, children } = props;
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed ? styles.pressed : null]}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed ? styles.pressed : null]}
+    >
       {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
       <Text style={styles.title}>{title}</Text>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}

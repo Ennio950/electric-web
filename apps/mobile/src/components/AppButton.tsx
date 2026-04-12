@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 import { colors, layout, radii } from '@/src/theme';
 
@@ -26,11 +27,16 @@ export function AppButton(props: AppButtonProps) {
   const spinnerColor = tone === 'secondary' ? colors.navy : colors.textOnDark;
   const labelColor = tone === 'secondary' ? colors.navy : colors.textOnDark;
 
+  const handlePress = () => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress?.();
+  };
+
   return (
     <Pressable
       accessibilityRole="button"
       disabled={isDisabled}
-      onPress={onPress}
+      onPress={handlePress}
       style={({ pressed }) => [
         styles.base,
         { minHeight: cfg.minHeight, borderRadius: cfg.borderRadius, paddingHorizontal: cfg.px },
