@@ -158,10 +158,10 @@ export function OperationalChatCard(props: OperationalChatCardProps) {
         <View style={styles.attachmentDrafts}>
           {pendingAttachments.map((attachment, index) => (
             <View key={`${attachment}-${index}`} style={styles.attachmentDraft}>
-              <Pressable onPress={() => void Linking.openURL(attachment)}>
+              <Pressable accessibilityRole="link" accessibilityLabel={`Abrir adjunto ${index + 1}`} onPress={() => void Linking.openURL(attachment)}>
                 <Text style={styles.attachmentDraftLabel}>Adjunto {index + 1}</Text>
               </Pressable>
-              <Pressable onPress={() => setPendingAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))}>
+              <Pressable accessibilityRole="button" accessibilityLabel={`Quitar adjunto ${index + 1}`} onPress={() => setPendingAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))}>
                 <Text style={styles.attachmentDraftRemove}>Quitar</Text>
               </Pressable>
             </View>

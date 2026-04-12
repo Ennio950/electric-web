@@ -156,6 +156,9 @@ export default function BuilderJobDetailScreen() {
             {MEASURE_TYPES.map((measureType) => (
               <Pressable
                 key={measureType}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: selectedComponent.measureType === measureType }}
+                accessibilityLabel={measureType}
                 onPress={() => updateComponentMeasureType(selectedComponent.id, measureType)}
                 style={[
                   styles.measureChip,
@@ -215,6 +218,9 @@ export default function BuilderJobDetailScreen() {
               {LABOR_MODES.map((mode) => (
                 <Pressable
                   key={mode}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: selectedComponent.labor.mode === mode }}
+                  accessibilityLabel={mode}
                   onPress={() => updateComponentLabor(selectedComponent.id, { mode })}
                   style={[
                     styles.measureChip,
@@ -461,6 +467,8 @@ function ComponentNode(props: {
   return (
     <View style={styles.stack}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Seleccionar componente ${component.name}`}
         onPress={() => onSelect(component.id)}
         style={[
           styles.componentNode,

@@ -373,10 +373,12 @@ export default function EmployeeRequestDetailScreen() {
           <View style={styles.attachmentDrafts}>
             {pendingChatAttachments.map((attachment, index) => (
               <View key={`${attachment}-${index}`} style={styles.attachmentDraft}>
-                <Pressable onPress={() => void Linking.openURL(attachment)}>
+                <Pressable accessibilityRole="link" accessibilityLabel={`Abrir adjunto ${index + 1}`} onPress={() => void Linking.openURL(attachment)}>
                   <Text style={styles.attachmentDraftLabel}>Adjunto {index + 1}</Text>
                 </Pressable>
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Quitar adjunto ${index + 1}`}
                   onPress={() =>
                     setPendingChatAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))
                   }
