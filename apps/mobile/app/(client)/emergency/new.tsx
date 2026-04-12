@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AppButton } from '@/src/components/AppButton';
 import { FilterChips } from '@/src/components/FilterChips';
+import { FormInput } from '@/src/components/FormInput';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { SectionCard } from '@/src/components/SectionCard';
 import { createClientEmergencyCall, withCurrentToken } from '@/src/lib/api';
 import { appRoutes, replaceAppRoute } from '@/src/navigation/routes';
 import { useSessionStore } from '@/src/stores/sessionStore';
-import { colors, radii, spacing } from '@/src/theme';
+import { colors, spacing } from '@/src/theme';
 
 const PRIORITY_OPTIONS = [
   { label: 'Urgente', value: 'urgent' },
@@ -77,47 +78,39 @@ export default function ClientEmergencyNewScreen() {
         title="Nueva emergencia"
         subtitle="Abre un servicio urgente o agenda uno programado desde el mismo flujo."
       >
-        <Text style={styles.label}>Tipo</Text>
+        <Text style={styles.chipLabel}>Tipo</Text>
         <FilterChips value={dispatchMode} onChange={(value) => setDispatchMode(value as 'emergency' | 'scheduled')} options={MODE_OPTIONS} />
 
-        <Text style={styles.label}>Prioridad</Text>
+        <Text style={styles.chipLabel}>Prioridad</Text>
         <FilterChips value={priority} onChange={setPriority} options={PRIORITY_OPTIONS} />
 
-        <Text style={styles.label}>Nombre de contacto</Text>
-        <TextInput
+        <FormInput
+          label="Nombre de contacto"
           placeholder="Tu nombre"
-          placeholderTextColor={colors.textPlaceholder}
-          style={styles.input}
           value={clientName}
           onChangeText={setClientName}
         />
 
-        <Text style={styles.label}>Telefono</Text>
-        <TextInput
+        <FormInput
+          label="Telefono"
           keyboardType="phone-pad"
           placeholder="Telefono de contacto"
-          placeholderTextColor={colors.textPlaceholder}
-          style={styles.input}
           value={phone}
           onChangeText={setPhone}
         />
 
-        <Text style={styles.label}>Ubicacion</Text>
-        <TextInput
+        <FormInput
+          label="Ubicacion"
           placeholder="Direccion o punto de referencia"
-          placeholderTextColor={colors.textPlaceholder}
-          style={styles.input}
           value={location}
           onChangeText={setLocation}
         />
 
-        <Text style={styles.label}>Detalle</Text>
-        <TextInput
+        <FormInput
+          label="Detalle"
           multiline
           numberOfLines={5}
           placeholder="Explica el problema"
-          placeholderTextColor={colors.textPlaceholder}
-          style={[styles.input, styles.textArea]}
           value={issue}
           onChangeText={setIssue}
         />
@@ -125,21 +118,17 @@ export default function ClientEmergencyNewScreen() {
         {dispatchMode === 'scheduled' ? (
           <View style={styles.row}>
             <View style={styles.flexField}>
-              <Text style={styles.label}>Fecha</Text>
-              <TextInput
+              <FormInput
+                label="Fecha"
                 placeholder="2026-03-11"
-                placeholderTextColor={colors.textPlaceholder}
-                style={styles.input}
                 value={scheduledDate}
                 onChangeText={setScheduledDate}
               />
             </View>
             <View style={styles.flexField}>
-              <Text style={styles.label}>Hora</Text>
-              <TextInput
+              <FormInput
+                label="Hora"
                 placeholder="14:30"
-                placeholderTextColor={colors.textPlaceholder}
-                style={styles.input}
                 value={scheduledTime}
                 onChangeText={setScheduledTime}
               />
@@ -165,24 +154,10 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.xl,
   },
-  label: {
+  chipLabel: {
     fontSize: 13,
     fontWeight: '700',
     color: colors.navyLabel,
-  },
-  input: {
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    backgroundColor: colors.inputBg,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    fontSize: 16,
-    color: colors.navy,
-  },
-  textArea: {
-    minHeight: 120,
-    textAlignVertical: 'top',
   },
   row: {
     flexDirection: 'row',

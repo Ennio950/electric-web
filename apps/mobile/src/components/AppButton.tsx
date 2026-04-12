@@ -28,7 +28,11 @@ export function AppButton(props: AppButtonProps) {
   const labelColor = tone === 'secondary' ? colors.navy : colors.textOnDark;
 
   const handlePress = () => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (tone === 'danger') {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    } else {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     onPress?.();
   };
 
