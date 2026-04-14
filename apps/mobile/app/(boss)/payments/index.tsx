@@ -150,10 +150,6 @@ const styles = StyleSheet.create({
   stack: {
     gap: spacing.md,
   },
-  error: {
-    fontSize: 14,
-    color: colors.error,
-  },
   amount: {
     fontSize: 18,
     fontWeight: '800',

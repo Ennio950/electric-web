@@ -283,10 +283,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textMuted,
   },
-  error: {
-    fontSize: 14,
-    color: colors.error,
-  },
   metaLine: {
     fontSize: 13,
     color: colors.textSecondary,

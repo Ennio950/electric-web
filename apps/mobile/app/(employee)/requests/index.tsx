@@ -214,10 +214,6 @@ const styles = StyleSheet.create({
   stack: {
     gap: spacing.md,
   },
-  error: {
-    fontSize: 14,
-    color: colors.error,
-  },
   metaLine: {
     fontSize: 13,
     color: colors.textSecondary,

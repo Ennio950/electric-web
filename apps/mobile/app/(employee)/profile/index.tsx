@@ -400,8 +400,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.navy,
   },
-  error: {
-    fontSize: 14,
-    color: colors.error,
-  },
 });
