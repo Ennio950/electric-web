@@ -38,7 +38,7 @@ export function StatusBadge({ status, type }: StatusBadgeProps) {
   const label = type === 'request' ? formatRequestStatus(status) : formatEmergencyStatus(status);
 
   return (
-    <View style={[styles.pill, { backgroundColor: pair.bg }]}>
+    <View accessibilityRole="text" accessibilityLabel={`Estado: ${label}`} style={[styles.pill, { backgroundColor: pair.bg }]}>
       <Text style={[styles.label, { color: pair.text }]}>{label}</Text>
     </View>
   );

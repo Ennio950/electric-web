@@ -22,8 +22,8 @@ export function PressableCard(props: PressableCardProps) {
       style={({ pressed }) => [styles.card, pressed ? styles.pressed : null]}
     >
       {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
-      <Text style={styles.title}>{title}</Text>
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <Text style={styles.title} numberOfLines={2}>{title}</Text>
+      {subtitle ? <Text style={styles.subtitle} numberOfLines={3}>{subtitle}</Text> : null}
       {meta ? <Text style={styles.meta}>{meta}</Text> : null}
       {children ? <View style={styles.children}>{children}</View> : null}
     </Pressable>
