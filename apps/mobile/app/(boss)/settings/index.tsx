@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AppButton } from '@/src/components/AppButton';
+import { KeyboardSafeScrollView } from '@/src/components/KeyboardSafeScrollView';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { SectionCard } from '@/src/components/SectionCard';
 import {
@@ -174,7 +175,7 @@ export default function BossSettingsScreen() {
               : null;
 
   return (
-    <ScrollView
+    <KeyboardSafeScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
@@ -285,7 +286,7 @@ export default function BossSettingsScreen() {
       </SectionCard>
 
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-    </ScrollView>
+    </KeyboardSafeScrollView>
   );
 }
 

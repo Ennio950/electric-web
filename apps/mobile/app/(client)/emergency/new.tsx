@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { AppButton } from '@/src/components/AppButton';
 import { FilterChips } from '@/src/components/FilterChips';
 import { FormInput } from '@/src/components/FormInput';
+import { KeyboardSafeScrollView } from '@/src/components/KeyboardSafeScrollView';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { SectionCard } from '@/src/components/SectionCard';
 import { createClientEmergencyCall, withCurrentToken } from '@/src/lib/api';
@@ -73,7 +74,7 @@ export default function ClientEmergencyNewScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <KeyboardSafeScrollView style={styles.container} contentContainerStyle={styles.content}>
       <SectionCard
         title="Nueva emergencia"
         subtitle="Abre un servicio urgente o agenda uno programado desde el mismo flujo."
@@ -142,7 +143,7 @@ export default function ClientEmergencyNewScreen() {
 
         {createMutation.error instanceof Error ? <Text style={styles.error}>{createMutation.error.message}</Text> : null}
       </SectionCard>
-    </ScrollView>
+    </KeyboardSafeScrollView>
   );
 }
 

@@ -6,6 +6,7 @@ import { AppButton } from '@/src/components/AppButton';
 import { FilterChips } from '@/src/components/FilterChips';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SearchField } from '@/src/components/SearchField';
 import { SectionCard } from '@/src/components/SectionCard';
 import { loadClientEmergencyCalls } from '@/src/services/apiService';
@@ -114,9 +115,7 @@ export default function ClientEmergencyListScreen() {
       <SectionCard title="Historial">
         {emergencyQuery.isLoading ? <Text style={styles.muted}>Cargando tus emergencias...</Text> : null}
         {emergencyQuery.error ? (
-          <Text style={styles.error}>
-            {emergencyQuery.error instanceof Error ? emergencyQuery.error.message : 'No se pudo cargar el historial.'}
-          </Text>
+          <QueryErrorBanner error={emergencyQuery.error} fallbackMessage="No se pudo cargar el historial." onRetry={() => void emergencyQuery.refetch()} />
         ) : null}
         {calls.length ? (
           <View style={styles.stack}>

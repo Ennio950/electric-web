@@ -6,6 +6,7 @@ import { EmptyState } from '@/src/components/EmptyState';
 import { FilterChips } from '@/src/components/FilterChips';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SearchField } from '@/src/components/SearchField';
 import { SectionCard } from '@/src/components/SectionCard';
 import { StatusBadge } from '@/src/components/StatusBadge';
@@ -124,9 +125,7 @@ export default function EmployeeRequestsScreen() {
       >
         {availableQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
         {availableQuery.error ? (
-          <Text style={styles.error}>
-            {availableQuery.error instanceof Error ? availableQuery.error.message : 'No se pudo cargar la cola disponible.'}
-          </Text>
+          <QueryErrorBanner error={availableQuery.error} fallbackMessage="No se pudo cargar la cola disponible." onRetry={() => void availableQuery.refetch()} />
         ) : null}
         {filteredAvailable.length ? (
           <View style={styles.stack}>
@@ -155,9 +154,7 @@ export default function EmployeeRequestsScreen() {
       >
         {myRequestsQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
         {myRequestsQuery.error ? (
-          <Text style={styles.error}>
-            {myRequestsQuery.error instanceof Error ? myRequestsQuery.error.message : 'No se pudo cargar tu cola.'}
-          </Text>
+          <QueryErrorBanner error={myRequestsQuery.error} fallbackMessage="No se pudo cargar tu cola." onRetry={() => void myRequestsQuery.refetch()} />
         ) : null}
         {filteredMine.length ? (
           <View style={styles.stack}>

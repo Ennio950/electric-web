@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { AppButton } from '@/src/components/AppButton';
 import { FilterChips } from '@/src/components/FilterChips';
 import { FormInput } from '@/src/components/FormInput';
+import { KeyboardSafeScrollView } from '@/src/components/KeyboardSafeScrollView';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { SectionCard } from '@/src/components/SectionCard';
 import { createClientRequest, withCurrentToken } from '@/src/lib/api';
@@ -83,10 +84,9 @@ export default function ClientRequestNewScreen() {
   }
 
   return (
-    <ScrollView
+    <KeyboardSafeScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
     >
       <SectionCard
         title="Nueva solicitud"
@@ -149,7 +149,7 @@ export default function ClientRequestNewScreen() {
         {uploadPhotoMutation.error instanceof Error ? <Text style={styles.error}>{uploadPhotoMutation.error.message}</Text> : null}
         {createMutation.error instanceof Error ? <Text style={styles.error}>{createMutation.error.message}</Text> : null}
       </SectionCard>
-    </ScrollView>
+    </KeyboardSafeScrollView>
   );
 }
 

@@ -6,6 +6,7 @@ import { AppButton } from '@/src/components/AppButton';
 import { FilterChips } from '@/src/components/FilterChips';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SearchField } from '@/src/components/SearchField';
 import { SectionCard } from '@/src/components/SectionCard';
 import { loadClientRequests } from '@/src/services/apiService';
@@ -113,9 +114,7 @@ export default function ClientRequestsScreen() {
       <SectionCard title="Historial">
         {requestsQuery.isLoading ? <Text style={styles.muted}>Cargando tus solicitudes...</Text> : null}
         {requestsQuery.error ? (
-          <Text style={styles.error}>
-            {requestsQuery.error instanceof Error ? requestsQuery.error.message : 'No se pudo cargar tu historial.'}
-          </Text>
+          <QueryErrorBanner error={requestsQuery.error} fallbackMessage="No se pudo cargar tu historial." onRetry={() => void requestsQuery.refetch()} />
         ) : null}
         {requests.length ? (
           <View style={styles.stack}>

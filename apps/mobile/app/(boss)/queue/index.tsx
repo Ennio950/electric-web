@@ -6,6 +6,7 @@ import { EmptyState } from '@/src/components/EmptyState';
 import { FilterChips } from '@/src/components/FilterChips';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SearchField } from '@/src/components/SearchField';
 import { SectionCard } from '@/src/components/SectionCard';
 import { StatusBadge } from '@/src/components/StatusBadge';
@@ -125,9 +126,7 @@ export default function BossQueueScreen() {
       <SectionCard title="Solicitudes" subtitle="Cola general de requests.">
         {requestsQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
         {requestsQuery.error ? (
-          <Text style={styles.error}>
-            {requestsQuery.error instanceof Error ? requestsQuery.error.message : 'No se pudo cargar la cola de requests.'}
-          </Text>
+          <QueryErrorBanner error={requestsQuery.error} fallbackMessage="No se pudo cargar la cola de requests." onRetry={() => void requestsQuery.refetch()} />
         ) : null}
         {filteredRequests.length ? (
           <View style={styles.stack}>
@@ -154,9 +153,7 @@ export default function BossQueueScreen() {
       <SectionCard title="Emergencias" subtitle="Incluye pendientes, programadas y en curso.">
         {emergenciesQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
         {emergenciesQuery.error ? (
-          <Text style={styles.error}>
-            {emergenciesQuery.error instanceof Error ? emergenciesQuery.error.message : 'No se pudo cargar la cola de emergencias.'}
-          </Text>
+          <QueryErrorBanner error={emergenciesQuery.error} fallbackMessage="No se pudo cargar la cola de emergencias." onRetry={() => void emergenciesQuery.refetch()} />
         ) : null}
         {filteredEmergencies.length ? (
           <View style={styles.stack}>

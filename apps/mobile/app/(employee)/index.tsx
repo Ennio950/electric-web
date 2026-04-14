@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 
 import { EmptyState } from '@/src/components/EmptyState';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SectionCard } from '@/src/components/SectionCard';
 import { SignOutButton } from '@/src/components/SignOutButton';
 import { StatusBadge } from '@/src/components/StatusBadge';
@@ -98,9 +99,7 @@ export default function EmployeeHomeScreen() {
       <SectionCard title="Tus requests recientes" subtitle="Los últimos trabajos asignados a tu cuenta.">
         {myRequestsQuery.isLoading ? <Text style={styles.muted}>Cargando tus requests...</Text> : null}
         {myRequestsQuery.error ? (
-          <Text style={styles.error}>
-            {myRequestsQuery.error instanceof Error ? myRequestsQuery.error.message : 'No se pudo cargar la actividad.'}
-          </Text>
+          <QueryErrorBanner error={myRequestsQuery.error} fallbackMessage="No se pudo cargar la actividad." onRetry={() => void myRequestsQuery.refetch()} />
         ) : null}
         {recentRequests.length ? (
           <View style={styles.stack}>
@@ -127,9 +126,7 @@ export default function EmployeeHomeScreen() {
       <SectionCard title="Emergencias asignadas" subtitle="Las emergencias activas que ya están en tu cancha.">
         {emergenciesQuery.isLoading ? <Text style={styles.muted}>Cargando emergencias...</Text> : null}
         {emergenciesQuery.error ? (
-          <Text style={styles.error}>
-            {emergenciesQuery.error instanceof Error ? emergenciesQuery.error.message : 'No se pudo cargar la actividad.'}
-          </Text>
+          <QueryErrorBanner error={emergenciesQuery.error} fallbackMessage="No se pudo cargar la actividad." onRetry={() => void emergenciesQuery.refetch()} />
         ) : null}
         {assignedEmergencies.length ? (
           <View style={styles.stack}>
@@ -153,7 +150,7 @@ export default function EmployeeHomeScreen() {
         ) : null}
       </SectionCard>
 
-      {homeQuery.error instanceof Error ? <Text style={styles.error}>{homeQuery.error.message}</Text> : null}
+      {homeQuery.error ? <QueryErrorBanner error={homeQuery.error} onRetry={() => void homeQuery.refetch()} /> : null}
       <SectionCard title="Sesión">
         <SignOutButton />
       </SectionCard>

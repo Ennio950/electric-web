@@ -6,6 +6,7 @@ import { AppButton } from '@/src/components/AppButton';
 import { EmptyState } from '@/src/components/EmptyState';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SectionCard } from '@/src/components/SectionCard';
 import {
   approveBossEmployeeRequest,
@@ -117,7 +118,7 @@ export default function BossAdminScreen() {
     >
       <SectionCard title="Earnings" subtitle="Comision del boss y ultimos ingresos aprobados.">
         {earningsQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
-        {earningsQuery.error instanceof Error ? <Text style={styles.error}>{earningsQuery.error.message}</Text> : null}
+        {earningsQuery.error ? <QueryErrorBanner error={earningsQuery.error} onRetry={() => void earningsQuery.refetch()} /> : null}
         {earnings ? (
           <View style={styles.statsGrid}>
             <Metric label="Hoy" value={formatCurrency(earnings.summary.today, currency, locale)} />
@@ -147,7 +148,7 @@ export default function BossAdminScreen() {
 
       <SectionCard title="Solicitudes de empleado" subtitle="Aprobacion de nuevos empleados desde móvil.">
         {employeeRequestsQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
-        {employeeRequestsQuery.error instanceof Error ? <Text style={styles.error}>{employeeRequestsQuery.error.message}</Text> : null}
+        {employeeRequestsQuery.error ? <QueryErrorBanner error={employeeRequestsQuery.error} onRetry={() => void employeeRequestsQuery.refetch()} /> : null}
         {employeeRequestsQuery.data?.length ? (
           <View style={styles.stack}>
             {employeeRequestsQuery.data.map((request) => (
@@ -173,7 +174,7 @@ export default function BossAdminScreen() {
 
       <SectionCard title="Cambios de foto" subtitle="Aprobacion de cambios de foto de perfil para tecnicos.">
         {photoChangesQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
-        {photoChangesQuery.error instanceof Error ? <Text style={styles.error}>{photoChangesQuery.error.message}</Text> : null}
+        {photoChangesQuery.error ? <QueryErrorBanner error={photoChangesQuery.error} onRetry={() => void photoChangesQuery.refetch()} /> : null}
         {photoChangesQuery.data?.length ? (
           <View style={styles.stack}>
             {photoChangesQuery.data.map((request) => (

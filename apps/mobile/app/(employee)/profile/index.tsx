@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { Linking, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Linking, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AppButton } from '@/src/components/AppButton';
 import { EmptyState } from '@/src/components/EmptyState';
+import { KeyboardSafeScrollView } from '@/src/components/KeyboardSafeScrollView';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SectionCard } from '@/src/components/SectionCard';
 import {
   fetchEmployeePublicProfile,
@@ -154,7 +156,7 @@ export default function EmployeeProfileScreen() {
   }
 
   return (
-    <ScrollView
+    <KeyboardSafeScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
@@ -263,8 +265,8 @@ export default function EmployeeProfileScreen() {
         </SectionCard>
       ) : null}
 
-      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-    </ScrollView>
+      {errorMessage ? <QueryErrorBanner error={errorMessage} onRetry={() => { void publicProfileQuery.refetch(); void photoChangeQuery.refetch(); }} /> : null}
+    </KeyboardSafeScrollView>
   );
 }
 
