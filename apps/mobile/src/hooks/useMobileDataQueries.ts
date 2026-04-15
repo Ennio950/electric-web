@@ -16,8 +16,6 @@ import {
   getBossReviewQueueQueryOptions,
   getClientDashboardQueryOptions,
   getClientEmergencyCallsQueryOptions,
-  getClientEmergencyDetailQueryOptions,
-  getClientRequestDetailQueryOptions,
   getClientRequestsQueryOptions,
   getEmergencyChatQueryOptions,
   getEmergencyDetailQueryOptions,
@@ -26,7 +24,6 @@ import {
   getEmployeeEmergencyCallsQueryOptions,
   getEmployeePublicProfileQueryOptions,
   getEmployeeRequestsQueryOptions,
-  getMobileDashboardQueryOptions,
   getMobileHomeQueryOptions,
   getMyEmployeePhotoChangeQueryOptions,
   getRequestChatQueryOptions,
@@ -67,11 +64,14 @@ export function useMobileHomeQuery() {
 export function useMobileDashboardQuery() {
   const { session } = useQuerySession();
 
-  return useQuery(getMobileDashboardQueryOptions({
-    role: session.role,
-    userId: session.userId,
-    enabled: session.isAuthenticated,
-  }));
+  // For now, dashboards redirect to home query based on role
+  if (session.role === 'boss') {
+    return useQuery(getBossDashboardQueryOptions(session.isAuthenticated));
+  } else if (session.role === 'employee') {
+    return useQuery(getEmployeeDashboardQueryOptions(session.isAuthenticated));
+  } else {
+    return useQuery(getClientDashboardQueryOptions(session.isAuthenticated));
+  }
 }
 
 export function useClientDashboardQuery() {
@@ -81,12 +81,9 @@ export function useClientDashboardQuery() {
 }
 
 export function useEmployeeDashboardQuery() {
-  const { session, enabled } = useQuerySession('employee');
+  const { enabled } = useQuerySession('employee');
 
-  return useQuery(getEmployeeDashboardQueryOptions({
-    userId: session.userId,
-    enabled,
-  }));
+  return useQuery(getEmployeeDashboardQueryOptions(enabled));
 }
 
 export function useBossDashboardQuery() {
@@ -104,7 +101,7 @@ export function useClientRequestsQuery() {
 export function useClientRequestDetailQuery(requestId: string | null) {
   const { enabled } = useQuerySession('client');
 
-  return useQuery(getClientRequestDetailQueryOptions(requestId, enabled));
+  return useQuery(getRequestDetailQueryOptions(requestId ?? '', enabled && Boolean(requestId)));
 }
 
 export function useClientEmergencyCallsQuery() {
@@ -116,7 +113,7 @@ export function useClientEmergencyCallsQuery() {
 export function useClientEmergencyDetailQuery(callId: string | null) {
   const { enabled } = useQuerySession('client');
 
-  return useQuery(getClientEmergencyDetailQueryOptions(callId, enabled));
+  return useQuery(getEmergencyDetailQueryOptions(callId ?? '', enabled && Boolean(callId)));
 }
 
 export function useEmployeeAvailableRequestsQuery() {
@@ -140,25 +137,25 @@ export function useEmployeeEmergencyCallsQuery(scope: MobileQueueScope = 'queue'
 export function useRequestDetailQuery(requestId: string | null) {
   const { enabled } = useQuerySession('employee');
 
-  return useQuery(getRequestDetailQueryOptions(requestId, enabled));
+  return useQuery(getRequestDetailQueryOptions(requestId ?? '', enabled && Boolean(requestId)));
 }
 
 export function useRequestChatQuery(requestId: string | null) {
   const { enabled } = useQuerySession('employee');
 
-  return useQuery(getRequestChatQueryOptions(requestId, enabled));
+  return useQuery(getRequestChatQueryOptions(requestId ?? '', enabled && Boolean(requestId)));
 }
 
 export function useEmergencyDetailQuery(callId: string | null) {
   const { enabled } = useQuerySession('employee');
 
-  return useQuery(getEmergencyDetailQueryOptions(callId, enabled));
+  return useQuery(getEmergencyDetailQueryOptions(callId ?? '', enabled && Boolean(callId)));
 }
 
 export function useEmergencyChatQuery(callId: string | null) {
   const { enabled } = useQuerySession('employee');
 
-  return useQuery(getEmergencyChatQueryOptions(callId, enabled));
+  return useQuery(getEmergencyChatQueryOptions(callId ?? '', enabled && Boolean(callId)));
 }
 
 export function useMyEmployeePhotoChangeQuery() {
@@ -169,8 +166,9 @@ export function useMyEmployeePhotoChangeQuery() {
 
 export function useEmployeePublicProfileQuery(employeeId?: string | null) {
   const { session, enabled } = useQuerySession('employee');
+  const targetId = employeeId ?? session.userId ?? '';
 
-  return useQuery(getEmployeePublicProfileQueryOptions(employeeId ?? session.userId, enabled));
+  return useQuery(getEmployeePublicProfileQueryOptions(targetId, enabled && Boolean(targetId)));
 }
 
 export function useBossRequestsQuery(scope: MobileQueueScope = 'queue') {
@@ -209,11 +207,7 @@ export function useBossQueueDetailQuery(
 ): UseQueryResult<MarketplaceRequest | MarketplaceEmergencyCall, Error> {
   const { enabled } = useQuerySession('boss');
 
-  if (sourceType === 'emergency') {
-    return useQuery(getBossQueueDetailQueryOptions('emergency', recordId, enabled));
-  }
-
-  return useQuery(getBossQueueDetailQueryOptions('request', recordId, enabled));
+  return useQuery(getBossQueueDetailQueryOptions(sourceType, recordId ?? '', enabled && Boolean(recordId))) as any;
 }
 
 export function useBossPaymentDetailQuery(
@@ -234,11 +228,7 @@ export function useBossPaymentDetailQuery(
 ): UseQueryResult<MarketplaceRequest | MarketplaceEmergencyCall, Error> {
   const { enabled } = useQuerySession('boss');
 
-  if (sourceType === 'emergency') {
-    return useQuery(getBossPaymentDetailQueryOptions('emergency', recordId, enabled));
-  }
-
-  return useQuery(getBossPaymentDetailQueryOptions('request', recordId, enabled));
+  return useQuery(getBossPaymentDetailQueryOptions(sourceType, recordId ?? '', enabled && Boolean(recordId))) as any;
 }
 
 export function useBossEmployeesQuery() {

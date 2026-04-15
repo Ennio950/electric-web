@@ -51,7 +51,7 @@ export function SessionBootstrap() {
       if (lastAuthUidRef.current !== nextUid) {
         lastAuthUidRef.current = nextUid;
         await queryClient.cancelQueries();
-        queryClient.clear();
+        queryClient.removeQueries();
       }
 
       if (!user) {

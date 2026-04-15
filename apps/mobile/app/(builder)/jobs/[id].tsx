@@ -7,13 +7,14 @@ import { AppButton } from '@/src/components/AppButton';
 import { PressableCard } from '@/src/components/PressableCard';
 import { SectionCard } from '@/src/components/SectionCard';
 import { formatCurrency } from '@/src/lib/formatters';
-import { appRoutes, pushAppRoute, replaceAppRoute } from '@/src/navigation/routes';
+import { appRoutes, replaceAppRoute } from '@/src/navigation/routes';
 import {
   useBuilderStore,
   useCurrentBuilderJob,
   useSelectedBuilderComponent
 } from '@/src/stores/builderStore';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 
 const MEASURE_TYPES: MeasureType[] = ['AREA', 'VOLUME', 'LENGTH', 'COUNT', 'ASSEMBLY', 'TIME', 'CUSTOM_FORMULA'];
 const LABOR_MODES = ['NONE', 'PER_COMPONENT', 'PER_BASE_UNIT', 'PER_HOUR'] as const;
@@ -155,6 +156,9 @@ export default function BuilderJobDetailScreen() {
             {MEASURE_TYPES.map((measureType) => (
               <Pressable
                 key={measureType}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: selectedComponent.measureType === measureType }}
+                accessibilityLabel={measureType}
                 onPress={() => updateComponentMeasureType(selectedComponent.id, measureType)}
                 style={[
                   styles.measureChip,
@@ -214,6 +218,9 @@ export default function BuilderJobDetailScreen() {
               {LABOR_MODES.map((mode) => (
                 <Pressable
                   key={mode}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: selectedComponent.labor.mode === mode }}
+                  accessibilityLabel={mode}
                   onPress={() => updateComponentLabor(selectedComponent.id, { mode })}
                   style={[
                     styles.measureChip,
@@ -443,12 +450,6 @@ export default function BuilderJobDetailScreen() {
               ))}
             </View>
           ) : null}
-
-          <AppButton
-            onPress={() => pushAppRoute(appRoutes.builderEstimatePreview(job.id))}
-          >
-            Generar estimacion
-          </AppButton>
         </SectionCard>
       ) : null}
     </ScrollView>
@@ -466,6 +467,8 @@ function ComponentNode(props: {
   return (
     <View style={styles.stack}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Seleccionar componente ${component.name}`}
         onPress={() => onSelect(component.id)}
         style={[
           styles.componentNode,
@@ -516,23 +519,23 @@ function Field(props: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB'
+    backgroundColor: colors.pageBg
   },
   content: {
-    padding: 20,
-    gap: 16
+    padding: spacing.xl,
+    gap: spacing.lg
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    gap: 16
+    gap: spacing.lg
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#10233F'
+    color: colors.navy
   },
   field: {
     gap: 8
@@ -542,17 +545,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
-    color: '#6B778C'
+    color: colors.textMuted
   },
   input: {
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#C7D5EA',
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.borderMedium,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     fontSize: 15,
-    color: '#10233F'
+    color: colors.navy
   },
   textarea: {
     minHeight: 88,
@@ -561,7 +564,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    gap: 12
+    gap: spacing.md
   },
   flexField: {
     flex: 1
@@ -577,7 +580,7 @@ const styles = StyleSheet.create({
   buttonGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12
+    gap: spacing.md
   },
   measureGrid: {
     flexDirection: 'row',
@@ -587,68 +590,68 @@ const styles = StyleSheet.create({
   measureChip: {
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#C7D5EA',
-    backgroundColor: '#FFFFFF',
+    borderColor: colors.borderMedium,
+    backgroundColor: colors.cardBg,
     paddingHorizontal: 14,
     paddingVertical: 9
   },
   measureChipActive: {
-    borderColor: '#0B5FFF',
+    borderColor: colors.primary,
     backgroundColor: '#DDEBFF'
   },
   measureChipText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#4A5970'
+    color: colors.textSecondary
   },
   measureChipTextActive: {
-    color: '#0B5FFF'
+    color: colors.primary
   },
   stack: {
-    gap: 12
+    gap: spacing.md
   },
   componentNode: {
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#D8E2F0',
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.border,
+    backgroundColor: colors.inputBg,
     padding: 14
   },
   componentNodeSelected: {
-    borderColor: '#0B5FFF',
+    borderColor: colors.primary,
     backgroundColor: '#EAF2FF'
   },
   componentTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#10233F'
+    color: colors.navy
   },
   componentMeta: {
     marginTop: 4,
     fontSize: 13,
-    color: '#6B778C'
+    color: colors.textMuted
   },
   bindingCard: {
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#D8E2F0',
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.border,
+    backgroundColor: colors.inputBg,
     padding: 14,
-    gap: 12
+    gap: spacing.md
   },
   bindingTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#10233F'
+    color: colors.navy
   },
   helperTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#10233F'
+    color: colors.navy
   },
   muted: {
     fontSize: 14,
-    color: '#6B778C'
+    color: colors.textMuted
   },
   resultRow: {
     flexDirection: 'row',
@@ -657,28 +660,28 @@ const styles = StyleSheet.create({
   },
   resultLabel: {
     fontSize: 14,
-    color: '#4A5970'
+    color: colors.textSecondary
   },
   resultValue: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#10233F'
+    color: colors.navy
   },
   resultMeta: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#10233F'
+    color: colors.navy
   },
   materialRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: spacing.md,
     alignItems: 'center'
   },
   breakdownRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: spacing.md,
     alignItems: 'flex-start'
   },
   materialInfo: {
@@ -688,25 +691,25 @@ const styles = StyleSheet.create({
   materialName: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#10233F'
+    color: colors.navy
   },
   materialMeta: {
     fontSize: 13,
-    color: '#6B778C'
+    color: colors.textMuted
   },
   materialTotal: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#10233F'
+    color: colors.navy
   },
   errorTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#B42318'
+    color: colors.error
   },
   errorText: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#B42318'
+    color: colors.error
   }
 });

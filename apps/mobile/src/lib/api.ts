@@ -53,6 +53,18 @@ export function ensureCurrentUserProfile(
   });
 }
 
+export function verifyGoogleClientAuth(idToken: string) {
+  return requestPublicJson<{
+    token: string;
+    customToken: string;
+    role: 'client';
+    user: { id: string; email: string | null };
+  }>('/auth/google', {
+    method: 'POST',
+    body: { idToken },
+  });
+}
+
 export function startMagicClientAuth(email: string) {
   return requestPublicJson<{
     challengeId: string;
@@ -80,7 +92,9 @@ export function fetchMobileHome(token: string) {
 }
 
 export function fetchClientRequests(token: string) {
-  return requestEnvelopeData<MarketplaceRequest[]>('/api/marketplace/requests', token);
+  return requestEnvelopeData<MarketplaceRequest[]>('/api/marketplace/requests', token, {
+    query: { limit: 50 },
+  });
 }
 
 export function registerPushToken(token: string, payload: RegisterPushTokenRequest) {

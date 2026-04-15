@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 
 import { EmptyState } from '@/src/components/EmptyState';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SectionCard } from '@/src/components/SectionCard';
 import { SignOutButton } from '@/src/components/SignOutButton';
 import { StatusBadge } from '@/src/components/StatusBadge';
@@ -98,12 +99,6 @@ export default function BossHomeScreen() {
             onPress={() => pushAppRoute(appRoutes.bossQueue)}
           />
           <PressableCard
-            eyebrow="Agenda"
-            title="Ver agenda"
-            subtitle="Servicios programados organizados por fecha y hora."
-            onPress={() => pushAppRoute(appRoutes.bossSchedule)}
-          />
-          <PressableCard
             eyebrow="Payments"
             title="Abrir payments"
             subtitle="Revisar comprobantes, aprobar y rechazar."
@@ -135,9 +130,7 @@ export default function BossHomeScreen() {
       <SectionCard title="Prioridad ahora" subtitle="Los próximos comprobantes que no deberían esperar.">
         {reviewQueueQuery.isLoading ? <Text style={styles.muted}>Cargando review queue...</Text> : null}
         {reviewQueueQuery.error ? (
-          <Text style={styles.error}>
-            {reviewQueueQuery.error instanceof Error ? reviewQueueQuery.error.message : 'No se pudo cargar la cola.'}
-          </Text>
+          <QueryErrorBanner error={reviewQueueQuery.error} fallbackMessage="No se pudo cargar la cola." onRetry={() => void reviewQueueQuery.refetch()} />
         ) : null}
         {priorityReviews.length ? (
           <View style={styles.stack}>
@@ -165,9 +158,7 @@ export default function BossHomeScreen() {
       <SectionCard title="Requests recientes" subtitle="Los últimos movimientos en solicitudes.">
         {requestsQuery.isLoading ? <Text style={styles.muted}>Cargando requests...</Text> : null}
         {requestsQuery.error ? (
-          <Text style={styles.error}>
-            {requestsQuery.error instanceof Error ? requestsQuery.error.message : 'No se pudo cargar la actividad.'}
-          </Text>
+          <QueryErrorBanner error={requestsQuery.error} fallbackMessage="No se pudo cargar la actividad." onRetry={() => void requestsQuery.refetch()} />
         ) : null}
         {recentRequests.length ? (
           <View style={styles.stack}>
@@ -194,9 +185,7 @@ export default function BossHomeScreen() {
       <SectionCard title="Emergencias en curso" subtitle="Lo más reciente para seguimiento rápido desde móvil.">
         {emergenciesQuery.isLoading ? <Text style={styles.muted}>Cargando emergencias...</Text> : null}
         {emergenciesQuery.error ? (
-          <Text style={styles.error}>
-            {emergenciesQuery.error instanceof Error ? emergenciesQuery.error.message : 'No se pudo cargar la actividad.'}
-          </Text>
+          <QueryErrorBanner error={emergenciesQuery.error} fallbackMessage="No se pudo cargar la actividad." onRetry={() => void emergenciesQuery.refetch()} />
         ) : null}
         {activeEmergencies.length ? (
           <View style={styles.stack}>
@@ -220,7 +209,7 @@ export default function BossHomeScreen() {
         ) : null}
       </SectionCard>
 
-      {homeQuery.error instanceof Error ? <Text style={styles.error}>{homeQuery.error.message}</Text> : null}
+      {homeQuery.error ? <QueryErrorBanner error={homeQuery.error} onRetry={() => void homeQuery.refetch()} /> : null}
       <SectionCard title="Sesión">
         <SignOutButton />
       </SectionCard>
@@ -375,10 +364,6 @@ const styles = StyleSheet.create({
   muted: {
     fontSize: 14,
     color: colors.textMuted,
-  },
-  error: {
-    fontSize: 14,
-    color: colors.error,
   },
   amount: {
     fontSize: 16,

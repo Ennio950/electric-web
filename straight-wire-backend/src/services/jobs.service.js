@@ -1,0 +1,853 @@
+'use strict';
+
+// Firestore-backed job operations for the CRM.
+//
+// Security:
+// - Employee operations verify job ownership by employeeId.
+// - Client operations verify job ownership by clientId.
+// - Boss operations are intended to be mounted behind requireRole('boss').
+
+const { admin, db } = require('../firebase');
+const { acquireLock, releaseLock } = require('../locks/employeeLock.service');
+const { appError, isFirestoreIndexRequiredError } = require('../utils/errors');
+
+const JOBS_COLLECTION = 'jobs';
+
+const STATUS = {
+  PENDING: 'pending',
+  OPEN: 'open',
+  ASSIGNED: 'assigned',
+  IN_PROGRESS: 'in_progress',
+  DONE: 'done',
+  CANCELLED: 'cancelled',
+};
+
+const EMPLOYEE_ACTIVE_STATUSES = [STATUS.ASSIGNED, STATUS.IN_PROGRESS];
+
+const EMPLOYEE_TRANSITIONS = {
+  [STATUS.ASSIGNED]: [STATUS.IN_PROGRESS],
+  [STATUS.IN_PROGRESS]: [STATUS.DONE],
+};
+
+// Policy decision: clients can cancel only while the job is still open.
+const CLIENT_CANCELLABLE_STATUSES = [STATUS.OPEN, STATUS.PENDING];
+
+// Legacy + backend-first available statuses.
+const AVAILABLE_STATUSES = [STATUS.OPEN, STATUS.PENDING];
+
+function normalizeLimit(value, fallback) {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) return fallback;
+  return Math.min(parsed, 200);
+}
+
+function normalizeEmail(value) {
+  return typeof value === 'string' ? value.trim().toLowerCase() : '';
+}
+
+function toMillis(value) {
+  if (!value) return 0;
+  if (typeof value.toMillis === 'function') return value.toMillis();
+  const date = value instanceof Date ? value : null;
+  return date ? date.getTime() : 0;
+}
+
+function requireNonEmptyString(value, label) {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw appError(400, 'INVALID_INPUT', `${label} is required.`);
+  }
+}
+
+function mapDoc(doc) {
+  return { id: doc.id, ...doc.data() };
+}
+
+/* ============================================================
+   OPEN (shared)
+============================================================ */
+
+async function listOpenJobs(options = {}) {
+  const limit = normalizeLimit(options.limit, 100);
+
+  try {
+    const snap = await db
+      .collection(JOBS_COLLECTION)
+      .where('status', 'in', AVAILABLE_STATUSES)
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .get();
+
+    return snap.docs.map(mapDoc);
+  } catch (err) {
+    if (!isFirestoreIndexRequiredError(err)) throw err;
+
+    const snap = await db
+      .collection(JOBS_COLLECTION)
+      .where('status', 'in', AVAILABLE_STATUSES)
+      .limit(200)
+      .get();
+
+    return snap.docs
+      .map(mapDoc)
+      .filter((job) => AVAILABLE_STATUSES.includes(job.status))
+      .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt))
+      .slice(0, limit);
+  }
+}
+
+/* ============================================================
+   EMPLOYEE
+============================================================ */
+
+async function listEmployeeActiveJobs(employeeId) {
+  requireNonEmptyString(employeeId, 'employeeId');
+
+  try {
+    const snap = await db
+      .collection(JOBS_COLLECTION)
+      .where('employeeId', '==', employeeId)
+      .where('status', 'in', EMPLOYEE_ACTIVE_STATUSES)
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    return snap.docs.map(mapDoc);
+  } catch (err) {
+    if (!isFirestoreIndexRequiredError(err)) throw err;
+
+    // Fallback (no composite index): fetch a bounded set and sort/filter in memory.
+    const snap = await db
+      .collection(JOBS_COLLECTION)
+      .where('employeeId', '==', employeeId)
+      .limit(200)
+      .get();
+
+    return snap.docs
+      .map(mapDoc)
+      .filter((job) => EMPLOYEE_ACTIVE_STATUSES.includes(job.status))
+      .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+  }
+}
+
+async function getJobForEmployee(employeeId, jobId) {
+  requireNonEmptyString(employeeId, 'employeeId');
+  requireNonEmptyString(jobId, 'jobId');
+
+  const snap = await db.collection(JOBS_COLLECTION).doc(jobId).get();
+  if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+  const job = snap.data();
+  if (!job || job.employeeId !== employeeId) {
+    throw appError(403, 'FORBIDDEN', 'Job does not belong to the employee.');
+  }
+
+  return { id: snap.id, ...job };
+}
+
+async function addEmployeeNoteToJob(employeeId, jobId, text) {
+  requireNonEmptyString(employeeId, 'employeeId');
+  requireNonEmptyString(jobId, 'jobId');
+  requireNonEmptyString(text, 'text');
+
+  const trimmedText = text.trim();
+  const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    const job = snap.data();
+    if (!job || job.employeeId !== employeeId) {
+      throw appError(403, 'FORBIDDEN', 'Job does not belong to the employee.');
+    }
+
+    const note = {
+      byUid: employeeId,
+      text: trimmedText,
+      // Timestamp generated by the backend server process.
+      createdAt: admin.firestore.Timestamp.now(),
+    };
+
+    tx.update(jobRef, {
+      notes: admin.firestore.FieldValue.arrayUnion(note),
+      updatedAt: serverTimestamp,
+    });
+  });
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+async function transitionJobStatusForEmployee(employeeId, jobId, nextStatus) {
+  requireNonEmptyString(employeeId, 'employeeId');
+  requireNonEmptyString(jobId, 'jobId');
+  requireNonEmptyString(nextStatus, 'status');
+
+  const normalizedNextStatus = nextStatus.trim();
+  if (![STATUS.IN_PROGRESS, STATUS.DONE].includes(normalizedNextStatus)) {
+    throw appError(400, 'INVALID_STATUS', 'status must be in_progress | done.');
+  }
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    const job = snap.data();
+    if (!job || job.employeeId !== employeeId) {
+      throw appError(403, 'FORBIDDEN', 'Job does not belong to the employee.');
+    }
+
+    const currentStatus = job.status;
+    const allowedNext = EMPLOYEE_TRANSITIONS[currentStatus] || [];
+    if (!allowedNext.includes(normalizedNextStatus)) {
+      throw appError(400, 'INVALID_TRANSITION', 'Status transition not allowed.');
+    }
+
+    const update = {
+      status: normalizedNextStatus,
+      updatedAt: serverTimestamp,
+    };
+
+    if (normalizedNextStatus === STATUS.IN_PROGRESS && !job.startedAt) {
+      update.startedAt = serverTimestamp;
+    }
+    if (normalizedNextStatus === STATUS.DONE && !job.completedAt) {
+      update.completedAt = serverTimestamp;
+    }
+
+    if (normalizedNextStatus === STATUS.IN_PROGRESS) {
+      await acquireLock(tx, employeeId, jobId);
+    }
+    if (normalizedNextStatus === STATUS.DONE) {
+      await releaseLock(tx, employeeId, jobId);
+    }
+
+    tx.update(jobRef, update);
+  });
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+async function claimJobAsEmployee(employeeId, jobId) {
+  requireNonEmptyString(employeeId, 'employeeId');
+  requireNonEmptyString(jobId, 'jobId');
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    const job = snap.data();
+    if (!job) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    // Allowed:
+    // - open (unassigned) -> in_progress (claimed by employee)
+    // - assigned (to this employee) -> in_progress
+    if (job.status === STATUS.OPEN || job.status === STATUS.PENDING) {
+      if (job.employeeId || job.assignedToUid || job.assignedTo) {
+        throw appError(400, 'INVALID_STATE', 'Available job must not have an assignee.');
+      }
+
+      await acquireLock(tx, employeeId, jobId);
+
+      tx.update(jobRef, {
+        employeeId,
+        status: STATUS.IN_PROGRESS,
+        claimedAt: serverTimestamp,
+        startedAt: job.startedAt || serverTimestamp,
+        updatedAt: serverTimestamp,
+      });
+
+      return;
+    }
+
+    if (job.status === STATUS.ASSIGNED) {
+      if (job.employeeId !== employeeId) {
+        throw appError(403, 'FORBIDDEN', 'Job is assigned to another employee.');
+      }
+
+      await acquireLock(tx, employeeId, jobId);
+
+      tx.update(jobRef, {
+        status: STATUS.IN_PROGRESS,
+        startedAt: job.startedAt || serverTimestamp,
+        updatedAt: serverTimestamp,
+      });
+
+      return;
+    }
+
+    if (job.status === STATUS.IN_PROGRESS && job.employeeId === employeeId) {
+      // Idempotent: already claimed/started by this employee.
+      return;
+    }
+
+    throw appError(400, 'INVALID_TRANSITION', 'Job cannot be claimed in its current status.');
+  });
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+/* ============================================================
+   CLIENT
+============================================================ */
+
+async function listClientJobs(clientId, options = {}) {
+  requireNonEmptyString(clientId, 'clientId');
+  const limit = normalizeLimit(options.limit, 100);
+
+  try {
+    const snap = await db
+      .collection(JOBS_COLLECTION)
+      .where('clientId', '==', clientId)
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .get();
+
+    return snap.docs.map(mapDoc);
+  } catch (err) {
+    if (!isFirestoreIndexRequiredError(err)) throw err;
+
+    const snap = await db
+      .collection(JOBS_COLLECTION)
+      .where('clientId', '==', clientId)
+      .limit(200)
+      .get();
+
+    return snap.docs
+      .map(mapDoc)
+      .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt))
+      .slice(0, limit);
+  }
+}
+
+async function listClientJobsByEmail(clientEmail, options = {}) {
+  const emailLower = normalizeEmail(clientEmail);
+  if (!emailLower) {
+    throw appError(400, 'INVALID_INPUT', 'clientEmail is required.');
+  }
+
+  const limit = normalizeLimit(options.limit, 100);
+
+  try {
+    const snap = await db
+      .collection(JOBS_COLLECTION)
+      .where('emailLower', '==', emailLower)
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .get();
+
+    return snap.docs.map(mapDoc);
+  } catch (err) {
+    if (!isFirestoreIndexRequiredError(err)) throw err;
+
+    const snap = await db
+      .collection(JOBS_COLLECTION)
+      .where('emailLower', '==', emailLower)
+      .limit(200)
+      .get();
+
+    return snap.docs
+      .map(mapDoc)
+      .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt))
+      .slice(0, limit);
+  }
+}
+
+async function createJobForClient(clientId, input) {
+  requireNonEmptyString(clientId, 'clientId');
+  if (!input || typeof input !== 'object') {
+    throw appError(400, 'INVALID_INPUT', 'Job payload is required.');
+  }
+
+  const rawEmail =
+    (typeof input.email === 'string' ? input.email.trim() : '') ||
+    (typeof input.clientEmail === 'string' ? input.clientEmail.trim() : '') ||
+    (typeof input.emailLower === 'string' ? input.emailLower.trim() : '');
+
+  const emailLower = normalizeEmail(rawEmail);
+  if (!emailLower) {
+    throw appError(400, 'INVALID_INPUT', 'Client email is required.');
+  }
+
+  const description = input.description;
+  const address = input.address;
+  const priority = input.priority;
+  const photos = input.photos;
+
+  requireNonEmptyString(description, 'description');
+  requireNonEmptyString(address, 'address');
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc();
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  const job = {
+    clientId,
+    employeeId: null,
+    status: STATUS.OPEN,
+    email: rawEmail || emailLower,
+    emailLower,
+    description: description.trim(),
+    address: address.trim(),
+    createdAt: serverTimestamp,
+    updatedAt: serverTimestamp,
+  };
+
+  if (typeof priority === 'string' && priority.trim() !== '') {
+    job.priority = priority.trim();
+  }
+
+  if (Array.isArray(photos)) {
+    job.photos = photos.filter((p) => typeof p === 'string' && p.trim() !== '').map((p) => p.trim());
+  }
+
+  await jobRef.set(job);
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+async function getJobForClient(clientId, jobId, options = {}) {
+  requireNonEmptyString(clientId, 'clientId');
+  requireNonEmptyString(jobId, 'jobId');
+
+  const expectedEmailLower = normalizeEmail(options.emailLower || options.clientEmail);
+
+  const snap = await db.collection(JOBS_COLLECTION).doc(jobId).get();
+  if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+  const job = snap.data();
+  if (!job || job.clientId !== clientId) {
+    throw appError(403, 'FORBIDDEN', 'Job does not belong to the client.');
+  }
+
+  if (expectedEmailLower) {
+    const jobEmailLower = normalizeEmail(job.emailLower || job.email);
+    if (jobEmailLower && jobEmailLower !== expectedEmailLower) {
+      throw appError(403, 'FORBIDDEN', 'Job does not belong to the client.');
+    }
+  }
+
+  return { id: snap.id, ...job };
+}
+
+async function cancelJobForClient(clientId, jobId, options = {}) {
+  requireNonEmptyString(clientId, 'clientId');
+  requireNonEmptyString(jobId, 'jobId');
+
+  const expectedEmailLower = normalizeEmail(options.emailLower || options.clientEmail);
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    const job = snap.data();
+    if (!job || job.clientId !== clientId) {
+      throw appError(403, 'FORBIDDEN', 'Job does not belong to the client.');
+    }
+    if (expectedEmailLower) {
+      const jobEmailLower = normalizeEmail(job.emailLower || job.email);
+      if (jobEmailLower && jobEmailLower !== expectedEmailLower) {
+        throw appError(403, 'FORBIDDEN', 'Job does not belong to the client.');
+      }
+    }
+
+    if (!CLIENT_CANCELLABLE_STATUSES.includes(job.status)) {
+      throw appError(400, 'INVALID_TRANSITION', 'Job cannot be cancelled in its current status.');
+    }
+
+    tx.update(jobRef, {
+      status: STATUS.CANCELLED,
+      cancelledAt: serverTimestamp,
+      updatedAt: serverTimestamp,
+    });
+  });
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+/* ============================================================
+   BOSS
+============================================================ */
+
+async function listJobsForBoss(options = {}) {
+  const limit = normalizeLimit(options.limit, 100);
+  const status = typeof options.status === 'string' && options.status.trim() ? options.status.trim() : null;
+  const employeeId = typeof options.employeeId === 'string' && options.employeeId.trim() ? options.employeeId.trim() : null;
+  const clientId = typeof options.clientId === 'string' && options.clientId.trim() ? options.clientId.trim() : null;
+
+  // Choose the most selective base query and filter the rest in memory if needed.
+  let baseQuery = db.collection(JOBS_COLLECTION);
+  let needsInMemoryFilter = false;
+
+  if (employeeId) {
+    baseQuery = baseQuery.where('employeeId', '==', employeeId);
+    needsInMemoryFilter = Boolean(status || clientId);
+  } else if (clientId) {
+    baseQuery = baseQuery.where('clientId', '==', clientId);
+    needsInMemoryFilter = Boolean(status);
+  } else if (status) {
+    baseQuery = baseQuery.where('status', '==', status);
+  } else {
+    // No filters: can use a simple orderBy on createdAt (single-field index).
+    const snap = await baseQuery.orderBy('createdAt', 'desc').limit(limit).get();
+    return snap.docs.map(mapDoc);
+  }
+
+  // Prefer orderBy(createdAt) if index exists; otherwise fall back.
+  try {
+    const snap = await baseQuery.orderBy('createdAt', 'desc').limit(limit).get();
+    let jobs = snap.docs.map(mapDoc);
+
+    if (needsInMemoryFilter) {
+      if (status) jobs = jobs.filter((j) => j.status === status);
+      if (clientId) jobs = jobs.filter((j) => j.clientId === clientId);
+    }
+
+    return jobs;
+  } catch (err) {
+    if (!isFirestoreIndexRequiredError(err)) throw err;
+
+    const snap = await baseQuery.limit(200).get();
+    let jobs = snap.docs.map(mapDoc);
+
+    if (status) jobs = jobs.filter((j) => j.status === status);
+    if (clientId) jobs = jobs.filter((j) => j.clientId === clientId);
+
+    return jobs
+      .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt))
+      .slice(0, limit);
+  }
+}
+
+async function assignJobToEmployee(jobId, employeeId) {
+  requireNonEmptyString(jobId, 'jobId');
+  requireNonEmptyString(employeeId, 'employeeId');
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    const job = snap.data();
+    if (!job) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    if (![STATUS.OPEN, STATUS.PENDING].includes(job.status)) {
+      throw appError(400, 'INVALID_TRANSITION', 'Only available jobs can be assigned.');
+    }
+
+    if (job.employeeId || job.assignedToUid || job.assignedTo) {
+      throw appError(409, 'JOB_ALREADY_ASSIGNED', 'Job is already assigned.');
+    }
+
+    await acquireLock(tx, employeeId, jobId);
+
+    tx.update(jobRef, {
+      employeeId,
+      status: STATUS.ASSIGNED,
+      assignedAt: job.assignedAt || serverTimestamp,
+      updatedAt: serverTimestamp,
+    });
+  });
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+async function unassignJob(jobId) {
+  requireNonEmptyString(jobId, 'jobId');
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    const job = snap.data();
+    if (!job) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    if (job.status !== STATUS.ASSIGNED) {
+      throw appError(400, 'INVALID_TRANSITION', 'Only assigned jobs can be unassigned.');
+    }
+
+    if (!job.employeeId) {
+      throw appError(400, 'INVALID_STATE', 'Job has no employeeId to unassign.');
+    }
+
+    await releaseLock(tx, job.employeeId, jobId);
+
+    tx.update(jobRef, {
+      employeeId: null,
+      status: STATUS.OPEN,
+      unassignedAt: serverTimestamp,
+      updatedAt: serverTimestamp,
+    });
+  });
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+/* ============================================================
+   BACKEND-FIRST JOBS API
+============================================================ */
+
+function normalizeFilter(value) {
+  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return normalized || 'available';
+}
+
+function isAssigned(job) {
+  if (!job) return false;
+  return Boolean(job.assignedToUid || job.employeeId || job.assignedTo);
+}
+
+async function fetchJobsByQuery(query, limit, fallbackFilter) {
+  try {
+    const snap = await query.orderBy('createdAt', 'desc').limit(limit).get();
+    return snap.docs.map(mapDoc);
+  } catch (err) {
+    if (!isFirestoreIndexRequiredError(err)) throw err;
+
+    const snap = await query.limit(200).get();
+    let jobs = snap.docs.map(mapDoc);
+    if (typeof fallbackFilter === 'function') {
+      jobs = fallbackFilter(jobs);
+    }
+
+    return jobs
+      .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt))
+      .slice(0, limit);
+  }
+}
+
+async function fetchJobsByField(field, value, limit) {
+  const query = db.collection(JOBS_COLLECTION).where(field, '==', value);
+  return fetchJobsByQuery(query, limit);
+}
+
+async function createJobForClientApi(clientId, input) {
+  requireNonEmptyString(clientId, 'clientId');
+
+  if (!input || typeof input !== 'object') {
+    throw appError(400, 'INVALID_INPUT', 'Job payload is required.');
+  }
+
+  const description = typeof input.description === 'string' ? input.description.trim() : '';
+  requireNonEmptyString(description, 'description');
+
+  const urgencyRaw = typeof input.urgency === 'string' ? input.urgency.trim().toLowerCase() : '';
+  const urgency = urgencyRaw || 'normal';
+  if (!['normal', 'urgent'].includes(urgency)) {
+    throw appError(400, 'INVALID_INPUT', 'urgency must be normal | urgent.');
+  }
+
+  const clientEmail =
+    typeof input.clientEmail === 'string' && input.clientEmail.trim() !== '' ? input.clientEmail.trim() : null;
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc();
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  const payload = {
+    clientId,
+    clientEmail,
+    description,
+    urgency,
+    status: STATUS.PENDING,
+    assignedToUid: null,
+    assignedToEmail: null,
+    assignedToName: null,
+    employeeId: null,
+    createdAt: serverTimestamp,
+    updatedAt: serverTimestamp,
+  };
+
+  await jobRef.set(payload);
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+async function listEmployeeJobsByFilter(filter, employeeUid, options = {}) {
+  const normalizedFilter = normalizeFilter(filter);
+  const limit = normalizeLimit(options.limit, 200);
+  const collection = db.collection(JOBS_COLLECTION);
+
+  if (normalizedFilter === 'all') {
+    return fetchJobsByQuery(collection, limit);
+  }
+
+  if (normalizedFilter === 'available') {
+    const query = collection.where('status', 'in', AVAILABLE_STATUSES);
+    const jobs = await fetchJobsByQuery(query, limit, (docs) =>
+      docs.filter((job) => AVAILABLE_STATUSES.includes(job.status)),
+    );
+    return jobs.filter((job) => !isAssigned(job));
+  }
+
+  requireNonEmptyString(employeeUid, 'employeeUid');
+
+  const [assignedToJobs, legacyEmployeeJobs] = await Promise.all([
+    fetchJobsByField('assignedToUid', employeeUid, limit),
+    fetchJobsByField('employeeId', employeeUid, limit),
+  ]);
+
+  const merged = new Map();
+  for (const job of assignedToJobs) merged.set(job.id, job);
+  for (const job of legacyEmployeeJobs) merged.set(job.id, job);
+
+  let jobs = Array.from(merged.values());
+
+  if (normalizedFilter === 'done') {
+    jobs = jobs.filter((job) => job.status === STATUS.DONE);
+  } else if (normalizedFilter === 'mine') {
+    jobs = jobs.filter((job) => job.status !== STATUS.DONE);
+  } else {
+    throw appError(400, 'INVALID_FILTER', 'filter must be available | mine | done | all.');
+  }
+
+  jobs.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+  return jobs.slice(0, limit);
+}
+
+async function acceptJobForStaff(jobId, staff) {
+  requireNonEmptyString(jobId, 'jobId');
+
+  if (!staff || typeof staff !== 'object') {
+    throw appError(400, 'INVALID_INPUT', 'Staff context is required.');
+  }
+
+  const staffUid = typeof staff.uid === 'string' ? staff.uid.trim() : '';
+  requireNonEmptyString(staffUid, 'uid');
+
+  const staffEmail =
+    typeof staff.email === 'string' && staff.email.trim() !== '' ? staff.email.trim() : null;
+  const staffName =
+    typeof staff.name === 'string' && staff.name.trim() !== '' ? staff.name.trim() : null;
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    const job = snap.data() || {};
+    if (isAssigned(job)) {
+      throw appError(409, 'JOB_ALREADY_ASSIGNED', 'Job already assigned.');
+    }
+
+    if (job.status && !AVAILABLE_STATUSES.includes(job.status)) {
+      throw appError(409, 'JOB_NOT_AVAILABLE', 'Job is not available.');
+    }
+
+    tx.update(jobRef, {
+      assignedToUid: staffUid,
+      assignedToEmail: staffEmail,
+      assignedToName: staffName,
+      employeeId: staffUid,
+      status: STATUS.ASSIGNED,
+      assignedAt: job.assignedAt || serverTimestamp,
+      updatedAt: serverTimestamp,
+    });
+  });
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+async function updateJobStatusForStaff(jobId, actor, nextStatus) {
+  requireNonEmptyString(jobId, 'jobId');
+
+  if (!actor || typeof actor !== 'object') {
+    throw appError(400, 'INVALID_INPUT', 'Actor context is required.');
+  }
+
+  const actorUid = typeof actor.uid === 'string' ? actor.uid.trim() : '';
+  requireNonEmptyString(actorUid, 'uid');
+
+  const normalizedNextStatus = typeof nextStatus === 'string' ? nextStatus.trim().toLowerCase() : '';
+  if (![STATUS.IN_PROGRESS, STATUS.DONE].includes(normalizedNextStatus)) {
+    throw appError(400, 'INVALID_STATUS', 'status must be in_progress | done.');
+  }
+
+  const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+  const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(jobRef);
+    if (!snap.exists) throw appError(404, 'JOB_NOT_FOUND', 'Job not found.');
+
+    const job = snap.data() || {};
+    const assignedUid = job.assignedToUid || job.employeeId || job.assignedTo || null;
+    const isBoss = actor.role === 'boss';
+
+    if (!isBoss && assignedUid !== actorUid) {
+      throw appError(403, 'FORBIDDEN', 'Job does not belong to the employee.');
+    }
+
+    const update = {
+      status: normalizedNextStatus,
+      updatedAt: serverTimestamp,
+    };
+
+    if (normalizedNextStatus === STATUS.IN_PROGRESS) {
+      if (!job.inProgressAt) update.inProgressAt = serverTimestamp;
+      if (!job.startedAt) update.startedAt = serverTimestamp;
+    }
+
+    if (normalizedNextStatus === STATUS.DONE) {
+      if (!job.completedAt) update.completedAt = serverTimestamp;
+    }
+
+    tx.update(jobRef, update);
+  });
+
+  const fresh = await jobRef.get();
+  return mapDoc(fresh);
+}
+
+module.exports = {
+  STATUS,
+
+  // Open
+  listOpenJobs,
+
+  // Employee
+  listEmployeeActiveJobs,
+  getJobForEmployee,
+  addEmployeeNoteToJob,
+  transitionJobStatusForEmployee,
+  claimJobAsEmployee,
+
+  // Client
+  listClientJobs,
+  listClientJobsByEmail,
+  createJobForClient,
+  getJobForClient,
+  cancelJobForClient,
+
+  // Boss
+  listJobsForBoss,
+  assignJobToEmployee,
+  unassignJob,
+
+  // Backend-first API
+  createJobForClientApi,
+  listEmployeeJobsByFilter,
+  acceptJobForStaff,
+  updateJobStatusForStaff,
+};

@@ -3,11 +3,11 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 
 import { EmptyState } from '@/src/components/EmptyState';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SectionCard } from '@/src/components/SectionCard';
 import { SignOutButton } from '@/src/components/SignOutButton';
 import { StatusBadge } from '@/src/components/StatusBadge';
 import {
-  fetchEmployeeActiveJob,
   fetchEmployeeRequests,
   fetchEmergencyCalls,
   withCurrentToken,
@@ -22,10 +22,6 @@ import type { MarketplaceEmergencyCall, MarketplaceRequest } from '@/src/types/a
 export default function EmployeeHomeScreen() {
   const bootstrap = useSessionStore((state) => state.bootstrap);
   const homeQuery = useMobileHomeQuery();
-  const activeJobQuery = useQuery({
-    queryKey: ['employee-active-job'],
-    queryFn: () => withCurrentToken(fetchEmployeeActiveJob),
-  });
   const myRequestsQuery = useQuery({
     queryKey: ['employee-home-requests'],
     queryFn: () => withCurrentToken(fetchEmployeeRequests),
@@ -47,12 +43,7 @@ export default function EmployeeHomeScreen() {
   const recentRequests = (myRequestsQuery.data ?? []).slice(0, 3);
 
   const onRefresh = () => {
-    void Promise.all([
-      homeQuery.refetch(),
-      activeJobQuery.refetch(),
-      myRequestsQuery.refetch(),
-      emergenciesQuery.refetch(),
-    ]);
+    void Promise.all([homeQuery.refetch(), myRequestsQuery.refetch(), emergenciesQuery.refetch()]);
   };
 
   return (
@@ -80,22 +71,6 @@ export default function EmployeeHomeScreen() {
         <StatCard icon="🚨" label="Emergencias activas" value={summary?.activeEmergencyCount ?? 0} />
       </View>
 
-      {activeJobQuery.data ? (
-        <SectionCard
-          title="Trabajo activo ahora"
-          subtitle="El job que tienes en curso en este momento."
-        >
-          <PressableCard
-            title={activeJobQuery.data.address || 'Trabajo sin direccion'}
-            subtitle={activeJobQuery.data.description || 'Sin descripcion'}
-            meta={activeJobQuery.data.category || 'General'}
-            onPress={() => pushAppRoute(appRoutes.employeeRequestDetail(activeJobQuery.data!.id))}
-          >
-            <StatusBadge status={activeJobQuery.data.status} type="request" />
-          </PressableCard>
-        </SectionCard>
-      ) : null}
-
       <SectionCard title="Atajos" subtitle="Entradas rápidas a los dos flujos operativos del técnico.">
         <View style={styles.stack}>
           <PressableCard
@@ -109,12 +84,6 @@ export default function EmployeeHomeScreen() {
             title="Abrir emergency dispatch"
             subtitle="Ver pendientes, aceptadas y compartir ubicación."
             onPress={() => pushAppRoute(appRoutes.employeeEmergencyNew)}
-          />
-          <PressableCard
-            eyebrow="Agenda"
-            title="Ver mi agenda"
-            subtitle="Servicios programados asignados a tu cuenta."
-            onPress={() => pushAppRoute(appRoutes.employeeSchedule)}
           />
           {bootstrap.featureFlags.builderMobile ? (
             <PressableCard
@@ -130,9 +99,7 @@ export default function EmployeeHomeScreen() {
       <SectionCard title="Tus requests recientes" subtitle="Los últimos trabajos asignados a tu cuenta.">
         {myRequestsQuery.isLoading ? <Text style={styles.muted}>Cargando tus requests...</Text> : null}
         {myRequestsQuery.error ? (
-          <Text style={styles.error}>
-            {myRequestsQuery.error instanceof Error ? myRequestsQuery.error.message : 'No se pudo cargar la actividad.'}
-          </Text>
+          <QueryErrorBanner error={myRequestsQuery.error} fallbackMessage="No se pudo cargar la actividad." onRetry={() => void myRequestsQuery.refetch()} />
         ) : null}
         {recentRequests.length ? (
           <View style={styles.stack}>
@@ -159,9 +126,7 @@ export default function EmployeeHomeScreen() {
       <SectionCard title="Emergencias asignadas" subtitle="Las emergencias activas que ya están en tu cancha.">
         {emergenciesQuery.isLoading ? <Text style={styles.muted}>Cargando emergencias...</Text> : null}
         {emergenciesQuery.error ? (
-          <Text style={styles.error}>
-            {emergenciesQuery.error instanceof Error ? emergenciesQuery.error.message : 'No se pudo cargar la actividad.'}
-          </Text>
+          <QueryErrorBanner error={emergenciesQuery.error} fallbackMessage="No se pudo cargar la actividad." onRetry={() => void emergenciesQuery.refetch()} />
         ) : null}
         {assignedEmergencies.length ? (
           <View style={styles.stack}>
@@ -185,7 +150,7 @@ export default function EmployeeHomeScreen() {
         ) : null}
       </SectionCard>
 
-      {homeQuery.error instanceof Error ? <Text style={styles.error}>{homeQuery.error.message}</Text> : null}
+      {homeQuery.error ? <QueryErrorBanner error={homeQuery.error} onRetry={() => void homeQuery.refetch()} /> : null}
       <SectionCard title="Sesión">
         <SignOutButton />
       </SectionCard>
@@ -317,10 +282,6 @@ const styles = StyleSheet.create({
   muted: {
     fontSize: 14,
     color: colors.textMuted,
-  },
-  error: {
-    fontSize: 14,
-    color: colors.error,
   },
   metaLine: {
     fontSize: 13,

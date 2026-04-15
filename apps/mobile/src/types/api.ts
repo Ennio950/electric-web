@@ -90,6 +90,7 @@ export type RegisterPushTokenRequest = {
 export type MarketplaceRequestStatus =
   | 'EN_ESPERA'
   | 'ASIGNADO'
+  | 'CANCELADO'
   | 'NEGOCIANDO'
   | 'EN_PROCESO'
   | 'ESPERANDO_CIERRE_CLIENTE'

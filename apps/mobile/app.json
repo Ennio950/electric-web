@@ -14,14 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.straightwireelectric.staff",
-      "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Electric Staff usa tu ubicacion para registrar llegada e inicio de trabajo.",
-        "NSCameraUsageDescription": "Electric Staff necesita acceso a la camara para selfies y evidencia.",
-        "NSPhotoLibraryUsageDescription": "Electric Staff necesita acceso a fotos para subir pruebas y evidencia.",
-        "NSMicrophoneUsageDescription": "Electric Staff necesita acceso al microfono para grabaciones de evidencia.",
-        "UIBackgroundModes": ["remote-notification"]
-      }
+      "bundleIdentifier": "com.fetris.services"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,6 +23,18 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "electricstaff"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -37,7 +42,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
       ],
-      "package": "com.straightwireelectric.staff"
+      "package": "com.fetris.services"
     },
     "web": {
       "bundler": "metro",
@@ -73,20 +78,8 @@
           "cameraPermission": "Electric Staff necesita acceso a la camara para selfies y evidencia."
         }
       ],
-      "expo-sharing",
-      "expo-updates",
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "electric-staff",
-          "organization": "straightwireelectric"
-        }
-      ]
+      "expo-sharing"
     ],
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
     "experiments": {
       "typedRoutes": true
     }

@@ -6,6 +6,7 @@ import { EmptyState } from '@/src/components/EmptyState';
 import { FilterChips } from '@/src/components/FilterChips';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SearchField } from '@/src/components/SearchField';
 import { SectionCard } from '@/src/components/SectionCard';
 import { StatusBadge } from '@/src/components/StatusBadge';
@@ -21,9 +22,6 @@ export default function BossQueueScreen() {
   const companyConfig = bootstrap?.companyConfig;
   const [searchQuery, setSearchQuery] = useState('');
   const [scopeFilter, setScopeFilter] = useState<'all' | 'request' | 'emergency'>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'in_progress' | 'payment' | 'done'>('all');
-  const [priorityFilter, setPriorityFilter] = useState<'all' | 'urgent' | 'normal'>('all');
-  const [dispatchFilter, setDispatchFilter] = useState<'all' | 'emergency' | 'scheduled'>('all');
 
   const requestsQuery = useQuery({
     queryKey: ['boss-requests'],
@@ -43,30 +41,15 @@ export default function BossQueueScreen() {
     void Promise.all([requestsQuery.refetch(), emergenciesQuery.refetch()]);
   };
 
-  const REQUEST_STATUS_GROUPS: Record<typeof statusFilter, string[] | null> = {
-    all: null,
-    open: ['EN_ESPERA', 'ASIGNADO'],
-    in_progress: ['NEGOCIANDO', 'EN_PROCESO'],
-    payment: ['ESPERANDO_CIERRE_CLIENTE', 'ESPERANDO_COMPROBANTE_PAGO', 'PAGO_PENDIENTE_REVISION'],
-    done: ['COMPLETADO'],
-  };
-
-  const EMERGENCY_STATUS_GROUPS: Record<typeof statusFilter, string[] | null> = {
-    all: null,
-    open: ['pending', 'scheduled'],
-    in_progress: ['accepted', 'en_route', 'on_site'],
-    payment: ['resolved', 'payment_review'],
-    done: ['completed'],
-  };
-
   const normalizedQuery = searchQuery.trim().toLowerCase();
-  const allowedRequestStatuses = REQUEST_STATUS_GROUPS[statusFilter];
-  const allowedEmergencyStatuses = EMERGENCY_STATUS_GROUPS[statusFilter];
-
   const filteredRequests = (requestsQuery.data ?? []).filter((request) => {
-    if (scopeFilter === 'emergency') return false;
-    if (allowedRequestStatuses && !allowedRequestStatuses.includes(request.status)) return false;
-    if (!normalizedQuery) return true;
+    if (scopeFilter === 'emergency') {
+      return false;
+    }
+
+    if (!normalizedQuery) {
+      return true;
+    }
 
     const haystack = [
       request.address,
@@ -85,11 +68,13 @@ export default function BossQueueScreen() {
   });
 
   const filteredEmergencies = (emergenciesQuery.data ?? []).filter((call) => {
-    if (scopeFilter === 'request') return false;
-    if (allowedEmergencyStatuses && !allowedEmergencyStatuses.includes(call.status)) return false;
-    if (priorityFilter !== 'all' && call.priority !== priorityFilter) return false;
-    if (dispatchFilter !== 'all' && call.dispatchMode !== dispatchFilter) return false;
-    if (!normalizedQuery) return true;
+    if (scopeFilter === 'request') {
+      return false;
+    }
+
+    if (!normalizedQuery) {
+      return true;
+    }
 
     const haystack = [
       call.location,
@@ -136,47 +121,12 @@ export default function BossQueueScreen() {
             { label: 'Emergencias', value: 'emergency' },
           ]}
         />
-        <FilterChips
-          value={statusFilter}
-          onChange={setStatusFilter}
-          options={[
-            { label: 'Todos', value: 'all' },
-            { label: 'Pendientes', value: 'open' },
-            { label: 'En progreso', value: 'in_progress' },
-            { label: 'Pagos', value: 'payment' },
-            { label: 'Completados', value: 'done' },
-          ]}
-        />
-        {scopeFilter !== 'request' ? (
-          <>
-            <FilterChips
-              value={priorityFilter}
-              onChange={setPriorityFilter}
-              options={[
-                { label: 'Urgencia: Todos', value: 'all' },
-                { label: 'Urgente', value: 'urgent' },
-                { label: 'Normal', value: 'normal' },
-              ]}
-            />
-            <FilterChips
-              value={dispatchFilter}
-              onChange={setDispatchFilter}
-              options={[
-                { label: 'Modo: Todos', value: 'all' },
-                { label: 'Emergencia', value: 'emergency' },
-                { label: 'Programada', value: 'scheduled' },
-              ]}
-            />
-          </>
-        ) : null}
       </SectionCard>
 
       <SectionCard title="Solicitudes" subtitle="Cola general de requests.">
         {requestsQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
         {requestsQuery.error ? (
-          <Text style={styles.error}>
-            {requestsQuery.error instanceof Error ? requestsQuery.error.message : 'No se pudo cargar la cola de requests.'}
-          </Text>
+          <QueryErrorBanner error={requestsQuery.error} fallbackMessage="No se pudo cargar la cola de requests." onRetry={() => void requestsQuery.refetch()} />
         ) : null}
         {filteredRequests.length ? (
           <View style={styles.stack}>
@@ -203,9 +153,7 @@ export default function BossQueueScreen() {
       <SectionCard title="Emergencias" subtitle="Incluye pendientes, programadas y en curso.">
         {emergenciesQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
         {emergenciesQuery.error ? (
-          <Text style={styles.error}>
-            {emergenciesQuery.error instanceof Error ? emergenciesQuery.error.message : 'No se pudo cargar la cola de emergencias.'}
-          </Text>
+          <QueryErrorBanner error={emergenciesQuery.error} fallbackMessage="No se pudo cargar la cola de emergencias." onRetry={() => void emergenciesQuery.refetch()} />
         ) : null}
         {filteredEmergencies.length ? (
           <View style={styles.stack}>
@@ -289,10 +237,6 @@ const styles = StyleSheet.create({
   },
   stack: {
     gap: spacing.md,
-  },
-  error: {
-    fontSize: 14,
-    color: colors.error,
   },
   metaLine: {
     fontSize: 13,

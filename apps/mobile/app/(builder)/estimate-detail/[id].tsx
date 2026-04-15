@@ -41,7 +41,7 @@ export default function EstimateDetailScreen() {
       const apiPath = builderEstimatePdfPath(estimateId);
       const url = buildApiUrl(apiPath);
       const filename = `estimate_${estimate?.quoteNumber ?? estimateId}.pdf`;
-      const localUri = `${FileSystem.cacheDirectory}${filename}`;
+      const localUri = (((FileSystem as any).cacheDirectory) || '') + filename;
 
       const { status } = await FileSystem.downloadAsync(url, localUri, {
         headers: { Authorization: `Bearer ${token}` },
@@ -82,7 +82,7 @@ export default function EstimateDetailScreen() {
         {estimate ? (
           <>
             <KeyValueList
-              rows={[
+              items={[
                 { label: 'Creada', value: formatDateTime(estimate.createdAt, locale, timezone) },
                 { label: 'Por', value: estimate.createdByEmail ?? '—' },
                 { label: 'Total', value: formatCurrency(estimate.grandTotal, estimate.currency, locale) },
@@ -107,3 +107,4 @@ const styles = StyleSheet.create({
   content: { padding: 20, gap: 16 },
   muted: { fontSize: 14, color: '#6B778C' },
 });
+;
