@@ -6,6 +6,7 @@ import { AppButton } from '@/src/components/AppButton';
 import { EmptyState } from '@/src/components/EmptyState';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SectionCard } from '@/src/components/SectionCard';
 import {
   approveBossEmployeeRequest,
@@ -19,6 +20,7 @@ import {
 } from '@/src/lib/api';
 import { formatCurrency, formatDateTime } from '@/src/lib/formatters';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 import type { BossEmployeeRequest, BossPhotoChangeRequest } from '@/src/types/api';
 
 export default function BossAdminScreen() {
@@ -116,7 +118,7 @@ export default function BossAdminScreen() {
     >
       <SectionCard title="Earnings" subtitle="Comision del boss y ultimos ingresos aprobados.">
         {earningsQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
-        {earningsQuery.error instanceof Error ? <Text style={styles.error}>{earningsQuery.error.message}</Text> : null}
+        {earningsQuery.error ? <QueryErrorBanner error={earningsQuery.error} onRetry={() => void earningsQuery.refetch()} /> : null}
         {earnings ? (
           <View style={styles.statsGrid}>
             <Metric label="Hoy" value={formatCurrency(earnings.summary.today, currency, locale)} />
@@ -146,7 +148,7 @@ export default function BossAdminScreen() {
 
       <SectionCard title="Solicitudes de empleado" subtitle="Aprobacion de nuevos empleados desde móvil.">
         {employeeRequestsQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
-        {employeeRequestsQuery.error instanceof Error ? <Text style={styles.error}>{employeeRequestsQuery.error.message}</Text> : null}
+        {employeeRequestsQuery.error ? <QueryErrorBanner error={employeeRequestsQuery.error} onRetry={() => void employeeRequestsQuery.refetch()} /> : null}
         {employeeRequestsQuery.data?.length ? (
           <View style={styles.stack}>
             {employeeRequestsQuery.data.map((request) => (
@@ -172,7 +174,7 @@ export default function BossAdminScreen() {
 
       <SectionCard title="Cambios de foto" subtitle="Aprobacion de cambios de foto de perfil para tecnicos.">
         {photoChangesQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
-        {photoChangesQuery.error instanceof Error ? <Text style={styles.error}>{photoChangesQuery.error.message}</Text> : null}
+        {photoChangesQuery.error ? <QueryErrorBanner error={photoChangesQuery.error} onRetry={() => void photoChangesQuery.refetch()} /> : null}
         {photoChangesQuery.data?.length ? (
           <View style={styles.stack}>
             {photoChangesQuery.data.map((request) => (
@@ -283,24 +285,24 @@ function PhotoChangeCard(props: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: spacing.md,
   },
   metricCard: {
     minWidth: 140,
     flexGrow: 1,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#D8E2F0',
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.border,
+    backgroundColor: colors.inputBg,
     padding: 14,
     gap: 6,
   },
@@ -308,25 +310,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
-    color: '#6B778C',
+    color: colors.textMuted,
   },
   metricValue: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#10233F',
+    color: colors.navy,
   },
   stack: {
-    gap: 12,
+    gap: spacing.md,
   },
   actions: {
     gap: 10,
   },
   metaLine: {
     fontSize: 13,
-    color: '#4A5970',
+    color: colors.textSecondary,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
 });

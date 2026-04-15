@@ -11,7 +11,6 @@ import { SectionCard } from '@/src/components/SectionCard';
 import {
   assignEmergencyToEmployee,
   assignRequestToEmployee,
-  deleteEmergencyCall,
   fetchBossEmployees,
   fetchEmergencyDetail,
   fetchRequestDetail,
@@ -26,6 +25,7 @@ import {
   formatRequestStatus,
 } from '@/src/lib/formatters';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 import type { EmployeeDirectoryItem } from '@/src/types/api';
 
 export default function BossQueueDetailScreen() {
@@ -61,13 +61,6 @@ export default function BossQueueDetailScreen() {
 
   const emergencyAssignMutation = useMutation({
     mutationFn: (employeeId: string) => withCurrentToken((token) => assignEmergencyToEmployee(token, recordId, employeeId)),
-    onSuccess: async () => {
-      await invalidateQueueQueries(queryClient, 'emergency', recordId);
-    },
-  });
-
-  const emergencyDeleteMutation = useMutation({
-    mutationFn: () => withCurrentToken((token) => deleteEmergencyCall(token, recordId)),
     onSuccess: async () => {
       await invalidateQueueQueries(queryClient, 'emergency', recordId);
     },
@@ -128,19 +121,6 @@ export default function BossQueueDetailScreen() {
         </SectionCard>
 
         <SectionCard title="Acciones">
-          {(call.clientCoords || call.location) ? (
-            <AppButton
-              tone="secondary"
-              onPress={() => {
-                const url = call.clientCoords
-                  ? `https://maps.google.com/?q=${call.clientCoords.lat},${call.clientCoords.lng}`
-                  : `https://maps.google.com/?q=${encodeURIComponent(call.location ?? '')}`;
-                void Linking.openURL(url);
-              }}
-            >
-              {call.clientCoords ? 'Ver GPS de la emergencia' : 'Ver ubicacion en mapa'}
-            </AppButton>
-          ) : null}
           {call.paymentProofUrl ? (
             <AppButton tone="secondary" onPress={() => void Linking.openURL(call.paymentProofUrl ?? '')}>
               Ver comprobante
@@ -156,23 +136,9 @@ export default function BossQueueDetailScreen() {
             >
               Ir a revision de pago
             </Link>
-          ) : (
+        ) : (
             <Text style={styles.muted}>Puedes asignar tecnico abajo o abrir revision si ya hay comprobante.</Text>
           )}
-          {call.status === 'pending' || call.status === 'scheduled' ? (
-            <>
-              <AppButton
-                tone="danger"
-                loading={emergencyDeleteMutation.isPending}
-                onPress={() => emergencyDeleteMutation.mutate()}
-              >
-                Cancelar emergencia
-              </AppButton>
-              {emergencyDeleteMutation.error instanceof Error ? (
-                <Text style={styles.error}>{emergencyDeleteMutation.error.message}</Text>
-              ) : null}
-            </>
-          ) : null}
         </SectionCard>
 
         {!call.assignedEmployeeId && call.status === 'pending' ? (
@@ -362,38 +328,38 @@ async function invalidateQueueQueries(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   eyebrow: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#0B5FFF',
+    color: colors.primary,
     textTransform: 'uppercase',
   },
   status: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#10233F',
+    color: colors.navy,
   },
   link: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0B5FFF',
+    color: colors.primary,
   },
   muted: {
     fontSize: 14,
-    color: '#6B778C',
+    color: colors.textMuted,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
   assignmentStack: {
-    gap: 12,
+    gap: spacing.md,
   },
   assignmentRow: {
     gap: 10,

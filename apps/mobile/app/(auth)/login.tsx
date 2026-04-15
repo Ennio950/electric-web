@@ -1,212 +1,242 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
-import { AuthPortalLayout } from '@/src/components/auth/AuthPortalLayout';
+import { AppButton } from '@/src/components/AppButton';
+import { auth } from '@/src/config/firebase';
+import { getApiBaseUrl } from '@/src/config/mobileEnv';
 import { appRoutes, pushAppRoute } from '@/src/navigation/routes';
 import { useSessionSnapshot, useSessionStore } from '@/src/stores/sessionStore';
-import { radii, spacing } from '@/src/theme';
-
-const LOGO = require('@/assets/images/logo.webp');
-
-const ACCESS_CARDS = [
-  {
-    id: 'client',
-    title: 'Cliente',
-    description: 'Servicios, seguimiento y pagos desde el celular.',
-    action: 'Acceso cliente',
-    accentColor: '#f5c842',
-    href: appRoutes.authClientLogin,
-  },
-  {
-    id: 'employee',
-    title: 'Empleado',
-    description: 'Operacion diaria, solicitudes y trabajo de campo.',
-    action: 'Acceso empleado',
-    accentColor: '#22c55e',
-    href: appRoutes.authEmployeeLogin,
-  },
-  {
-    id: 'admin',
-    title: 'Admin',
-    description: 'Revision, aprobaciones y panel de control.',
-    action: 'Acceso admin',
-    accentColor: '#8b5cf6',
-    href: appRoutes.authAdminLogin,
-  },
-] as const;
+import { colors, layout, radii, spacing } from '@/src/theme';
 
 export default function LoginScreen() {
   const session = useSessionSnapshot();
   const setNotice = useSessionStore((state) => state.setNotice);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit() {
+    if (isSubmitting) return;
+
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !password.trim()) {
+      setNotice('Completa email y password.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setNotice(null);
+
+    try {
+      await signInWithEmailAndPassword(auth, cleanEmail, password);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo iniciar sesion.';
+      setNotice(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
-    <AuthPortalLayout>
-      <View style={styles.shell}>
-        <Image source={LOGO} resizeMode="contain" style={styles.logo} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={styles.safeArea}
+    >
+      <View style={styles.hero}>
+        <Text style={styles.eyebrow}>Electric Staff</Text>
+        <Text style={styles.title}>Acceso nativo para client, employee y boss</Text>
+        <Text style={styles.subtitle}>
+          Login con Firebase y bootstrap tipado contra el backend.
+        </Text>
+      </View>
 
-        <View style={styles.hero}>
-          <Text style={styles.eyebrow}>Straight Wire Electric</Text>
-          <Text style={styles.title}>Selecciona tu acceso</Text>
-          <Text style={styles.subtitle}>
-            Una sola app nativa para clientes, cuadrilla y administracion.
-          </Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          autoCapitalize="none"
+          autoComplete="email"
+          keyboardType="email-address"
+          placeholder="boss@electric.com"
+          placeholderTextColor={colors.textPlaceholder}
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+        />
+
+        <Text style={styles.label}>Password</Text>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            autoCapitalize="none"
+            placeholder="Tu password"
+            placeholderTextColor={colors.textPlaceholder}
+            secureTextEntry={!showPassword}
+            style={styles.passwordInput}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            onPress={() => setShowPassword((prev) => !prev)}
+            style={styles.passwordToggle}
+          >
+            <Text style={styles.passwordToggleLabel}>{showPassword ? 'Ocultar' : 'Mostrar'}</Text>
+          </Pressable>
         </View>
 
         {session.notice ? (
           <View style={styles.noticeBanner}>
-            <Text style={styles.noticeText}>{session.notice}</Text>
+            <Text style={styles.notice}>{session.notice}</Text>
           </View>
         ) : null}
 
-        <View style={styles.cardsGrid}>
-          {ACCESS_CARDS.map((card) => (
-            <Pressable
-              key={card.id}
-              accessibilityRole="button"
-              onPress={() => {
-                setNotice(null);
-                pushAppRoute(card.href);
-              }}
-              style={({ pressed }) => [
-                styles.card,
-                { borderColor: `${card.accentColor}3d` },
-                pressed ? styles.cardPressed : null,
-              ]}
-            >
-              <View style={styles.cardHeader}>
-                <View style={[styles.cardBadge, { backgroundColor: card.accentColor }]}>
-                  <Text style={styles.cardBadgeText}>{card.title.charAt(0)}</Text>
-                </View>
-                <Text style={styles.cardTitle}>{card.title}</Text>
-              </View>
+        <View style={styles.actions}>
+          <AppButton size="lg" loading={isSubmitting} onPress={handleSubmit}>
+            Entrar
+          </AppButton>
 
-              <Text style={styles.cardDescription}>{card.description}</Text>
+          <AppButton
+            size="lg"
+            tone="secondary"
+            disabled={isSubmitting}
+            onPress={() => pushAppRoute(appRoutes.authSignupClient)}
+          >
+            Crear cuenta cliente
+          </AppButton>
 
-              <View style={[styles.cardAction, { borderColor: `${card.accentColor}66` }]}>
-                <Text style={[styles.cardActionText, { color: card.accentColor }]}>{card.action}</Text>
-              </View>
-            </Pressable>
-          ))}
+          <AppButton
+            size="lg"
+            tone="secondary"
+            disabled={isSubmitting}
+            onPress={() => pushAppRoute(appRoutes.authMagicClient)}
+          >
+            Entrar con código
+          </AppButton>
+
+          <AppButton
+            size="lg"
+            tone="secondary"
+            disabled={isSubmitting}
+            onPress={() => pushAppRoute(appRoutes.authApplyEmployee)}
+          >
+            Solicitar acceso como employee
+          </AppButton>
         </View>
+
+        {__DEV__ ? <Text style={styles.footnote}>API base: {getApiBaseUrl()}</Text> : null}
       </View>
-    </AuthPortalLayout>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  shell: {
-    width: '100%',
-    maxWidth: 680,
-    alignItems: 'center',
-    gap: spacing.xl,
-  },
-  logo: {
-    width: 190,
-    height: 84,
+  safeArea: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xxl,
+    backgroundColor: colors.pageBg,
   },
   hero: {
-    alignItems: 'center',
-    gap: spacing.sm,
+    marginBottom: spacing.xxl,
   },
   eyebrow: {
-    fontSize: 13,
-    fontWeight: '800',
-    letterSpacing: 1.3,
+    marginBottom: spacing.sm,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    color: colors.primary,
     textTransform: 'uppercase',
-    color: '#f5c842',
   },
   title: {
-    fontSize: 28,
-    fontWeight: '900',
-    textAlign: 'center',
-    color: '#f8fafc',
+    fontSize: 30,
+    fontWeight: '800',
+    color: colors.navy,
   },
   subtitle: {
-    maxWidth: 360,
+    marginTop: spacing.sm,
     fontSize: 15,
     lineHeight: 22,
-    textAlign: 'center',
-    color: '#cbd5e1',
-  },
-  noticeBanner: {
-    width: '100%',
-    borderRadius: radii.xl,
-    borderWidth: 1,
-    borderColor: 'rgba(248,113,113,0.35)',
-    backgroundColor: 'rgba(127,29,29,0.22)',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  noticeText: {
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: 'center',
-    color: '#fecaca',
-  },
-  cardsGrid: {
-    width: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-    justifyContent: 'center',
+    color: colors.textSecondary,
   },
   card: {
-    width: '100%',
-    maxWidth: 320,
-    minHeight: 146,
-    borderRadius: 24,
-    borderWidth: 1,
-    backgroundColor: 'rgba(12, 10, 15, 0.84)',
-    padding: spacing.lg,
-    justifyContent: 'space-between',
-    shadowColor: '#000000',
-    shadowOpacity: 0.18,
+    borderRadius: radii.xxxl,
+    backgroundColor: colors.cardBg,
+    padding: layout.containerPadding,
+    shadowColor: colors.shadow,
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 24,
-    elevation: 8,
+    elevation: 4,
   },
-  cardPressed: {
-    opacity: 0.94,
-    transform: [{ translateY: 1 }],
+  label: {
+    marginBottom: spacing.sm,
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.navyLabel,
   },
-  cardHeader: {
+  input: {
+    marginBottom: spacing.lg,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    backgroundColor: colors.inputBg,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    fontSize: 16,
+    color: colors.navy,
+  },
+  passwordContainer: {
+    marginBottom: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    backgroundColor: colors.inputBg,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    fontSize: 16,
+    color: colors.navy,
+  },
+  passwordToggle: {
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+  },
+  passwordToggleLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  noticeBanner: {
+    marginBottom: spacing.lg,
+    borderRadius: radii.md,
+    backgroundColor: colors.errorBg,
+    paddingHorizontal: 14,
+    paddingVertical: spacing.md,
+  },
+  notice: {
+    fontSize: 14,
+    color: colors.error,
+  },
+  actions: {
     gap: spacing.md,
   },
-  cardBadge: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardBadgeText: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#0b0b0f',
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#f8fafc',
-  },
-  cardDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#cbd5e1',
-  },
-  cardAction: {
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.02)',
-  },
-  cardActionText: {
-    fontSize: 13,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
+  footnote: {
+    marginTop: spacing.lg,
+    fontSize: 12,
+    color: colors.textPlaceholder,
   },
 });

@@ -5,7 +5,6 @@ import { onIdTokenChanged, signOut } from 'firebase/auth';
 
 import { auth } from '@/src/config/firebase';
 import { ApiError } from '@/src/lib/api';
-import { setSentryUser } from '@/src/lib/sentry';
 import { loadBootstrapForUser } from '@/src/services/apiService';
 import { useSessionAuthFlow, useSessionStore } from '@/src/stores/sessionStore';
 
@@ -51,16 +50,14 @@ export function SessionBootstrap() {
       if (lastAuthUidRef.current !== nextUid) {
         lastAuthUidRef.current = nextUid;
         await queryClient.cancelQueries();
-        queryClient.clear();
+        queryClient.removeQueries();
       }
 
       if (!user) {
-        setSentryUser(null);
         finishSignedOut(null);
         return;
       }
 
-      setSentryUser(user.uid, user.email);
       beginBootstrap(user);
 
       try {

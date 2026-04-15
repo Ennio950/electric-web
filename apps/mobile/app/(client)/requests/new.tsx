@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { AppButton } from '@/src/components/AppButton';
 import { FilterChips } from '@/src/components/FilterChips';
+import { FormInput } from '@/src/components/FormInput';
+import { KeyboardSafeScrollView } from '@/src/components/KeyboardSafeScrollView';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { SectionCard } from '@/src/components/SectionCard';
 import { createClientRequest, withCurrentToken } from '@/src/lib/api';
@@ -11,6 +13,7 @@ import { compressImageForUpload, uploadImageAsset } from '@/src/lib/imageUpload'
 import { captureImageFromCamera, pickImageFromLibrary } from '@/src/lib/media';
 import { appRoutes, replaceAppRoute } from '@/src/navigation/routes';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, spacing } from '@/src/theme';
 
 const CATEGORY_OPTIONS = [
   { label: 'Electricidad', value: 'electricidad' },
@@ -81,34 +84,29 @@ export default function ClientRequestNewScreen() {
   }
 
   return (
-    <ScrollView
+    <KeyboardSafeScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={createMutation.isPending} onRefresh={() => undefined} />}
     >
       <SectionCard
         title="Nueva solicitud"
         subtitle="Abre un request nuevo y opcionalmente adjunta una foto desde galeria o camara."
       >
-        <Text style={styles.label}>Categoria</Text>
+        <Text style={styles.chipLabel}>Categoria</Text>
         <FilterChips value={category} onChange={setCategory} options={CATEGORY_OPTIONS} />
 
-        <Text style={styles.label}>Direccion</Text>
-        <TextInput
+        <FormInput
+          label="Direccion"
           placeholder="Direccion del servicio"
-          placeholderTextColor="#8A94A6"
-          style={styles.input}
           value={address}
           onChangeText={setAddress}
         />
 
-        <Text style={styles.label}>Descripcion</Text>
-        <TextInput
+        <FormInput
+          label="Descripcion"
           multiline
           numberOfLines={5}
           placeholder="Que necesitas que resolvamos"
-          placeholderTextColor="#8A94A6"
-          style={[styles.input, styles.textArea]}
           value={description}
           onChangeText={setDescription}
         />
@@ -132,12 +130,10 @@ export default function ClientRequestNewScreen() {
           </AppButton>
         </View>
 
-        <TextInput
+        <FormInput
           autoCapitalize="none"
           autoCorrect={false}
           placeholder="https://... (fallback manual)"
-          placeholderTextColor="#8A94A6"
-          style={styles.input}
           value={photoUrl}
           onChangeText={setPhotoUrl}
         />
@@ -153,42 +149,28 @@ export default function ClientRequestNewScreen() {
         {uploadPhotoMutation.error instanceof Error ? <Text style={styles.error}>{uploadPhotoMutation.error.message}</Text> : null}
         {createMutation.error instanceof Error ? <Text style={styles.error}>{createMutation.error.message}</Text> : null}
       </SectionCard>
-    </ScrollView>
+    </KeyboardSafeScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
+    padding: spacing.xl,
   },
-  label: {
+  chipLabel: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#23324A',
-  },
-  input: {
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#D6DDE8',
-    backgroundColor: '#F9FBFD',
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    fontSize: 16,
-    color: '#10233F',
-  },
-  textArea: {
-    minHeight: 120,
-    textAlignVertical: 'top',
+    color: colors.navyLabel,
   },
   actions: {
-    gap: 12,
+    gap: spacing.md,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
 });

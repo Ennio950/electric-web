@@ -6,6 +6,7 @@ import { EmptyState } from '@/src/components/EmptyState';
 import { FilterChips } from '@/src/components/FilterChips';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SearchField } from '@/src/components/SearchField';
 import { SectionCard } from '@/src/components/SectionCard';
 import { StatusBadge } from '@/src/components/StatusBadge';
@@ -85,9 +86,7 @@ export default function BossPaymentsScreen() {
       <SectionCard title="Pendientes de revision">
         {reviewQueueQuery.isLoading ? <LoadingScreen variant="skeleton" /> : null}
         {reviewQueueQuery.error ? (
-          <Text style={styles.error}>
-            {reviewQueueQuery.error instanceof Error ? reviewQueueQuery.error.message : 'No se pudo cargar la cola de pagos.'}
-          </Text>
+          <QueryErrorBanner error={reviewQueueQuery.error} fallbackMessage="No se pudo cargar la cola de pagos." onRetry={() => void reviewQueueQuery.refetch()} />
         ) : null}
         {filteredRows.length ? (
           <View style={styles.stack}>
@@ -150,10 +149,6 @@ const styles = StyleSheet.create({
   },
   stack: {
     gap: spacing.md,
-  },
-  error: {
-    fontSize: 14,
-    color: colors.error,
   },
   amount: {
     fontSize: 18,

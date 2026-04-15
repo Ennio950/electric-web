@@ -1,22 +1,40 @@
+import { z } from 'zod';
+
 import { appRoutes, type AppRouteHref } from '@/src/navigation/routes';
 import type { MobileUserRole } from '@/src/types/api';
 
-type NotificationRouteData = {
-  href?: unknown;
-  pathname?: unknown;
-  entityType?: unknown;
-  sourceType?: unknown;
-  role?: unknown;
-  recordId?: unknown;
-  requestId?: unknown;
-  emergencyId?: unknown;
-  paymentId?: unknown;
-  targetId?: unknown;
-  screen?: unknown;
-};
+const notificationRouteSchema = z.object({
+  href: z.string().optional(),
+  pathname: z.string().optional(),
+  entityType: z.string().optional(),
+  sourceType: z.string().optional(),
+  role: z.string().optional(),
+  recordId: z.string().optional(),
+  requestId: z.string().optional(),
+  emergencyId: z.string().optional(),
+  paymentId: z.string().optional(),
+  targetId: z.string().optional(),
+  screen: z.string().optional(),
+}).passthrough();
 
-function asString(value: unknown) {
-  return typeof value === 'string' && value.trim() ? value.trim() : null;
+type NotificationRouteData = z.infer<typeof notificationRouteSchema>;
+
+function parseNotificationData(data: unknown): NotificationRouteData | null {
+  if (!data || typeof data !== 'object') {
+    return null;
+  }
+
+  const result = notificationRouteSchema.safeParse(data);
+  if (!result.success) {
+    console.warn('[NotificationRouting] Invalid notification data:', result.error.message);
+    return null;
+  }
+
+  return result.data;
+}
+
+function trimOrNull(value: string | undefined): string | null {
+  return value?.trim() || null;
 }
 
 function asAbsoluteRoute(value: string | null): `/${string}` | null {
@@ -80,34 +98,34 @@ function resolveEntityHref(
 }
 
 export function resolveNotificationHref(data: unknown, fallbackRole: MobileUserRole | null) {
-  if (!data || typeof data !== 'object') {
+  const payload = parseNotificationData(data);
+  if (!payload) {
     return null;
   }
 
-  const payload = data as NotificationRouteData;
-  const directHref = asAbsoluteRoute(asString(payload.href) ?? asString(payload.pathname));
+  const directHref = asAbsoluteRoute(trimOrNull(payload.href) ?? trimOrNull(payload.pathname));
   if (directHref) {
     return directHref;
   }
 
-  const role = (asString(payload.role) as MobileUserRole | null) ?? fallbackRole;
+  const role = (trimOrNull(payload.role) as MobileUserRole | null) ?? fallbackRole;
   if (!role) {
     return null;
   }
 
-  const screen = asString(payload.screen);
+  const screen = trimOrNull(payload.screen);
   if (screen === 'builder') {
     return appRoutes.builderHome;
   }
 
-  const entityType = asString(payload.entityType);
-  const sourceType = asString(payload.sourceType);
+  const entityType = trimOrNull(payload.entityType);
+  const sourceType = trimOrNull(payload.sourceType);
   const recordId =
-    asString(payload.recordId)
-    ?? asString(payload.requestId)
-    ?? asString(payload.emergencyId)
-    ?? asString(payload.paymentId)
-    ?? asString(payload.targetId);
+    trimOrNull(payload.recordId)
+    ?? trimOrNull(payload.requestId)
+    ?? trimOrNull(payload.emergencyId)
+    ?? trimOrNull(payload.paymentId)
+    ?? trimOrNull(payload.targetId);
 
   if (entityType && recordId) {
     return resolveEntityHref(entityType, recordId, role, sourceType);

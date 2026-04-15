@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radii, spacing } from '@/src/theme';
@@ -16,18 +16,23 @@ type DashboardScreenProps = {
   companyName: string;
   stats: DashboardStat[];
   isLoading?: boolean;
+  onRefresh?: () => void;
   errorMessage?: string | null;
   footer?: ReactNode;
 };
 
-export function DashboardScreen(props: DashboardScreenProps) {
-  const { title, subtitle, role, companyName, stats, isLoading, errorMessage, footer } = props;
+export const DashboardScreen = memo(function DashboardScreen(props: DashboardScreenProps) {
+  const { title, subtitle, role, companyName, stats, isLoading, onRefresh, errorMessage, footer } = props;
 
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={Boolean(isLoading)} onRefresh={() => undefined} />}
+      refreshControl={
+        onRefresh
+          ? <RefreshControl refreshing={Boolean(isLoading)} onRefresh={onRefresh} />
+          : undefined
+      }
     >
       <View style={styles.hero}>
         <Text style={styles.eyebrow}>{role.toUpperCase()}</Text>
@@ -54,7 +59,7 @@ export function DashboardScreen(props: DashboardScreenProps) {
       {footer ? <View style={styles.footer}>{footer}</View> : null}
     </ScrollView>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

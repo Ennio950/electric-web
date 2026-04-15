@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AppButton } from '@/src/components/AppButton';
+import { KeyboardSafeScrollView } from '@/src/components/KeyboardSafeScrollView';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { SectionCard } from '@/src/components/SectionCard';
 import {
@@ -16,6 +17,7 @@ import {
   withCurrentToken,
 } from '@/src/lib/api';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 
 export default function BossSettingsScreen() {
   const bootstrap = useSessionStore((state) => state.bootstrap);
@@ -173,7 +175,7 @@ export default function BossSettingsScreen() {
               : null;
 
   return (
-    <ScrollView
+    <KeyboardSafeScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
@@ -284,7 +286,7 @@ export default function BossSettingsScreen() {
       </SectionCard>
 
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-    </ScrollView>
+    </KeyboardSafeScrollView>
   );
 }
 
@@ -334,11 +336,11 @@ function ChannelCard(props: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   field: {
     gap: 8,
@@ -347,17 +349,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
-    color: '#6B778C',
+    color: colors.textMuted,
   },
   input: {
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#D8E2F0',
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.border,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     fontSize: 15,
-    color: '#10233F',
+    color: colors.navy,
   },
   textarea: {
     minHeight: 88,
@@ -366,38 +368,38 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   flexField: {
     flex: 1,
   },
   stack: {
-    gap: 12,
+    gap: spacing.md,
   },
   channelCard: {
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#D8E2F0',
-    backgroundColor: '#F8FAFD',
+    borderColor: colors.border,
+    backgroundColor: colors.inputBg,
     padding: 14,
     gap: 6,
   },
   channelTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#10233F',
+    color: colors.navy,
   },
   channelMeta: {
     fontSize: 13,
-    color: '#4A5970',
+    color: colors.textSecondary,
   },
   note: {
     fontSize: 13,
-    color: '#6B778C',
+    color: colors.textMuted,
     lineHeight: 20,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
 });

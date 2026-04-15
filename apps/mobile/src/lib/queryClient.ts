@@ -1,6 +1,13 @@
-import { QueryClient } from '@tanstack/react-query';
+import NetInfo from '@react-native-community/netinfo';
+import { onlineManager, QueryClient } from '@tanstack/react-query';
 
 import { ApiError } from '@/src/lib/apiClient';
+
+onlineManager.setEventListener((setOnline) => {
+  return NetInfo.addEventListener((state) => {
+    setOnline(Boolean(state.isConnected));
+  });
+});
 
 export const MOBILE_QUERY_STALE_TIME = 30_000;
 export const MOBILE_QUERY_GC_TIME = 5 * 60_000;

@@ -19,10 +19,13 @@ import { compressImageForUpload, uploadImageAsset } from '@/src/lib/imageUpload'
 import { getCurrentForegroundCoords } from '@/src/lib/location';
 import { captureImageFromCamera, pickImageFromLibrary } from '@/src/lib/media';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, radii, spacing } from '@/src/theme';
 
 const CHAT_ENABLED_STATUSES = new Set([
   'accepted',
   'awaiting_client_close',
+  'awaiting_payment_proof',
+  'payment_pending_review',
 ]);
 
 export default function ClientEmergencyDetailScreen() {
@@ -37,8 +40,6 @@ export default function ClientEmergencyDetailScreen() {
   const detailQuery = useQuery({
     queryKey: ['client-emergency-detail', callId],
     enabled: Boolean(callId),
-    refetchInterval: callId ? 15_000 : false,
-    refetchIntervalInBackground: false,
     queryFn: () => withCurrentToken((token) => fetchEmergencyDetail(token, callId)),
   });
 
@@ -106,9 +107,7 @@ export default function ClientEmergencyDetailScreen() {
 
   const locationMutation = useMutation({
     mutationFn: async () => {
-      const coords = await getCurrentForegroundCoords({
-        fallbackAddress: detailQuery.data?.location ?? '',
-      });
+      const coords = await getCurrentForegroundCoords();
       return withCurrentToken((token) => updateEmergencyLocation(token, callId, coords));
     },
     onSuccess: invalidateAll,
@@ -116,10 +115,7 @@ export default function ClientEmergencyDetailScreen() {
 
   const status = String(detailQuery.data?.status || '').trim().toLowerCase();
   const canClose = status === 'awaiting_client_close';
-  const hasAssignedTechnician = Boolean(
-    detailQuery.data?.assignedEmployeeId || detailQuery.data?.assignedEmployeeName || detailQuery.data?.assignedEmployeeEmail,
-  );
-  const showChat = CHAT_ENABLED_STATUSES.has(status) && hasAssignedTechnician;
+  const showChat = CHAT_ENABLED_STATUSES.has(status);
 
   const actionError = useMemo(() => {
     const candidates = [closeMutation.error, uploadFinalPhotoMutation.error, locationMutation.error];
@@ -181,21 +177,6 @@ export default function ClientEmergencyDetailScreen() {
         >
           Compartir mi ubicacion
         </AppButton>
-        {(call.employeeCoords || call.clientCoords || call.location) ? (
-          <AppButton
-            tone="secondary"
-            onPress={() => {
-              // Prefer employee GPS (where the tech is), fallback to client GPS, then text address
-              const coords = call.employeeCoords ?? call.clientCoords;
-              const url = coords
-                ? `https://maps.google.com/?q=${coords.lat},${coords.lng}`
-                : `https://maps.google.com/?q=${encodeURIComponent(call.location ?? '')}`;
-              void Linking.openURL(url);
-            }}
-          >
-            {call.employeeCoords ? 'Ver ubicacion GPS del tecnico' : 'Ver ubicacion en mapa'}
-          </AppButton>
-        ) : null}
         {call.finalPhotoUrl ? (
           <AppButton tone="secondary" onPress={() => void Linking.openURL(call.finalPhotoUrl ?? '')}>
             Ver foto final actual
@@ -212,7 +193,7 @@ export default function ClientEmergencyDetailScreen() {
           <TextInput
             keyboardType="decimal-pad"
             placeholder="Monto final"
-            placeholderTextColor="#8A94A6"
+            placeholderTextColor={colors.textPlaceholder}
             style={styles.input}
             value={finalAmount}
             onChangeText={setFinalAmount}
@@ -220,7 +201,7 @@ export default function ClientEmergencyDetailScreen() {
           <TextInput
             keyboardType="number-pad"
             placeholder="Calificacion 1-5"
-            placeholderTextColor="#8A94A6"
+            placeholderTextColor={colors.textPlaceholder}
             style={styles.input}
             value={clientRating}
             onChangeText={setClientRating}
@@ -247,7 +228,7 @@ export default function ClientEmergencyDetailScreen() {
             autoCapitalize="none"
             autoCorrect={false}
             placeholder="https://... (foto final)"
-            placeholderTextColor="#8A94A6"
+            placeholderTextColor={colors.textPlaceholder}
             style={styles.input}
             value={finalPhotoUrl}
             onChangeText={setFinalPhotoUrl}
@@ -278,32 +259,32 @@ export default function ClientEmergencyDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   status: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0B5FFF',
+    color: colors.primary,
   },
   actions: {
-    gap: 12,
+    gap: spacing.md,
   },
   input: {
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: '#D6DDE8',
-    backgroundColor: '#F9FBFD',
+    borderColor: colors.borderLight,
+    backgroundColor: colors.inputBg,
     paddingHorizontal: 14,
     paddingVertical: 13,
     fontSize: 16,
-    color: '#10233F',
+    color: colors.navy,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
 });

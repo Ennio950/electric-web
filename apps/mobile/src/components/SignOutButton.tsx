@@ -18,7 +18,7 @@ export function SignOutButton() {
   }
 
   return (
-    <Pressable onPress={handlePress} style={styles.button}>
+    <Pressable accessibilityRole="button" accessibilityLabel="Cerrar sesion" onPress={handlePress} style={styles.button}>
       <Text style={styles.label}>Cerrar sesion</Text>
     </Pressable>
   );

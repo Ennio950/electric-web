@@ -1,14 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { AppButton } from '@/src/components/AppButton';
 import { FilterChips } from '@/src/components/FilterChips';
+import { FormInput } from '@/src/components/FormInput';
+import { KeyboardSafeScrollView } from '@/src/components/KeyboardSafeScrollView';
 import { LoadingScreen } from '@/src/components/LoadingScreen';
 import { SectionCard } from '@/src/components/SectionCard';
 import { createClientEmergencyCall, withCurrentToken } from '@/src/lib/api';
 import { appRoutes, replaceAppRoute } from '@/src/navigation/routes';
 import { useSessionStore } from '@/src/stores/sessionStore';
+import { colors, spacing } from '@/src/theme';
 
 const PRIORITY_OPTIONS = [
   { label: 'Urgente', value: 'urgent' },
@@ -71,52 +74,44 @@ export default function ClientEmergencyNewScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <KeyboardSafeScrollView style={styles.container} contentContainerStyle={styles.content}>
       <SectionCard
         title="Nueva emergencia"
         subtitle="Abre un servicio urgente o agenda uno programado desde el mismo flujo."
       >
-        <Text style={styles.label}>Tipo</Text>
+        <Text style={styles.chipLabel}>Tipo</Text>
         <FilterChips value={dispatchMode} onChange={(value) => setDispatchMode(value as 'emergency' | 'scheduled')} options={MODE_OPTIONS} />
 
-        <Text style={styles.label}>Prioridad</Text>
+        <Text style={styles.chipLabel}>Prioridad</Text>
         <FilterChips value={priority} onChange={setPriority} options={PRIORITY_OPTIONS} />
 
-        <Text style={styles.label}>Nombre de contacto</Text>
-        <TextInput
+        <FormInput
+          label="Nombre de contacto"
           placeholder="Tu nombre"
-          placeholderTextColor="#8A94A6"
-          style={styles.input}
           value={clientName}
           onChangeText={setClientName}
         />
 
-        <Text style={styles.label}>Telefono</Text>
-        <TextInput
+        <FormInput
+          label="Telefono"
           keyboardType="phone-pad"
           placeholder="Telefono de contacto"
-          placeholderTextColor="#8A94A6"
-          style={styles.input}
           value={phone}
           onChangeText={setPhone}
         />
 
-        <Text style={styles.label}>Ubicacion</Text>
-        <TextInput
+        <FormInput
+          label="Ubicacion"
           placeholder="Direccion o punto de referencia"
-          placeholderTextColor="#8A94A6"
-          style={styles.input}
           value={location}
           onChangeText={setLocation}
         />
 
-        <Text style={styles.label}>Detalle</Text>
-        <TextInput
+        <FormInput
+          label="Detalle"
           multiline
           numberOfLines={5}
           placeholder="Explica el problema"
-          placeholderTextColor="#8A94A6"
-          style={[styles.input, styles.textArea]}
           value={issue}
           onChangeText={setIssue}
         />
@@ -124,21 +119,17 @@ export default function ClientEmergencyNewScreen() {
         {dispatchMode === 'scheduled' ? (
           <View style={styles.row}>
             <View style={styles.flexField}>
-              <Text style={styles.label}>Fecha</Text>
-              <TextInput
+              <FormInput
+                label="Fecha"
                 placeholder="2026-03-11"
-                placeholderTextColor="#8A94A6"
-                style={styles.input}
                 value={scheduledDate}
                 onChangeText={setScheduledDate}
               />
             </View>
             <View style={styles.flexField}>
-              <Text style={styles.label}>Hora</Text>
-              <TextInput
+              <FormInput
+                label="Hora"
                 placeholder="14:30"
-                placeholderTextColor="#8A94A6"
-                style={styles.input}
                 value={scheduledTime}
                 onChangeText={setScheduledTime}
               />
@@ -152,46 +143,32 @@ export default function ClientEmergencyNewScreen() {
 
         {createMutation.error instanceof Error ? <Text style={styles.error}>{createMutation.error.message}</Text> : null}
       </SectionCard>
-    </ScrollView>
+    </KeyboardSafeScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: colors.pageBg,
   },
   content: {
-    padding: 20,
+    padding: spacing.xl,
   },
-  label: {
+  chipLabel: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#23324A',
-  },
-  input: {
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#D6DDE8',
-    backgroundColor: '#F9FBFD',
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    fontSize: 16,
-    color: '#10233F',
-  },
-  textArea: {
-    minHeight: 120,
-    textAlignVertical: 'top',
+    color: colors.navyLabel,
   },
   row: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   flexField: {
     flex: 1,
   },
   error: {
     fontSize: 14,
-    color: '#B42318',
+    color: colors.error,
   },
 });

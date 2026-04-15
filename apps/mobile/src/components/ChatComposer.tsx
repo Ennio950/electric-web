@@ -27,6 +27,7 @@ export function ChatComposer(props: ChatComposerProps) {
   return (
     <View style={styles.container}>
       <TextInput
+        accessibilityLabel={placeholder}
         multiline
         numberOfLines={3}
         placeholder={placeholder}
@@ -35,6 +36,7 @@ export function ChatComposer(props: ChatComposerProps) {
         value={value}
         onChangeText={onChangeText}
         editable={!disabled && !isSending}
+        blurOnSubmit={false}
       />
       <AppButton loading={isSending} disabled={disabled || !canSend} onPress={onSend}>
         Enviar mensaje

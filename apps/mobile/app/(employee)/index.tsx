@@ -1,41 +1,49 @@
+import { useQuery } from '@tanstack/react-query';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { EmptyState } from '@/src/components/EmptyState';
 import { PressableCard } from '@/src/components/PressableCard';
+import { QueryErrorBanner } from '@/src/components/QueryErrorBanner';
 import { SectionCard } from '@/src/components/SectionCard';
 import { SignOutButton } from '@/src/components/SignOutButton';
 import { StatusBadge } from '@/src/components/StatusBadge';
+import {
+  fetchEmployeeRequests,
+  fetchEmergencyCalls,
+  withCurrentToken,
+} from '@/src/lib/api';
 import { formatDateTime } from '@/src/lib/formatters';
-import { useMobileHomeQuery, useEmployeeRequestsQuery, useEmployeeEmergencyCallsQuery } from '@/src/hooks/useMobileDataQueries';
+import { useMobileHomeQuery } from '@/src/hooks/useMobileHomeQuery';
 import { appRoutes, pushAppRoute } from '@/src/navigation/routes';
 import { useSessionStore } from '@/src/stores/sessionStore';
 import { colors, radii, spacing } from '@/src/theme';
-import type { MarketplaceEmergencyCall, MarketplaceRequest, MobileHomeResponse } from '@/src/types/api';
+import type { MarketplaceEmergencyCall, MarketplaceRequest } from '@/src/types/api';
 
 export default function EmployeeHomeScreen() {
   const bootstrap = useSessionStore((state) => state.bootstrap);
   const homeQuery = useMobileHomeQuery();
-  const requestsQuery = useEmployeeRequestsQuery('home');
-  const emergenciesQuery = useEmployeeEmergencyCallsQuery('home');
+  const myRequestsQuery = useQuery({
+    queryKey: ['employee-home-requests'],
+    queryFn: () => withCurrentToken(fetchEmployeeRequests),
+  });
+  const emergenciesQuery = useQuery({
+    queryKey: ['employee-home-emergencies'],
+    queryFn: () => withCurrentToken((token) => fetchEmergencyCalls(token)),
+  });
 
   if (!bootstrap) {
     return null;
   }
 
-  const data = homeQuery.data as MobileHomeResponse | undefined;
-  const summary = data && data.role === 'employee' ? data.summary : null;
-  
-  const recentRequests = (requestsQuery.data ?? []).slice(0, 3);
-  const activeEmergencies = (emergenciesQuery.data ?? [])
-    .filter((call) => call.status !== 'completed')
+  const summary = homeQuery.data?.role === 'employee' ? homeQuery.data.summary : null;
+  const currentUserId = bootstrap.user.uid;
+  const assignedEmergencies = (emergenciesQuery.data ?? [])
+    .filter((call) => call.assignedEmployeeId === currentUserId)
     .slice(0, 3);
+  const recentRequests = (myRequestsQuery.data ?? []).slice(0, 3);
 
   const onRefresh = () => {
-    void Promise.all([
-      homeQuery.refetch(),
-      requestsQuery.refetch(),
-      emergenciesQuery.refetch(),
-    ]);
+    void Promise.all([homeQuery.refetch(), myRequestsQuery.refetch(), emergenciesQuery.refetch()]);
   };
 
   return (
@@ -44,60 +52,55 @@ export default function EmployeeHomeScreen() {
       contentContainerStyle={styles.content}
       refreshControl={
         <RefreshControl
-          refreshing={
-            homeQuery.isRefetching
-            || requestsQuery.isRefetching
-            || emergenciesQuery.isRefetching
-          }
+          refreshing={homeQuery.isRefetching || myRequestsQuery.isRefetching || emergenciesQuery.isRefetching}
           onRefresh={onRefresh}
         />
       }
     >
       <View style={styles.hero}>
-        <Text style={styles.eyebrow}>TÉCNICO</Text>
-        <Text style={styles.title}>¡Hola, {bootstrap.user.displayName || 'técnico'}!</Text>
-        <Text style={styles.subtitle}>Gestiona tus servicios asignados y emergencias activas.</Text>
+        <Text style={styles.eyebrow}>EMPLOYEE</Text>
+        <Text style={styles.title}>Panel de campo</Text>
+        <Text style={styles.subtitle}>Resumen del turno, atajos operativos y lo que tienes que atender ahora.</Text>
         <Text style={styles.company}>{bootstrap.companyConfig.companyName}</Text>
       </View>
 
       <View style={styles.grid}>
-        <StatCard icon="📋" label="Mis servicios" value={summary?.assignedRequests ?? 0} />
-        <StatCard icon="🚨" label="Emergencias" value={summary?.activeEmergencyCount ?? 0} />
+        <StatCard icon="📂" label="Requests abiertos" value={summary?.openRequests ?? 0} />
+        <StatCard icon="👤" label="Asignados" value={summary?.assignedRequests ?? 0} />
+        <StatCard icon="⚡" label="En progreso" value={summary?.inProgressRequests ?? 0} />
+        <StatCard icon="🚨" label="Emergencias activas" value={summary?.activeEmergencyCount ?? 0} />
       </View>
 
-      <SectionCard title="Atajos" subtitle="Acceso rápido a tu operación diaria.">
+      <SectionCard title="Atajos" subtitle="Entradas rápidas a los dos flujos operativos del técnico.">
         <View style={styles.stack}>
           <PressableCard
-            eyebrow="Queue"
-            title="Ver mis solicitudes"
-            subtitle="Servicios asignados y disponibles."
+            eyebrow="Requests"
+            title="Abrir cola de requests"
+            subtitle="Ver disponibles, mis asignados y tomar un trabajo."
             onPress={() => pushAppRoute(appRoutes.employeeRequests)}
           />
           <PressableCard
-            eyebrow="Urgente"
-            title="Ver emergencias"
-            subtitle="Atención de casos críticos asignados."
+            eyebrow="Emergencias"
+            title="Abrir emergency dispatch"
+            subtitle="Ver pendientes, aceptadas y compartir ubicación."
             onPress={() => pushAppRoute(appRoutes.employeeEmergencyNew)}
-          />
-          <PressableCard
-            eyebrow="Perfil"
-            title="Mi perfil público"
-            subtitle="Gestiona tu foto y datos de contacto."
-            onPress={() => pushAppRoute(appRoutes.employeeProfile)}
           />
           {bootstrap.featureFlags.builderMobile ? (
             <PressableCard
               eyebrow="Builder"
               title="Abrir estimator"
-              subtitle="Calculadora de materiales y recetas."
+              subtitle="Consultar y calcular trabajos desde la app."
               onPress={() => pushAppRoute(appRoutes.builderHome)}
             />
           ) : null}
         </View>
       </SectionCard>
 
-      <SectionCard title="Servicios asignados" subtitle="Tus próximos trabajos programados.">
-        {requestsQuery.isLoading ? <Text style={styles.muted}>Cargando servicios...</Text> : null}
+      <SectionCard title="Tus requests recientes" subtitle="Los últimos trabajos asignados a tu cuenta.">
+        {myRequestsQuery.isLoading ? <Text style={styles.muted}>Cargando tus requests...</Text> : null}
+        {myRequestsQuery.error ? (
+          <QueryErrorBanner error={myRequestsQuery.error} fallbackMessage="No se pudo cargar la actividad." onRetry={() => void myRequestsQuery.refetch()} />
+        ) : null}
         {recentRequests.length ? (
           <View style={styles.stack}>
             {recentRequests.map((request) => (
@@ -111,20 +114,23 @@ export default function EmployeeHomeScreen() {
             ))}
           </View>
         ) : null}
-        {!requestsQuery.isLoading && !recentRequests.length ? (
+        {!myRequestsQuery.isLoading && !myRequestsQuery.error && !recentRequests.length ? (
           <EmptyState
             icon="📋"
-            title="Sin servicios"
-            subtitle="No tienes servicios asignados actualmente."
+            title="Sin requests recientes"
+            subtitle="Los trabajos asignados a tu cuenta aparecerán aquí."
           />
         ) : null}
       </SectionCard>
 
-      <SectionCard title="Emergencias activas" subtitle="Reportes críticos que requieren tu atención.">
+      <SectionCard title="Emergencias asignadas" subtitle="Las emergencias activas que ya están en tu cancha.">
         {emergenciesQuery.isLoading ? <Text style={styles.muted}>Cargando emergencias...</Text> : null}
-        {activeEmergencies.length ? (
+        {emergenciesQuery.error ? (
+          <QueryErrorBanner error={emergenciesQuery.error} fallbackMessage="No se pudo cargar la actividad." onRetry={() => void emergenciesQuery.refetch()} />
+        ) : null}
+        {assignedEmergencies.length ? (
           <View style={styles.stack}>
-            {activeEmergencies.map((call) => (
+            {assignedEmergencies.map((call) => (
               <EmergencyPreviewCard
                 key={call.id}
                 call={call}
@@ -135,15 +141,16 @@ export default function EmployeeHomeScreen() {
             ))}
           </View>
         ) : null}
-        {!emergenciesQuery.isLoading && !activeEmergencies.length ? (
+        {!emergenciesQuery.isLoading && !emergenciesQuery.error && !assignedEmergencies.length ? (
           <EmptyState
             icon="🚨"
-            title="Sin emergencias"
-            subtitle="No tienes emergencias asignadas ahora mismo."
+            title="Sin emergencias asignadas"
+            subtitle="No tienes emergencias activas en este momento."
           />
         ) : null}
       </SectionCard>
 
+      {homeQuery.error ? <QueryErrorBanner error={homeQuery.error} onRetry={() => void homeQuery.refetch()} /> : null}
       <SectionCard title="Sesión">
         <SignOutButton />
       </SectionCard>
@@ -153,6 +160,7 @@ export default function EmployeeHomeScreen() {
 
 function StatCard(props: { icon: string; label: string; value: number }) {
   const { icon, label, value } = props;
+
   return (
     <View style={styles.statCard}>
       <Text style={styles.statIcon}>{icon}</Text>
@@ -169,14 +177,16 @@ function RequestPreviewCard(props: {
   onPress: () => void;
 }) {
   const { request, locale, timezone, onPress } = props;
+
   return (
     <PressableCard
-      title={request.address || 'Solicitud'}
+      title={request.address || 'Solicitud sin dirección'}
       subtitle={request.description || 'Sin descripción'}
       meta={formatDateTime(request.updatedAt || request.createdAt, locale, timezone)}
       onPress={onPress}
     >
       <StatusBadge status={request.status} type="request" />
+      <Text style={styles.metaLine}>{request.category || 'General'}</Text>
     </PressableCard>
   );
 }
@@ -188,31 +198,93 @@ function EmergencyPreviewCard(props: {
   onPress: () => void;
 }) {
   const { call, locale, timezone, onPress } = props;
+
   return (
     <PressableCard
-      title={call.location || 'Emergencia'}
+      title={call.location || 'Emergencia sin ubicación'}
       subtitle={call.issue || 'Sin detalle'}
       meta={formatDateTime(call.updatedAt || call.createdAt, locale, timezone)}
       onPress={onPress}
     >
       <StatusBadge status={call.status} type="emergency" />
+      <Text style={styles.metaLine}>{call.priority || 'urgent'}</Text>
     </PressableCard>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.pageBg },
-  content: { padding: spacing.xl, gap: spacing.lg },
-  hero: { borderRadius: radii.hero, backgroundColor: colors.navy, padding: spacing.xxl },
-  eyebrow: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, color: colors.accent },
-  title: { marginTop: spacing.sm, fontSize: 30, fontWeight: '800', color: colors.textOnDark },
-  subtitle: { marginTop: spacing.sm, fontSize: 15, lineHeight: 22, color: colors.textSubtleOnDark },
-  company: { marginTop: 18, fontSize: 14, fontWeight: '700', color: colors.textOnDark },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  statCard: { minWidth: '47%', flexGrow: 1, borderRadius: radii.xxl, backgroundColor: colors.cardBg, padding: 18 },
-  statIcon: { fontSize: 22, marginBottom: spacing.xs },
-  statValue: { fontSize: 28, fontWeight: '800', color: colors.navy },
-  statLabel: { marginTop: spacing.xs, fontSize: 13, color: colors.textSecondary },
-  stack: { gap: spacing.md },
-  muted: { fontSize: 14, color: colors.textMuted },
+  container: {
+    flex: 1,
+    backgroundColor: colors.pageBg,
+  },
+  content: {
+    padding: spacing.xl,
+    gap: spacing.lg,
+  },
+  hero: {
+    borderRadius: radii.hero,
+    backgroundColor: colors.navy,
+    padding: spacing.xxl,
+  },
+  eyebrow: {
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    color: colors.accent,
+  },
+  title: {
+    marginTop: spacing.sm,
+    fontSize: 30,
+    fontWeight: '800',
+    color: colors.textOnDark,
+  },
+  subtitle: {
+    marginTop: spacing.sm,
+    fontSize: 15,
+    lineHeight: 22,
+    color: colors.textSubtleOnDark,
+  },
+  company: {
+    marginTop: 18,
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textOnDark,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  statCard: {
+    minWidth: '47%',
+    flexGrow: 1,
+    borderRadius: radii.xxl,
+    backgroundColor: colors.cardBg,
+    padding: 18,
+  },
+  statIcon: {
+    fontSize: 22,
+    marginBottom: spacing.xs,
+  },
+  statValue: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.navy,
+  },
+  statLabel: {
+    marginTop: spacing.xs,
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  stack: {
+    gap: spacing.md,
+  },
+  muted: {
+    fontSize: 14,
+    color: colors.textMuted,
+  },
+  metaLine: {
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
 });
