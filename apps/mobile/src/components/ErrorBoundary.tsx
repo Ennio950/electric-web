@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type PropsWithChildren } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { captureError } from '@/src/lib/sentry';
 import { colors, radii, spacing } from '@/src/theme';
 
 type ErrorBoundaryState = {
@@ -17,6 +18,7 @@ export class ErrorBoundary extends Component<PropsWithChildren, ErrorBoundarySta
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('[ErrorBoundary]', error, info.componentStack);
+    captureError(error, { componentStack: info.componentStack ?? 'unknown' });
   }
 
   private handleRetry = () => {
